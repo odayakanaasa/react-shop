@@ -30,13 +30,12 @@ class Product extends React.Component<
   IConnectedProductProps & IProductProps,
   IProductState
 > {
-
   componentWillMount() {
     const { imagesWithColor } = this.props;
-    this.state = {
-      titleImage:
-        imagesWithColor.filter(img => img.isTitle)[0] || imagesWithColor[0]
-    };
+    const titleImage = imagesWithColor
+      ? imagesWithColor.filter(img => img.isTitle)[0]
+      : null;
+    this.state = { titleImage: titleImage as any };
   }
 
   isViewed() {
@@ -81,11 +80,13 @@ class Product extends React.Component<
       width -= 32;
     }
 
-    const maxImageHeight = Math.max(
-      ...imagesWithColor.map(
-        img => scaleImageSize(img.width, img.height).height
-      )
-    );
+    const maxImageHeight = imagesWithColor
+      ? Math.max(
+          ...imagesWithColor.map(
+            img => scaleImageSize(img.width, img.height).height
+          )
+        )
+      : 300;
 
     const linkParams = {
       to: {
@@ -121,14 +122,16 @@ class Product extends React.Component<
               className={styles.imageContainer}
               style={{ height: maxImageHeight }}
             >
-              <LazyLoad height={maxImageHeight} offset={1500}>
-                <img src={titleImage.src} />
-              </LazyLoad>
+              {titleImage
+                ? <LazyLoad height={maxImageHeight} offset={1500}>
+                    <img src={titleImage.src} />
+                  </LazyLoad>
+                : <img src={require("!svg-sprite-loader!./viewed.svg")} />}
             </div>
           </Link>
 
           {/* Images */}
-          {imagesWithColor.length > 1
+          {imagesWithColor && imagesWithColor.length > 0
             ? <Flex justify="center">
                 {imagesWithColor.map((image, i) =>
                   <Icon
