@@ -1,0 +1,60 @@
+.mainContainer {
+  height: 150;
+}
+
+.cartContent {
+  flex: 1;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.imageContainer {
+  align-self: center;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  height: 90;
+  margin-top: 8;
+  width: 35%;
+  /* flex: contain; */
+}
+
+.image {
+  width: 80%;
+  height: 80%;
+}
+
+.info {
+  align-items: flex-start;
+  justify-content: center;
+  width: 55%;
+}
+
+.infoTitle {
+  font-weight: bold;
+}
+
+.infoColor {
+  color: black;
+}
+
+.infoStepper {
+  height: 35;
+  width: 150;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.infoPriceContainer {
+  font-weight: bold;
+}
+
+.infoPrice {
+  font-size: 18;
+  color: green;
+}
+
+.infoArticle {
+  color: gray;
+}

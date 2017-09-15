@@ -32,14 +32,6 @@ interface IProductProps {
   history: any;
 }
 
-const options = {
-  options: props => ({
-    variables: {
-      id: props.id
-    }
-  })
-};
-
 const getActiveSubProduct = (subProducts, subProductId): ISubProduct => {
   return subProducts.filter(sp => sp.id === subProductId)[0] || subProducts[0];
 };
@@ -64,7 +56,9 @@ class Product extends React.Component<
       const { subProducts } = product;
       const { subProductId } = nextProps.product;
       const subProductIds = subProducts.map(sp => sp.id);
-      const subProductColor = product.images.filter(el => el.colorValue !== "")[0].id;
+      const subProductColor = product.images.filter(
+        el => el.colorValue !== ""
+      )[0].id;
       if (subProductIds.indexOf(subProductId) === -1) {
         this.props.dispatch({
           colorId: subProductColor,
@@ -135,6 +129,14 @@ class Product extends React.Component<
 const mapStateToProps: any = state => ({
   product: state.product
 });
+
+const options = {
+  options: props => ({
+    variables: {
+      id: props.id
+    }
+  })
+};
 
 export default compose(
   connect<IConnectedProductProps, {}, IProductProps>(mapStateToProps),

@@ -2,6 +2,7 @@ import { routerReducer } from "react-router-redux";
 import { combineReducers } from "redux";
 
 import client from "./graphqlClient";
+import cart from "./modules/cart/reducer";
 import catalog from "./modules/catalog/reducer";
 import layout from "./modules/layout/reducer";
 import product from "./modules/product/reducer";
@@ -15,7 +16,8 @@ const rootReducers = combineReducers(
     catalog,
     layout,
     product,
-    router
+    router,
+    cart
   } as any
 );
 

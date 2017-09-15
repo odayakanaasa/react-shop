@@ -1,0 +1,27 @@
+.ripple {
+  padding-right: 15px;
+  padding-bottom: 15px;
+}
+
+.image {
+  height: 22px;
+  width: 22px;
+}
+
+.counterContainer {
+  top: 8;
+  left: 13;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8;
+  background-color: red;
+  width: 15px;
+  height: 15px;
+  z-index: 1;
+}
+
+.counter {
+  font-size: 10px;
+  font-weight: 900;
+  color: white;
+}

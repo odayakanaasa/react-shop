@@ -1,12 +1,14 @@
 import * as React from "react";
 import { ApolloProvider } from "react-apollo";
-import { Route, Router } from "react-router";
+import { Route } from "react-router";
 import { Switch } from "react-router-dom";
 import { ConnectedRouter } from "react-router-redux";
+
 import client from "./graphqlClient";
 import history from "./history";
-import { FlatPageModal, FlatPages, Layout } from "./modules/layout/index";
-import { Product, ProductModal } from "./modules/product/index";
+import { FlatPageModal, Layout } from "./modules/layout/index";
+import { ProductModal } from "./modules/product/index";
+import CartPage from "./pages/CartPage/CartPage";
 import { CategoryPage, HomePage, ProductPage } from "./pages/index";
 import store from "./store";
 
@@ -45,6 +47,7 @@ class ModalSwitch extends React.Component<any, any> {
           ? <div>
               <Route path="/flatpage/:id" component={FlatPageModal} />
               <Route path="/product/:id" component={ProductModal} />
+              <Route path="/cart/" component={CartPage} />
             </div>
           : null}
       </div>

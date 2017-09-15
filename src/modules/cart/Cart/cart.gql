@@ -1,0 +1,54 @@
+query {
+  cart {
+    id
+    totalPrice
+    email
+    phone
+    city
+    comment
+    items {
+      id
+      amount
+      price
+      subProduct {
+        id
+        article
+        price
+        oldPrice
+        discount
+        attributes {
+          name
+          values {
+            id
+            name
+            value
+            description
+          }
+        }
+        product {
+          id
+          name
+          shortDescription
+          description
+          brand {
+            id
+            name
+          }
+          category {
+            id
+            name
+          }
+          images {
+            id
+            src
+            width
+            height
+            colorValue
+            colorName
+            isTitle
+          }
+        }
+      }
+    }
+  }
+}
