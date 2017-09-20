@@ -9,10 +9,11 @@ const styles = require("./styles.css");
 const empty = "Нет товара";
 
 interface IConnectedCartBarProps {
-  cart: any;
 }
 
-interface ICartBarProps {}
+interface ICartBarProps {
+  totalPrice: number;
+}
 
 class CartBar extends React.Component<
   IConnectedCartBarProps & ICartBarProps,
@@ -31,33 +32,26 @@ class CartBar extends React.Component<
   }
 
   render() {
-    const { cart } = this.props;
-    const productsPrice = cart.map(product => product.price * product.count);
-    const totalPrice = productsPrice.reduce(this.add, 0);
-
+    const { totalPrice } = this.props;
     return (
-      <View>
-        <View style={styles.footerContainer}>
-          <View style={styles.containerTotalPrice}>
-            <Text style={styles.price}>Стоимость заказа</Text>
-            <Text style={styles.price}>
+        <div className={styles.footerContainer}>
+          <div className={styles.containerTotalPrice}>
+            <span className={styles.price}>
               {prettyPrice(totalPrice)} грн.
-            </Text>
-          </View>
-          <View
-            style={styles.buyCart}
-            onPress={() => alert("To Be Continued...")}
+            </span>
+          </div>
+          <div
+            className={styles.buyCart}
+            onClick={() => alert("To Be Continued...")}
           >
-            <Text style={styles.buy}>Оформить заказ</Text>
-          </View>
-        </View>
-      </View>
+            <div className={styles.buy}>Оформить заказ</div>
+          </div>
+        </div>
     );
   }
 }
 
 const mapStateToProps: any = state => ({
-  cart: state.cart
 });
 
 export default connect<IConnectedCartBarProps, {}, ICartBarProps>(

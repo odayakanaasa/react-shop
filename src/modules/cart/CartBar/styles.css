@@ -1,7 +1,7 @@
 .footerContainer {
   flex-direction: row;
   flex-direction: center;
-  align-items: center
+  align-items: center;
 }
 
 .containerTotalPrice {
@@ -11,20 +11,20 @@
   height: 40;
   border-top-color: lightgray;
   border-top-width: 1;
-};
+}
 
 .buyCart {
   flex-direction: center;
   background-color: orange;
   width: 50%;
   height: 40;
-};
+}
 
 .price {
   text-align: center;
   font-size: 16;
   font-weight: bold;
-};
+}
 
 .buy {
   text-align: center;

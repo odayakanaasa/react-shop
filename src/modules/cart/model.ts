@@ -1,15 +1,3 @@
-export interface ICartItem {
-  productId: string;
-  subProductId: string;
-  colorId: number;
-  price: number;
-  count: number;
-}
-
-interface IBrand {
-  name: string;
-}
-
 interface ISubProduct {
   id: string;
   article: string;
@@ -20,4 +8,24 @@ interface IImage {
   id: string;
   src: string;
   colorName: string;
+}
+
+export interface ICartItem {
+  id: number;
+  subProduct: ISubProduct;
+  // colorId: number;
+  price: number;
+  amount: number;
+}
+
+export interface ICart {
+  id: number;
+  sessionid: string;
+  totalPrice: number;
+  amount: number;
+  items: [ICartItem];
+}
+
+interface IBrand {
+  name: string;
 }

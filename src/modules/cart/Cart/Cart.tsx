@@ -1,31 +1,38 @@
-import { View } from "antd-mobile";
 import * as React from "react";
 import { gql, graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { compose } from "redux";
 
-import client from "../../../graphqlClient";
 import { IData } from "../../../model";
 import { Loading } from "../../layout/index";
-import { IProduct } from "../../product/model";
+import { getCartItemTotalPrice } from "../CartItem/CartItem";
 import { CartBar, CartItem } from "../index";
-import { ICartItem } from "../model";
+import { ICart, ICartItem } from "../model";
 
 const styles = require("./styles.css");
 
-const CART_QUERY = require("./cart.gql");
+export const CART_QUERY = require("./cart.gql");
 
-interface IDataCart extends IData {
-  cart: [ICartItem];
+export interface IDataCart extends IData {
+  cart: ICart;
 }
 
 interface IConnectedCartProps {
   data: IDataCart;
 }
 
-interface ICartProps {
+export interface ICartProps {
   history: any;
 }
+
+const getCartTotalPrice = (items: [ICartItem]): number => {
+  let totalPrice = 0;
+  items.forEach(item => {
+    const { price, amount } = item;
+    totalPrice += getCartItemTotalPrice(price, amount);
+  });
+  return totalPrice;
+};
 
 class Cart extends React.Component<
   IConnectedCartProps & ICartProps & any,
@@ -33,65 +40,71 @@ class Cart extends React.Component<
 > {
   render() {
     const { history, data } = this.props;
-    const { loading, cart } = data;
+    const cart = data.cart as ICart;
+    const { loading } = data;
 
     if (loading === true) {
       return <Loading />;
     }
 
-    const products = cart.map(el => {
-      const product = client.readFragment({
-        fragment: gql`
-          fragment someFragment on ProductType {
-            id
-            name
-            brand {
-              name
-            }
-            subProducts {
-              id
-              article
-              price
-            }
-            images {
-              id
-              src
-              colorName
-            }
-          }
-        `,
-        id: `ProductType:${el.productId}`
-      }) as any;
-      return product as IProduct;
-    });
+    if (!cart) {
+      return (
+        <div className={styles.emptyCartContainer}>
+          <div>
+            Cart is empty.
+            <br />
+            Tap to continue.
+          </div>
+        </div>
+      );
+    }
 
-    // tslint:disable-next-line
-    const emptyCartSrc = "https://thumbs.dreamstime.com/t/smiley-%D0%BF%D0%BE%D0%BA%D1%83%D0%BF%D0%BA%D1%8B-emoticon-%D1%82%D0%B5%D0%BB%D0%B5%D0%B6%D0%BA%D0%B8-2986275.jpg";
+    const totalPrice = getCartTotalPrice(cart.items);
+
+    // const productsMap = {};
+    // for (const item of cart.items) {
+    //   const product = client.readFragment({
+    //     fragment: gql`
+    //       fragment someFragment on ProductType {
+    //         id
+    //         name
+    //         brand {
+    //           name
+    //         }
+    //         subProducts {
+    //           id
+    //           article
+    //           price
+    //         }
+    //         images {
+    //           id
+    //           src
+    //           colorName
+    //         }
+    //       }
+    //     `,
+    //     id: `ProductType:${item.subProduct.product.id}`
+    //   }) as IProduct;
+    //   productsMap[product.id] = product;
+    // }
 
     return (
-      <View style={{ flex: 1 }}>
-        {products.map((product, index) =>
-          <CartItem
-            key={index}
-            product={product}
-            productId={cart[index].productId}
-            subProductId={cart[index].subProductId}
-            colorId={cart[index].colorId}
-            price={cart[index].price}
-            count={cart[index].count}
-            index={index}
-          />
-        )}
-        {cart.length > 0
-          ? <CartBar />
-          : <View style={styles.emptyCartContainer}>
-              <img
-                // resizeMode="contain"
-                src={emptyCartSrc}
-                style={{ width: "80%", height: "80%" }}
-              />
-            </View>}
-      </View>
+      <div style={{ flex: 1 }}>
+        <div>
+          {cart.items.map((item, index) =>
+            <CartItem
+              key={index}
+              // product={productsMap[item.subProduct.product.id]}
+              id={item.id}
+              subProduct={item.subProduct}
+              // colorId={cart[index].colorId}
+              price={item.price}
+              amount={item.amount}
+            />
+          )}
+        </div>
+        <CartBar totalPrice={totalPrice} />
+      </div>
     );
   }
 }
@@ -100,15 +113,7 @@ const mapStateToProps: any = state => ({
   cart: state.cart
 });
 
-const options = {
-  options: props => ({
-    variables: {
-      id: props.id
-    }
-  })
-}
-
 export default compose(
   connect<IConnectedCartProps, {}, ICartProps>(mapStateToProps),
-  graphql(gql(CART_QUERY), options)
+  graphql(gql(CART_QUERY))
 )(Cart);

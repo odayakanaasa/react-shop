@@ -1,12 +1,9 @@
-query cart {
-  cart {
-    id
-    totalPrice
-    amount
-    items {
+mutation addCartItem($subProductId: Int!) {
+  addCartItem(subProductId: $subProductId) {
+    cartItem {
       id
-      amount
       price
+      amount
       subProduct {
         id
         article
@@ -15,6 +12,7 @@ query cart {
           id
           name
           brand {
+            id
             name
           }
           images {
@@ -23,6 +21,12 @@ query cart {
             colorName
           }
         }
+      }
+      cart {
+        id
+        sessionid
+        totalPrice
+        amount
       }
     }
   }

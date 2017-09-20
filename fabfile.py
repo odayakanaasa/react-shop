@@ -28,6 +28,6 @@ def test_update():
         local('git push')
         run('git pull -f')
         run('git reset --hard')
-        run('git checkout test')
+        run('git checkout cart')
         run('yarn')
         run('yarn run publish')

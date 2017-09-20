@@ -41,13 +41,13 @@ class ModalSwitch extends React.Component<any, any> {
           <Route exact={true} path="/" component={HomePage} />
           <Route path="/category/:id" component={CategoryPage} />
           <Route path="/product/:id" component={ProductPage} />
+          <Route path="/cart/" component={CartPage} />
         </Switch>
 
         {isModal
           ? <div>
               <Route path="/flatpage/:id" component={FlatPageModal} />
               <Route path="/product/:id" component={ProductModal} />
-              <Route path="/cart/" component={CartPage} />
             </div>
           : null}
       </div>

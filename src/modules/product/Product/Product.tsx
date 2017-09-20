@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
 import { IData } from "../../../model";
+import { CartTrigger } from "../../cart/index";
 import { ACTION_ADD_VIEWED_PRODUCT } from "../../catalog/constants";
 import { HEIGHT } from "../../layout/Header/Header";
 import { Loading } from "../../layout/index";
@@ -77,7 +78,8 @@ class Product extends React.Component<
   render() {
     const { isModal, data } = this.props;
     const { loading, product } = data;
-    const { subProductId, colorId } = this.props.product;
+    const { colorId } = this.props.product;
+    const subProductId = parseInt(this.props.product.subProductId, 0);
     if (loading === true || subProductId === null) {
       return <Loading />;
     }
@@ -98,6 +100,7 @@ class Product extends React.Component<
               <div className={styles.categoryName} onClick={this.back}>
                 {product.category.name}
               </div>
+              <CartTrigger />
             </Flex>
           : ""}
 
@@ -120,7 +123,11 @@ class Product extends React.Component<
             activeSubProduct={activeSubProduct}
           />
         </div>
-        <ProductBuy price={price} oldPrice={oldPrice} />
+        <ProductBuy
+          subProductId={subProductId}
+          price={price}
+          oldPrice={oldPrice}
+        />
       </div>
     );
   }

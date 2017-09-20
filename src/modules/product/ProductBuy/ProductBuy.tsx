@@ -1,11 +1,14 @@
-import { Flex, Toast } from "antd-mobile";
+import { Flex } from "antd-mobile";
 import * as React from "react";
+
+import { AddCartItem } from "../../cart/index";
 
 const styles = require("./styles.css");
 
 interface IConnectedProductBuyProps {}
 
 interface IProductBuyProps {
+  subProductId: number;
   price: number;
   oldPrice?: number;
 }
@@ -15,7 +18,7 @@ class ProductBuy extends React.Component<
   any
 > {
   render() {
-    const { price, oldPrice } = this.props;
+    const { subProductId, price, oldPrice } = this.props;
     return (
       <Flex className={styles.buy}>
         <div className={styles.buyPrice}>
@@ -32,12 +35,7 @@ class ProductBuy extends React.Component<
                 {parseInt(String(price), 10)} грн
               </div>}
         </div>
-        <div
-          onClick={e => Toast.info("To Be Continued...", 2)}
-          className={styles.buyButton}
-        >
-          Купить
-        </div>
+        <AddCartItem subProductId={subProductId} />
       </Flex>
     );
   }
