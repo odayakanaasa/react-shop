@@ -20,9 +20,6 @@ export interface ICartItem {
 
 export interface ICart {
   id: number;
-  sessionid: string;
-  totalPrice: number;
-  amount: number;
   items: [ICartItem];
 }
 

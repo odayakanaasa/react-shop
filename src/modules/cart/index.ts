@@ -2,6 +2,7 @@ import AddCartItem from "./AddCartItem/AddCartItem";
 import Cart from "./Cart/Cart";
 import CartBar from "./CartBar/CartBar";
 import CartItem from "./CartItem/CartItem";
+import CartModal from "./CartModal/CartModal";
 import CartTrigger from "./CartTrigger/CartTrigger";
 import RemoveCartItem from "./RemoveCartItem/RemoveCartItem";
 import UpdateCartItem from "./UpdateCartItem/UpdateCartItem";
@@ -14,6 +15,7 @@ export {
   Cart,
   CartBar,
   CartItem,
+  CartModal,
   CartTrigger,
   RemoveCartItem,
   UpdateCartItem,

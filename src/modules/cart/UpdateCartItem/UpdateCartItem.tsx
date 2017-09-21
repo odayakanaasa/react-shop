@@ -31,22 +31,22 @@ class UpdateCartItem extends React.Component<
     };
   }
 
-  handleStepper = (value: number) => {
+  onChange = (amount: number) => {
     const { id, submit } = this.props;
-    this.setState({ amount: value });
-    submit(id, value);
+    this.setState({ amount });
+    submit(id, amount);
   };
 
   render() {
     const { amount } = this.props;
     return (
       <Stepper
-        min={1}
-        max={10}
-        step={1}
-        onChange={this.handleStepper}
+        style={{ width: "100%", minWidth: "1rem" }}
         showNumber={true}
+        max={10}
+        min={1}
         value={this.state.amount}
+        onChange={this.onChange}
       />
     );
   }

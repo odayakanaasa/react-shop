@@ -1,30 +1,32 @@
 import * as React from "react";
 
+import { IData } from "../../../model";
 import { Modal } from "../../layout/index";
-import { Product } from "../index";
+import { getCartItemTotalPrice } from "../CartItem/CartItem";
+import { Cart } from "../index";
+import { ICart } from "../model";
 
 const styles = require("./styles.css");
 
 interface IConnectedCartModalProps {}
 
 export interface ICartModalProps {
-  location: any;
   history: any;
-  match: any;
+  location: any;
 }
 
-class ProductModal extends React.Component<
+class CartModal extends React.Component<
   IConnectedCartModalProps & ICartModalProps,
   any
 > {
   render() {
-    const { match, history, location } = this.props;
+    const { history, location } = this.props;
     return (
       <Modal location={location} history={history}>
-        <Product id={match.params.id} />
+        <Cart history={history} />
       </Modal>
     );
   }
 }
 
-export default ProductModal as any;
+export default CartModal as any;

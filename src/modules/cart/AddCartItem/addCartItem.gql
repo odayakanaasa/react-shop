@@ -1,6 +1,9 @@
 mutation addCartItem($subProductId: Int!) {
   addCartItem(subProductId: $subProductId) {
     cartItem {
+      cart {
+        id
+      }
       id
       price
       amount
@@ -21,12 +24,6 @@ mutation addCartItem($subProductId: Int!) {
             colorName
           }
         }
-      }
-      cart {
-        id
-        sessionid
-        totalPrice
-        amount
       }
     }
   }

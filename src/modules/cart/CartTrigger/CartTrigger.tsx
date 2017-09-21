@@ -8,13 +8,11 @@ import { compose } from "redux";
 
 import { HEIGHT } from "../../layout/Header/Header";
 import { Loading } from "../../layout/index";
-import { IDataCart } from "../Cart/Cart";
+import { CART_QUERY, getCartAmount, IDataCart } from "../Cart/Cart";
 
 interface IConnectedCartTriggerProps {
   data: IDataCart;
 }
-
-export const CART_QUERY = require("../Cart/cart.gql");
 
 interface ICartTriggerProps {}
 
@@ -27,22 +25,22 @@ class CartTrigger extends React.Component<
   render() {
     const { data } = this.props;
     const { loading, cart } = data;
-
-    if (loading === true) {
+    const amount = getCartAmount(cart);
+    if (loading) {
       return <Loading />;
     }
     return (
       <Ripples style={{ height: HEIGHT }}>
         <Link
           to={{
-            pathname: "/cart/"
-            // state: { modal: true }
+            pathname: "/cart/",
+            state: { modal: true, title: "Корзина" }
           }}
         >
-          {cart && cart.amount > 0
+          {amount > 0
             ? <div className={styles.counterContainer}>
                 <span className={styles.counter}>
-                  {cart.amount}
+                  {amount}
                 </span>
               </div>
             : null}
@@ -62,5 +60,5 @@ const mapStateToProps: any = state => ({});
 
 export default compose(
   connect<IConnectedCartTriggerProps, {}, ICartTriggerProps>(mapStateToProps),
-  graphql(gql(CART_QUERY))
+  graphql(CART_QUERY)
 )(CartTrigger as any);

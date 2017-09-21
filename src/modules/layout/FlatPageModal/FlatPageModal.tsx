@@ -11,29 +11,12 @@ function createMarkup(html) {
 }
 
 class FlatPageModal extends React.Component<any, any> {
-  back = e => {
-    e.stopPropagation();
-    this.props.history.goBack();
-  };
-
   render() {
-    const { match, history, location: { state: { pages } } } = this.props;
+    const { match, history, location } = this.props;
     const id = match.params.id;
-    const page = pages.filter(el => el.id === id);
+    const page = location.state.pages.filter(el => el.id === id);
     return (
-      <Modal>
-        <Flex className={styles.backPanel} justify="start" align="center">
-          <Icon
-            className={styles.backIcon}
-            type={require("!svg-sprite-loader!./back.svg")}
-            size="md"
-            style={{ height: HEIGHT }}
-            onClick={this.back}
-          />
-          <div className={styles.title}>
-            {page.map(el => el.name)}
-          </div>
-        </Flex>
+      <Modal location={location} history={history}>
         <div
           className={styles.flatpage}
           dangerouslySetInnerHTML={createMarkup(page.map(el => el.content))}

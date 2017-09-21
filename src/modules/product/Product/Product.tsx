@@ -4,7 +4,9 @@ import { compose, gql, graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
+import client from "../../../graphqlClient";
 import { IData } from "../../../model";
+import { CART_QUERY, IDataCart } from "../../cart/Cart/Cart";
 import { CartTrigger } from "../../cart/index";
 import { ACTION_ADD_VIEWED_PRODUCT } from "../../catalog/constants";
 import { HEIGHT } from "../../layout/Header/Header";
@@ -29,8 +31,6 @@ interface IConnectedProductProps {
 
 interface IProductProps {
   id: string;
-  isModal: boolean;
-  history: any;
 }
 
 const getActiveSubProduct = (subProducts, subProductId): ISubProduct => {
@@ -70,13 +70,8 @@ class Product extends React.Component<
     }
   };
 
-  back = e => {
-    e.stopPropagation();
-    this.props.history.goBack();
-  };
-
   render() {
-    const { isModal, data } = this.props;
+    const { data } = this.props;
     const { loading, product } = data;
     const { colorId } = this.props.product;
     const subProductId = parseInt(this.props.product.subProductId, 0);
@@ -86,24 +81,8 @@ class Product extends React.Component<
     const { brand, images, subProducts } = product;
     const activeSubProduct = getActiveSubProduct(subProducts, subProductId);
     const { price, oldPrice } = activeSubProduct;
-
     return (
       <div className={styles.product}>
-        {isModal
-          ? <Flex className={styles.productTop} justify="start" align="center">
-              <Icon
-                className={styles.productTopBack}
-                type={require("!svg-sprite-loader!./back.svg")}
-                size="md"
-                onClick={this.back}
-              />
-              <div className={styles.categoryName} onClick={this.back}>
-                {product.category.name}
-              </div>
-              <CartTrigger />
-            </Flex>
-          : ""}
-
         <div className={styles.productContent}>
           <Flex
             style={{ height: window.innerHeight - HEIGHT * 2 }}

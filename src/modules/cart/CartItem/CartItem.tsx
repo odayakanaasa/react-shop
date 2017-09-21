@@ -69,7 +69,7 @@ class CartItem extends React.Component<
                 <UpdateCartItem id={id} amount={amount} />
               </div>
               <span className={styles.infoPriceContainer}>
-                Цена: {prettyPrice(Math.round(totalPrice))} грн.
+                {prettyPrice(Math.round(totalPrice))} грн.
               </span>
             </div>
             <RemoveCartItem id={id} />

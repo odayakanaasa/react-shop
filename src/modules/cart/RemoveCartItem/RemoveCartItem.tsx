@@ -44,35 +44,25 @@ class RemoveCartItem extends React.Component<
 
 const mapStateToProps: any = state => ({});
 
-const REMOVE_CART_ITEM_QUERY = require("./removeCartItem.gql");
+const REMOVE_CART_ITEM_MUTATION = require("./removeCartItem.gql");
 
 export default compose(
   connect<IConnectedRemoveCartItemProps, {}, IRemoveCartItemProps>(
     mapStateToProps
   ),
-  graphql(gql(REMOVE_CART_ITEM_QUERY), {
+  graphql(gql(REMOVE_CART_ITEM_MUTATION), {
     props: ({ ownProps, mutate }) => {
       return {
-        submit: (id: number) =>
-          (mutate as any)({
+        submit(id) {
+          return (mutate as any)({
             variables: { id },
-            updateQueries: {
-              cart: (prev, { mutationResult }) => {
-                const {
-                  data: { removeCartItem: { totalPrice } }
-                } = mutationResult;
-                return update(prev, {
-                  cart: {
-                    totalPrice: { $set: totalPrice },
-                    amount: { $set: prev.cart.amount - 1 },
-                    items: {
-                      $set: prev.cart.items.filter(item => item.id !== id)
-                    }
-                  }
-                });
-              }
+            update: (store, { removeCartItem }) => {
+              const data = store.readQuery({ query: CART_QUERY });
+              data.cart.items = data.cart.items.filter(item => item.id !== id);
+              store.writeQuery({ query: CART_QUERY, data });
             }
-          })
+          });
+        }
       };
     }
   })

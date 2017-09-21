@@ -1,8 +1,6 @@
 query cart {
   cart {
     id
-    totalPrice
-    amount
     items {
       id
       amount
@@ -15,6 +13,7 @@ query cart {
           id
           name
           brand {
+            id
             name
           }
           images {

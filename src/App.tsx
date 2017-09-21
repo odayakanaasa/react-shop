@@ -6,6 +6,7 @@ import { ConnectedRouter } from "react-router-redux";
 
 import client from "./graphqlClient";
 import history from "./history";
+import { CartModal } from "./modules/cart/index";
 import { FlatPageModal, Layout } from "./modules/layout/index";
 import { ProductModal } from "./modules/product/index";
 import CartPage from "./pages/CartPage/CartPage";
@@ -48,6 +49,7 @@ class ModalSwitch extends React.Component<any, any> {
           ? <div>
               <Route path="/flatpage/:id" component={FlatPageModal} />
               <Route path="/product/:id" component={ProductModal} />
+              <Route path="/cart/" component={CartModal} />
             </div>
           : null}
       </div>

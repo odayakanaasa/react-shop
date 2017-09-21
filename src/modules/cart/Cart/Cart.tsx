@@ -1,17 +1,18 @@
+import { Flex, Icon } from "antd-mobile";
 import * as React from "react";
 import { gql, graphql } from "react-apollo";
-import { connect } from "react-redux";
 import { compose } from "redux";
 
 import { IData } from "../../../model";
 import { Loading } from "../../layout/index";
 import { getCartItemTotalPrice } from "../CartItem/CartItem";
 import { CartBar, CartItem } from "../index";
-import { ICart, ICartItem } from "../model";
+import { ICart } from "../model";
 
 const styles = require("./styles.css");
 
-export const CART_QUERY = require("./cart.gql");
+export let CART_QUERY = require("./cart.gql");
+CART_QUERY = gql(CART_QUERY);
 
 export interface IDataCart extends IData {
   cart: ICart;
@@ -25,95 +26,69 @@ export interface ICartProps {
   history: any;
 }
 
-const getCartTotalPrice = (items: [ICartItem]): number => {
+const getCartTotalPrice = (cart: ICart): number => {
+  if (!cart) {
+    return 0;
+  }
   let totalPrice = 0;
-  items.forEach(item => {
+  cart.items.forEach(item => {
     const { price, amount } = item;
     totalPrice += getCartItemTotalPrice(price, amount);
   });
   return totalPrice;
 };
 
+export const getCartAmount = (cart: ICart): number => {
+  return cart ? cart.items.length : 0;
+};
+
 class Cart extends React.Component<
   IConnectedCartProps & ICartProps & any,
   any
 > {
+  back = e => {
+    e.stopPropagation();
+    this.props.history.goBack();
+  };
+
   render() {
-    const { history, data } = this.props;
+    const { data } = this.props;
     const cart = data.cart as ICart;
     const { loading } = data;
+    const totalPrice = getCartTotalPrice(cart);
+    const amount = getCartAmount(cart);
 
     if (loading === true) {
       return <Loading />;
     }
 
-    if (!cart) {
-      return (
-        <div className={styles.emptyCartContainer}>
-          <div>
-            Cart is empty.
-            <br />
-            Tap to continue.
-          </div>
-        </div>
-      );
-    }
-
-    const totalPrice = getCartTotalPrice(cart.items);
-
-    // const productsMap = {};
-    // for (const item of cart.items) {
-    //   const product = client.readFragment({
-    //     fragment: gql`
-    //       fragment someFragment on ProductType {
-    //         id
-    //         name
-    //         brand {
-    //           name
-    //         }
-    //         subProducts {
-    //           id
-    //           article
-    //           price
-    //         }
-    //         images {
-    //           id
-    //           src
-    //           colorName
-    //         }
-    //       }
-    //     `,
-    //     id: `ProductType:${item.subProduct.product.id}`
-    //   }) as IProduct;
-    //   productsMap[product.id] = product;
-    // }
-
     return (
-      <div style={{ flex: 1 }}>
-        <div>
-          {cart.items.map((item, index) =>
-            <CartItem
-              key={index}
-              // product={productsMap[item.subProduct.product.id]}
-              id={item.id}
-              subProduct={item.subProduct}
-              // colorId={cart[index].colorId}
-              price={item.price}
-              amount={item.amount}
-            />
-          )}
-        </div>
-        <CartBar totalPrice={totalPrice} />
+      <div>
+        {cart.items.length === 0
+          ? <div onClick={this.back} className={styles.emptyCartContainer}>
+              Cart is empty.
+              <br />
+              Tap to continue.
+            </div>
+          : <div style={{ flex: 1 }}>
+              <div>
+                {cart.items.map((item, index) =>
+                  <CartItem
+                    key={index}
+                    // product={productsMap[item.subProduct.product.id]}
+                    id={item.id}
+                    subProduct={item.subProduct}
+                    // colorId={cart[index].colorId}
+                    price={item.price}
+                    amount={item.amount}
+                  />
+                )}
+              </div>
+              <CartBar totalPrice={totalPrice} />
+            </div>}
       </div>
     );
   }
 }
 
-const mapStateToProps: any = state => ({
-  cart: state.cart
-});
-
-export default compose(
-  connect<IConnectedCartProps, {}, ICartProps>(mapStateToProps),
-  graphql(gql(CART_QUERY))
-)(Cart);
+export default compose(graphql(CART_QUERY))(Cart) as any;
