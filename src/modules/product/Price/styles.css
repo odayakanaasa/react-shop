@@ -1,0 +1,15 @@
+.price {
+  color: black;
+  font-weight: bold;
+  text-align: center;
+}
+
+.value {
+  color: black;
+}
+
+.oldValue {
+  color: #b94a48;
+  font-size: 12px;
+  text-decoration: line-through;
+}
