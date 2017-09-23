@@ -23,7 +23,7 @@ class CartModal extends React.Component<
     const { history, location } = this.props;
     return (
       <Modal location={location} history={history}>
-        <Cart history={history} />
+        <Cart history={history} isModal={true} />
       </Modal>
     );
   }

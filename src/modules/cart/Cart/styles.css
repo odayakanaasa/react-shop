@@ -3,6 +3,10 @@
   height: 100%;
 }
 
+.cartItems {
+  padding-bottom: 40px;
+}
+
 .emptyCart {
   display: flex;
   flex-direction: column;

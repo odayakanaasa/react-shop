@@ -2,15 +2,15 @@ import { Flex, Icon } from "antd-mobile";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
-import Ripples from "react-ripples";
 import { Link } from "react-router-dom";
 import { compose } from "redux";
 
-import { HEIGHT } from "../../layout/Header/Header";
+import { IRouterReducer } from "../../../interfaces";
 import { CART_QUERY, getCartAmount, IDataCart } from "../Cart/Cart";
 
 interface IConnectedCartTriggerProps {
   data: IDataCart;
+  router: IRouterReducer;
 }
 
 interface ICartTriggerProps {}
@@ -22,14 +22,16 @@ class CartTrigger extends React.Component<
   any
 > {
   render() {
-    const { data } = this.props;
+    const { data, router } = this.props;
     const { loading, cart } = data;
     const amount = getCartAmount(cart);
+    const pathname = "/cart/";
     return (
       <Link
+        disabled={router.location.pathname === pathname}
         className={styles.container}
         to={{
-          pathname: "/cart/",
+          pathname,
           state: { modal: true, title: "Корзина" }
         }}
       >
@@ -48,7 +50,9 @@ class CartTrigger extends React.Component<
   }
 }
 
-const mapStateToProps: any = state => ({});
+const mapStateToProps: any = state => ({
+  router: state.router
+});
 
 export default compose(
   connect<IConnectedCartTriggerProps, {}, ICartTriggerProps>(mapStateToProps),

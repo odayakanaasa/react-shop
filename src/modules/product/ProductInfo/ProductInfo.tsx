@@ -1,4 +1,4 @@
-import { Checkbox, Flex, Icon, Tabs, WingBlank } from "antd-mobile";
+import { Checkbox, Flex, Icon, Tabs, WhiteSpace, WingBlank } from "antd-mobile";
 import * as React from "react";
 import { compose } from "react-apollo";
 import { connect } from "react-redux";
@@ -58,12 +58,13 @@ class ProductInfo extends React.Component<
         {/* Select SubProduct section */}
         {subProducts.length > 1
           ? <div>
-              <Devider/>
+              <Devider />
               <SubProducts subProducts={subProducts} />
             </div>
           : ""}
 
-        <Devider/>
+        <Devider />
+        <WhiteSpace />
 
         {/* Select Color section */}
         <WingBlank>
@@ -111,7 +112,9 @@ class ProductInfo extends React.Component<
           </Flex>
         </WingBlank>
 
+        <WhiteSpace />
         <Devider />
+        <WhiteSpace />
 
         {/* Product params section */}
         <WingBlank>
@@ -125,8 +128,6 @@ class ProductInfo extends React.Component<
               </Flex>
             </Flex>
           )}
-
-          {/* Product description section */}
           {subProducts.length === 1
             ? subProducts.map((supProduct, i) =>
                 <Flex key={i} justify="between">
@@ -144,7 +145,9 @@ class ProductInfo extends React.Component<
             : null}
         </WingBlank>
 
+        <WhiteSpace />
         <Devider />
+        <WhiteSpace />
 
         {/* Product description section */}
         <WingBlank>

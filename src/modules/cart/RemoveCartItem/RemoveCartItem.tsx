@@ -41,13 +41,13 @@ class RemoveCartItem extends React.Component<
 
 const mapStateToProps: any = state => ({});
 
-const REMOVE_CART_ITEM_MUTATION = require("./removeCartItem.gql");
+const REMOVE_CART_ITEM_MUTATION = gql(require("./removeCartItem.gql"));
 
 export default compose(
   connect<IConnectedRemoveCartItemProps, {}, IRemoveCartItemProps>(
     mapStateToProps
   ),
-  graphql(gql(REMOVE_CART_ITEM_MUTATION), {
+  graphql(REMOVE_CART_ITEM_MUTATION, {
     props: ({ ownProps, mutate }) => {
       return {
         submit(id) {

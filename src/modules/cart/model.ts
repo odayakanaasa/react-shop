@@ -20,7 +20,7 @@ export interface ICartItem {
 
 export interface ICart {
   id: number;
-  items: [ICartItem];
+  items?: [ICartItem];
 }
 
 interface IBrand {

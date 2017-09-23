@@ -1,5 +1,6 @@
 import * as React from "react";
 import { gql, graphql } from "react-apollo";
+import { connect } from "react-redux";
 import { compose } from "redux";
 
 import { IData } from "../../../model";
@@ -10,8 +11,7 @@ import { ICart } from "../model";
 
 const styles = require("./styles.css");
 
-export let CART_QUERY = require("./cart.gql");
-CART_QUERY = gql(CART_QUERY);
+export const CART_QUERY = gql(require("./cart.gql"));
 
 export interface IDataCart extends IData {
   cart: ICart;
@@ -23,57 +23,54 @@ interface IConnectedCartProps {
 
 export interface ICartProps {
   history: any;
+  location: any;
+  isModal: boolean;
 }
 
 const getCartTotalPrice = (cart: ICart): number => {
-  if (!cart) {
-    return 0;
-  }
   let totalPrice = 0;
-  cart.items.forEach(item => {
-    const { price, amount } = item;
-    totalPrice += getCartItemTotalPrice(price, amount);
-  });
+  if (cart && cart.items) {
+    cart.items.forEach(item => {
+      const { price, amount } = item;
+      totalPrice += getCartItemTotalPrice(price, amount);
+    });
+  }
   return totalPrice;
 };
 
 export const getCartAmount = (cart: ICart): number => {
-  return cart ? cart.items.length : 0;
+  return cart && cart.items ? cart.items.length : 0;
 };
 
 class Cart extends React.Component<
   IConnectedCartProps & ICartProps & any,
   any
 > {
-  goBack = e => {
+  handleClick = e => {
     e.stopPropagation();
-    this.props.history.goBack();
+    const { isModal } = this.props;
+    if (isModal) {
+      this.props.history.goBack();
+    } else {
+      this.props.history.push("/");
+    }
   };
 
   render() {
     const { data } = this.props;
-    const cart = data.cart as ICart;
     const { loading } = data;
-    const totalPrice = getCartTotalPrice(cart);
-    const amount = getCartAmount(cart);
-
     if (loading === true) {
       return <Loading />;
     }
-
+    const cart = data.cart as ICart;
+    const totalPrice = getCartTotalPrice(cart);
+    const amount = getCartAmount(cart);
     return (
       <div className={styles.cart}>
-        {cart.items.length === 0
-          ? <div onClick={this.goBack} className={styles.emptyCart}>
-              <img className={styles.emptyCartImage} src={require("./sad_smile.png")}/>
-              <div className={styles.emptyCartTitle}>Корзина пуста</div>
-              <div className={styles.emptyCartContinue}>
-                нажмите чтобы продолжить
-              </div>
-            </div>
-          : <div>
-              <div>
-                {cart.items.map((item, index) =>
+        {cart && cart.items && cart.items.length === 0
+          ? <div>
+              <div className={styles.cartItems}>
+                {(cart as any).items.map((item, index) =>
                   <CartItem
                     key={index}
                     // product={productsMap[item.subProduct.product.id]}
@@ -86,6 +83,16 @@ class Cart extends React.Component<
                 )}
               </div>
               <CheckoutTrigger totalPrice={totalPrice} />
+            </div>
+          : <div onClick={this.handleClick} className={styles.emptyCart}>
+              <img
+                className={styles.emptyCartImage}
+                src={require("./sad_smile.png")}
+              />
+              <div className={styles.emptyCartTitle}>Корзина пуста</div>
+              <div className={styles.emptyCartContinue}>
+                нажмите чтобы продолжить
+              </div>
             </div>}
       </div>
     );

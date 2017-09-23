@@ -20,8 +20,7 @@ interface IProductToCartProps {
   oldPrice?: number;
 }
 
-interface IProductBuyState {
-}
+interface IProductBuyState {}
 
 class ProductToCart extends React.Component<
   IConnectedProductToCartProps & IProductToCartProps,
@@ -34,6 +33,8 @@ class ProductToCart extends React.Component<
       return <Loading />;
     }
     const inCart =
+      cart &&
+      cart.items &&
       cart.items.filter(
         item => parseInt(item.subProduct.id, 0) === subProductId
       ).length > 0;

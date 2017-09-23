@@ -59,7 +59,6 @@ class CartItem extends React.Component<
               src={subProduct.product.images[0].src}
             />
           </Link>
-
           <Flex
             direction="column"
             justify="around"
@@ -84,7 +83,7 @@ class CartItem extends React.Component<
             </Flex>
           </Flex>
         </div>
-        <Devider/>
+        <Devider />
       </div>
     );
   }

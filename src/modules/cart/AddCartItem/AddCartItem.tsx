@@ -32,11 +32,11 @@ class CartItemAdd extends React.Component<
 
 const mapStateToProps: any = state => ({});
 
-const ADD_CART_ITEM_MUTATION = require("./addCartItem.gql");
+const ADD_CART_ITEM_MUTATION = gql(require("./addCartItem.gql"));
 
 export default compose(
   connect<IConnectedAddCartItemProps, {}, IAddCartItemProps>(mapStateToProps),
-  graphql(gql(ADD_CART_ITEM_MUTATION), {
+  graphql(ADD_CART_ITEM_MUTATION, {
     props: ({ ownProps, mutate }) => {
       return {
         submit(subProductId: number) {
