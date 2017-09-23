@@ -11,26 +11,3 @@
   width: 100%;
   z-index: 9999 !important;
 }
-
-.panel {
-  flex: 1;
-  background-color: #2474cc;
-  color: white;
-  min-height: 40px;
-  width: 100%;
-  z-index: 1000;
-}
-
-.back {
-  fill: white;
-  padding: 0 10px;
-  height: 40px;
-}
-
-.title {
-  font-size: 0.35rem;
-  line-height: 0.35rem;
-  text-align: center;
-  margin-right: 0.5rem;
-  width: 100%;
-}

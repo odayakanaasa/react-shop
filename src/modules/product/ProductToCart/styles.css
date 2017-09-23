@@ -1,0 +1,33 @@
+.container {
+  background: white;
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+  height: 40px;
+  text-align: center;
+  box-shadow: 0 0 48px -12px gray;
+}
+
+.priceSection {
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  width: 50%;
+}
+
+.price {
+  color: black;
+}
+
+.oldPrice {
+  color: #b94a48;
+  font-size: 12px;
+  text-decoration: line-through;
+}
+
+.cartSection {
+  color: white;
+  line-height: 40px;
+  width: 50%;
+  transition: 0.5s;
+}

@@ -1,18 +1,15 @@
-import { Flex, Icon, WingBlank } from "antd-mobile";
+import { Flex, WingBlank } from "antd-mobile";
 import * as React from "react";
 import { compose, gql, graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
-import client from "../../../graphqlClient";
 import { IData } from "../../../model";
-import { CART_QUERY, IDataCart } from "../../cart/Cart/Cart";
-import { CartTrigger } from "../../cart/index";
 import { ACTION_ADD_VIEWED_PRODUCT } from "../../catalog/constants";
 import { HEIGHT } from "../../layout/Header/Header";
 import { Loading } from "../../layout/index";
 import { ACTION_SELECT_SUBPRODUCT } from "../constants";
-import { Images, ProductBuy, ProductInfo } from "../index";
+import { Images, ProductInfo, ProductToCart } from "../index";
 import { ICurrentProduct, IProduct, ISubProduct } from "../model";
 
 const PRODUCT_QUERY = require("./product.gql");
@@ -102,7 +99,7 @@ class Product extends React.Component<
             activeSubProduct={activeSubProduct}
           />
         </div>
-        <ProductBuy
+        <ProductToCart
           subProductId={subProductId}
           price={price}
           oldPrice={oldPrice}
@@ -126,5 +123,5 @@ const options = {
 
 export default compose(
   connect<IConnectedProductProps, {}, IProductProps>(mapStateToProps),
-  graphql(gql(PRODUCT_QUERY), options)
+  graphql(gql(PRODUCT_QUERY), options),
 )(Product);

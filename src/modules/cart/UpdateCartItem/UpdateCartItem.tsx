@@ -54,6 +54,14 @@ class UpdateCartItem extends React.Component<
 
 const UPDATE_CART_ITEM_QUERY = require("./updateCartItem.gql");
 
-export default compose(graphql(gql(UPDATE_CART_ITEM_QUERY)))(
-  UpdateCartItem
-) as any;
+export default compose(
+  graphql(gql(UPDATE_CART_ITEM_QUERY), {
+    props: ({ ownProps, mutate }) => {
+      return {
+        submit(id: number, amount: number) {
+          return (mutate as any)({ variables: { id, amount } });
+        }
+      };
+    }
+  })
+)(UpdateCartItem) as any;

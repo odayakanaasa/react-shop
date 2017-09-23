@@ -1,8 +1,5 @@
-.container {
-  width: 10%;
-}
-
-.removeIcon {
-  width: 20px;
-  height: 20px;
+.icon {
+  width: 25px;
+  height: 25px;
+  fill: red;
 }

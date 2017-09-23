@@ -37,7 +37,7 @@ class ModalSwitch extends React.Component<any, any> {
     const _location = isModal ? this.previousLocation : location;
 
     return (
-      <div>
+      <div style={{ height: "100%" }}>
         <Switch location={_location}>
           <Route exact={true} path="/" component={HomePage} />
           <Route path="/category/:id" component={CategoryPage} />

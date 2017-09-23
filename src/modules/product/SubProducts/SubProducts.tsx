@@ -57,7 +57,8 @@ class SubProducts extends React.Component<
               extra={
                 <span
                   style={{
-                    color: this.isActive(subProduct.id) ? "orange" : "grey"
+                    color: this.isActive(subProduct.id) ? "orange" : "grey",
+                    transition: "1s"
                   }}
                 >
                   {subProduct.price} грн

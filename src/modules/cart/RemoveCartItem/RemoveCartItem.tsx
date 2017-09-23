@@ -30,14 +30,11 @@ class RemoveCartItem extends React.Component<
 
   render() {
     return (
-      <Ripples onClick={this.removeCartItem} style={{ height: HEIGHT }}>
-        <Icon
-          // className={styles.ripple}
-          type={require("!svg-sprite-loader!./remove.svg")}
-          style={{ fill: "red" }}
-          size="md"
-        />
-      </Ripples>
+      <Icon
+        className={styles.icon}
+        type={require("!svg-sprite-loader!./remove.svg")}
+        onClick={this.removeCartItem}
+      />
     );
   }
 }

@@ -1,13 +1,12 @@
-import { Icon, Text, View } from "antd-mobile";
-import React from "react";
-import { gql, graphql } from "react-apollo";
+import { Flex, Icon } from "antd-mobile";
+import * as React from "react";
+import { graphql } from "react-apollo";
 import { connect } from "react-redux";
 import Ripples from "react-ripples";
 import { Link } from "react-router-dom";
 import { compose } from "redux";
 
 import { HEIGHT } from "../../layout/Header/Header";
-import { Loading } from "../../layout/index";
 import { CART_QUERY, getCartAmount, IDataCart } from "../Cart/Cart";
 
 interface IConnectedCartTriggerProps {
@@ -26,32 +25,25 @@ class CartTrigger extends React.Component<
     const { data } = this.props;
     const { loading, cart } = data;
     const amount = getCartAmount(cart);
-    if (loading) {
-      return <Loading />;
-    }
     return (
-      <Ripples style={{ height: HEIGHT }}>
-        <Link
-          to={{
-            pathname: "/cart/",
-            state: { modal: true, title: "Корзина" }
-          }}
-        >
-          {amount > 0
-            ? <div className={styles.counterContainer}>
-                <span className={styles.counter}>
-                  {amount}
-                </span>
-              </div>
-            : null}
-
-          <Icon
-            className={styles.ripple}
-            type={require("!svg-sprite-loader!./cart.svg")}
-            size="md"
-          />
-        </Link>
-      </Ripples>
+      <Link
+        className={styles.container}
+        to={{
+          pathname: "/cart/",
+          state: { modal: true, title: "Корзина" }
+        }}
+      >
+        {!loading && amount > 0
+          ? <Flex justify="center" align="center" className={styles.amount}>
+              {amount}
+            </Flex>
+          : null}
+        <Icon
+          className={styles.icon}
+          type={require("!svg-sprite-loader!./cart.svg")}
+          size="md"
+        />
+      </Link>
     );
   }
 }

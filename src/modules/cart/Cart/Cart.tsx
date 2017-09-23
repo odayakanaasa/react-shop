@@ -1,4 +1,3 @@
-import { Flex, Icon } from "antd-mobile";
 import * as React from "react";
 import { gql, graphql } from "react-apollo";
 import { compose } from "redux";
@@ -6,7 +5,7 @@ import { compose } from "redux";
 import { IData } from "../../../model";
 import { Loading } from "../../layout/index";
 import { getCartItemTotalPrice } from "../CartItem/CartItem";
-import { CartBar, CartItem } from "../index";
+import { CartItem, CheckoutTrigger } from "../index";
 import { ICart } from "../model";
 
 const styles = require("./styles.css");
@@ -46,7 +45,7 @@ class Cart extends React.Component<
   IConnectedCartProps & ICartProps & any,
   any
 > {
-  back = e => {
+  goBack = e => {
     e.stopPropagation();
     this.props.history.goBack();
   };
@@ -63,14 +62,16 @@ class Cart extends React.Component<
     }
 
     return (
-      <div>
+      <div className={styles.cart}>
         {cart.items.length === 0
-          ? <div onClick={this.back} className={styles.emptyCartContainer}>
-              Cart is empty.
-              <br />
-              Tap to continue.
+          ? <div onClick={this.goBack} className={styles.emptyCart}>
+              <img className={styles.emptyCartImage} src={require("./sad_smile.png")}/>
+              <div className={styles.emptyCartTitle}>Корзина пуста</div>
+              <div className={styles.emptyCartContinue}>
+                нажмите чтобы продолжить
+              </div>
             </div>
-          : <div style={{ flex: 1 }}>
+          : <div>
               <div>
                 {cart.items.map((item, index) =>
                   <CartItem
@@ -84,7 +85,7 @@ class Cart extends React.Component<
                   />
                 )}
               </div>
-              <CartBar totalPrice={totalPrice} />
+              <CheckoutTrigger totalPrice={totalPrice} />
             </div>}
       </div>
     );

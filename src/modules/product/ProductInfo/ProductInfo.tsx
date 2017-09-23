@@ -4,6 +4,7 @@ import { compose } from "react-apollo";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
+import { Devider } from "../../layout/index";
 import { ACTION_SELECT_COLOR } from "../constants";
 import { SubProducts } from "../index";
 import { ICurrentProduct, IProduct, ISubProduct } from "../model";
@@ -57,12 +58,12 @@ class ProductInfo extends React.Component<
         {/* Select SubProduct section */}
         {subProducts.length > 1
           ? <div>
-              <hr />
+              <Devider/>
               <SubProducts subProducts={subProducts} />
             </div>
           : ""}
 
-        <hr />
+        <Devider/>
 
         {/* Select Color section */}
         <WingBlank>
@@ -110,7 +111,7 @@ class ProductInfo extends React.Component<
           </Flex>
         </WingBlank>
 
-        <hr />
+        <Devider />
 
         {/* Product params section */}
         <WingBlank>
@@ -140,10 +141,10 @@ class ProductInfo extends React.Component<
                   </div>
                 </Flex>
               )
-            : ""}
+            : null}
         </WingBlank>
 
-        <hr />
+        <Devider />
 
         {/* Product description section */}
         <WingBlank>

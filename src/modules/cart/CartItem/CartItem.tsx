@@ -1,15 +1,15 @@
-import { WhiteSpace, WingBlank } from "antd-mobile";
+import { Flex } from "antd-mobile";
 import React from "react";
+import { Link } from "react-router-dom";
 import { Dispatch } from "redux";
 
+import { Devider } from "../../layout/index";
 import { ISubProduct } from "../../product/model";
 import { RemoveCartItem, UpdateCartItem } from "../index";
 import { ICartItem } from "../model";
 import { prettyPrice } from "../utils";
 
 const styles = require("./styles.css");
-
-const Hr = props => <div style={{ background: "gray" }} />;
 
 interface IConnectedCartItemProps {
   dispatch: Dispatch<{}>;
@@ -45,38 +45,47 @@ class CartItem extends React.Component<
     } = this.props;
     const { product } = subProduct;
 
+    const linkTo = {
+      pathname: `/product/${product.id}`
+    };
+
     const totalPrice = getCartItemTotalPrice(price, amount);
     return (
-      <WingBlank size="lg">
-        <WhiteSpace size="sm" />
-        <div className={styles.mainContainer}>
-          <div className={styles.cartContent}>
-            <div className={styles.imageContainer}>
-              <img
-                className={styles.image}
-                src={subProduct.product.images[0].src}
-              />
-            </div>
+      <div>
+        <div className={styles.cartItem}>
+          <Link className={styles.imageContainer} to={linkTo}>
+            <img
+              className={styles.image}
+              src={subProduct.product.images[0].src}
+            />
+          </Link>
 
-            <div className={styles.info}>
-              <span className={styles.infoTitle}>
-                {product.name} {product.brand.name}
-              </span>
-              <span className={styles.infoArticle}>
-                артикул:{subProduct.article}
-              </span>
-              <div className={styles.infoStepper}>
-                <UpdateCartItem id={id} amount={amount} />
-              </div>
-              <span className={styles.infoPriceContainer}>
-                {prettyPrice(Math.round(totalPrice))} грн.
-              </span>
+          <Flex
+            direction="column"
+            justify="around"
+            align="start"
+            className={styles.info}
+          >
+            <Link to={linkTo} className={styles.name}>
+              {product.name}
+              <br />
+              {product.brand.name} {subProduct.article}
+            </Link>
+            <div className={styles.amount}>
+              <UpdateCartItem id={id} amount={amount} />
             </div>
-            <RemoveCartItem id={id} />
-          </div>
+            <Flex className={styles.bottom} justify="between" align="center">
+              <div className={styles.price}>
+                {prettyPrice(Math.round(totalPrice))} грн.
+              </div>
+              <div className={styles.remove}>
+                <RemoveCartItem id={id} />
+              </div>
+            </Flex>
+          </Flex>
         </div>
-        <Hr />
-      </WingBlank>
+        <Devider/>
+      </div>
     );
   }
 }

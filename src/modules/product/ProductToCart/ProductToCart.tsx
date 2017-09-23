@@ -10,22 +10,21 @@ import { Loading } from "../../layout/index";
 
 const styles = require("./styles.css");
 
-interface IConnectedProductBuyProps {
+interface IConnectedProductToCartProps {
   data: IDataCart;
 }
 
-interface IProductBuyProps {
+interface IProductToCartProps {
   subProductId: number;
   price: number;
   oldPrice?: number;
 }
 
 interface IProductBuyState {
-  // inCart: boolean;
 }
 
-class ProductBuy extends React.Component<
-  IConnectedProductBuyProps & IProductBuyProps,
+class ProductToCart extends React.Component<
+  IConnectedProductToCartProps & IProductToCartProps,
   IProductBuyState
 > {
   render() {
@@ -40,8 +39,8 @@ class ProductBuy extends React.Component<
       ).length > 0;
 
     return (
-      <Flex className={styles.buy}>
-        <div className={styles.buyPrice}>
+      <Flex className={styles.container} justify="center" align="center">
+        <div className={styles.priceSection}>
           {!!oldPrice
             ? <div>
                 <div className={styles.currentPrice}>
@@ -55,21 +54,27 @@ class ProductBuy extends React.Component<
                 {parseInt(String(price), 10)} грн
               </div>}
         </div>
-        {inCart
-          ? <Link
-              to={{
-                pathname: "/cart/",
-                state: { modal: true, title: "Корзина" }
-              }}
-            >
-              В корзину
-            </Link>
-          : <AddCartItem subProductId={subProductId} />}
+        <div
+          className={styles.cartSection}
+          style={{ background: inCart ? "green" : "orange" }}
+        >
+          {inCart
+            ? <Link
+                style={{ color: "white", display: "block" }}
+                to={{
+                  pathname: "/cart/",
+                  state: { modal: true, title: "Корзина" }
+                }}
+              >
+                В корзину
+              </Link>
+            : <AddCartItem subProductId={subProductId} />}
+        </div>
       </Flex>
     );
   }
 }
 
-export default compose<IProductBuyProps & IConnectedProductBuyProps>(
+export default compose<IProductToCartProps & IConnectedProductToCartProps>(
   graphql(CART_QUERY)
-)(ProductBuy) as any;
+)(ProductToCart) as any;
