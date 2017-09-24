@@ -44,6 +44,10 @@ export default compose(
             variables: { subProductId },
             update: (store, { data: { addCartItem: { cartItem } } }) => {
               const data = store.readQuery({ query: CART_QUERY });
+              if (!data.cart) {
+                data.cart = cartItem.cart;
+                data.cart.items = [];
+              }
               data.cart.items.push(cartItem);
               store.writeQuery({ query: CART_QUERY, data });
             }

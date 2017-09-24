@@ -11,6 +11,7 @@ mutation addCartItem($subProductId: Int!) {
         id
         article
         price
+        oldPrice
         product {
           id
           name
