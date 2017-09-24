@@ -5,7 +5,7 @@
   width: 100%;
   height: 40px;
   text-align: center;
-  box-shadow: 0 0 48px -12px gray;
+  box-shadow: 0 0 40px -16px grey;
 }
 
 .priceSection {
@@ -13,16 +13,6 @@
   font-weight: bold;
   text-align: center;
   width: 50%;
-}
-
-.price {
-  color: black;
-}
-
-.oldPrice {
-  color: #b94a48;
-  font-size: 12px;
-  text-decoration: line-through;
 }
 
 .cartSection {

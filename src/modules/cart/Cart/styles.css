@@ -16,7 +16,7 @@
   height: 100%;
 }
 
-emptyCartImage {
+.emptyCartImage {
   width: 80%;
   height: 80%;
   object-fit: contain;
@@ -25,7 +25,7 @@ emptyCartImage {
 
 .emptyCartTitle {
   font-size: 0.63rem;
-  margin: 20px 0 5px 0;
+  margin: 20px 0 5px;
 }
 
 .emptyCartContinue {

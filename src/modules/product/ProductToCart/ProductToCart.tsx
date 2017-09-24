@@ -6,6 +6,7 @@ import { compose } from "redux";
 
 import { CART_QUERY, IDataCart } from "../../cart/Cart/Cart";
 import { AddCartItem } from "../../cart/index";
+import { Price } from "../../common/index";
 import { Loading } from "../../layout/index";
 
 const styles = require("./styles.css");
@@ -42,18 +43,7 @@ class ProductToCart extends React.Component<
     return (
       <Flex className={styles.container} justify="center" align="center">
         <div className={styles.priceSection}>
-          {!!oldPrice
-            ? <div>
-                <div className={styles.currentPrice}>
-                  {parseInt(String(price), 10)} грн
-                </div>
-                <div className={styles.oldPrice}>
-                  {parseInt(String(oldPrice), 10)} грн
-                </div>
-              </div>
-            : <div className={styles.price}>
-                {parseInt(String(price), 10)} грн
-              </div>}
+          <Price price={price} oldPrice={oldPrice} />
         </div>
         <div
           className={styles.cartSection}

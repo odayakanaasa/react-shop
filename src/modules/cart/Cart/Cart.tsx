@@ -67,7 +67,7 @@ class Cart extends React.Component<
     const amount = getCartAmount(cart);
     return (
       <div className={styles.cart}>
-        {cart && cart.items && cart.items.length === 0
+        {cart && cart.items && cart.items.length > 0
           ? <div>
               <div className={styles.cartItems}>
                 {(cart as any).items.map((item, index) =>
@@ -78,6 +78,8 @@ class Cart extends React.Component<
                     subProduct={item.subProduct}
                     // colorId={cart[index].colorId}
                     price={item.price}
+                    // oldPrice={item.oldPrice}
+                    oldPrice={0}
                     amount={item.amount}
                   />
                 )}

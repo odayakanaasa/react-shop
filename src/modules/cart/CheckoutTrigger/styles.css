@@ -9,7 +9,7 @@
   position: fixed;
   bottom: 0;
   font-weight: bold;
-  box-shadow: 0 0 60px -16px grey;
+  box-shadow: 0 0 40px -16px grey;
 }
 
 .totalPrice {

@@ -15,6 +15,7 @@ export interface ICartItem {
   subProduct: ISubProduct;
   // colorId: number;
   price: number;
+  oldPrice?: number;
   amount: number;
 }
 

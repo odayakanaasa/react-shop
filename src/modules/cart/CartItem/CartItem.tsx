@@ -3,25 +3,19 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Dispatch } from "redux";
 
+import { Price } from "../../common/index";
 import { Devider } from "../../layout/index";
-import { ISubProduct } from "../../product/model";
 import { RemoveCartItem, UpdateCartItem } from "../index";
 import { ICartItem } from "../model";
-import { prettyPrice } from "../utils";
 
+// import { Price } from "../../product/index";
 const styles = require("./styles.css");
 
 interface IConnectedCartItemProps {
   dispatch: Dispatch<{}>;
 }
 
-interface ICartItemProps extends ICartItem {
-  id: number;
-  subProduct: ISubProduct;
-  // colorId: number;
-  price: number;
-  amount: number;
-}
+interface ICartItemProps extends ICartItem {}
 
 export const getCartItemTotalPrice = (price: number, amount: number) => {
   return price * amount;
@@ -74,9 +68,7 @@ class CartItem extends React.Component<
               <UpdateCartItem id={id} amount={amount} />
             </div>
             <Flex className={styles.bottom} justify="between" align="center">
-              <div className={styles.price}>
-                {prettyPrice(Math.round(totalPrice))} грн.
-              </div>
+              <Price price={price} oldPrice={subProduct.oldPrice} />
               <div className={styles.remove}>
                 <RemoveCartItem id={id} />
               </div>
