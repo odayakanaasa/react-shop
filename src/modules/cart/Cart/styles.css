@@ -17,10 +17,9 @@
 }
 
 .emptyCartImage {
-  width: 80%;
-  height: 80%;
+  width: 70%;
+  height: 70%;
   object-fit: contain;
-  background: gray;
 }
 
 .emptyCartTitle {
@@ -29,6 +28,6 @@
 }
 
 .emptyCartContinue {
-  color: lightgray;
+  color: darkgrey;
   padding-bottom: 30px;
 }
