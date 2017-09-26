@@ -79,13 +79,13 @@ class Product extends React.Component<
     const activeSubProduct = getActiveSubProduct(subProducts, subProductId);
     const { price, oldPrice } = activeSubProduct;
     return (
-      <div className={styles.product}>
+      <Flex direction="column" className={styles.product}>
         <div className={styles.productContent}>
           <Flex
-            style={{ height: window.innerHeight - HEIGHT * 2 }}
+            style={{ height: window.innerHeight - HEIGHT * 2 + 5 }}
             justify="around"
             direction="column"
-            className={styles.productMainScreen}
+            className={styles.productFirstScreen}
           >
             <Images images={images} />
             <WingBlank className={styles.productName}>
@@ -104,7 +104,7 @@ class Product extends React.Component<
           price={price}
           oldPrice={oldPrice}
         />
-      </div>
+      </Flex>
     );
   }
 }

@@ -5,6 +5,12 @@
   padding: 5px 0;
 }
 
+.remove {
+  position: absolute;
+  right: 0;
+  padding: 8px;
+}
+
 .imageContainer {
   display: flex;
   justify-content: center;
@@ -31,7 +37,6 @@
 
 .name {
   color: black;
-  padding-right: 10px;
 }
 
 .amountAndPriceSection {

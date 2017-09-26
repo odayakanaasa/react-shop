@@ -68,16 +68,8 @@ class Cart extends React.Component<
     if (amount === 0) {
       return <EmptyCart history={history} isModal={isModal} />;
     }
-
-    const style =
-      amount <= 2
-        ? {
-            overflow: "hidden",
-            position: "fixed"
-          }
-        : {};
     return (
-      <Flex direction="column" className={styles.cart} style={style}>
+      <Flex direction="column" className={styles.cart}>
         <div className={styles.cartItems}>
           {cart.items.map((item, index) =>
             <CartItem
