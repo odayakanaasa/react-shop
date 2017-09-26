@@ -47,7 +47,7 @@ class CartItem extends React.Component<
     return (
       <div>
         <RemoveCartItem id={id} />
-        <div className={styles.cartItem}>
+        <Flex justify="between" className={styles.cartItem}>
           <Link className={styles.imageContainer} to={linkTo}>
             <img
               className={styles.image}
@@ -79,7 +79,7 @@ class CartItem extends React.Component<
               />
             </Flex>
           </Flex>
-        </div>
+        </Flex>
         <Devider />
       </div>
     );

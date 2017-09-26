@@ -15,20 +15,20 @@ class Price extends React.Component<IPriceProps, any> {
     const { price, oldPrice } = this.props;
     const currency = this.props.currency || "грн";
     return (
-      <div className={styles.price}>
+      <span className={styles.price}>
         {!!oldPrice
-          ? <div>
+          ? <span>
               <div>
                 {prettyPrice(price)} {currency}
               </div>
               <div className={styles.oldValue}>
                 {prettyPrice(oldPrice)} {currency}
               </div>
-            </div>
-          : <div className={styles.value}>
+            </span>
+          : <span className={styles.value}>
               {prettyPrice(price)} {currency}
-            </div>}
-      </div>
+            </span>}
+      </span>
     );
   }
 }

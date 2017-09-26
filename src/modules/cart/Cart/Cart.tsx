@@ -4,6 +4,7 @@ import { gql, graphql } from "react-apollo";
 import { compose } from "redux";
 
 import { IData } from "../../../model";
+import { Price } from "../../common/index";
 import { Loading } from "../../layout/index";
 import { getCartItemTotalPrice } from "../CartItem/CartItem";
 import { CartItem, CheckoutTrigger, EmptyCart } from "../index";
@@ -69,17 +70,23 @@ class Cart extends React.Component<
       return <EmptyCart history={history} isModal={isModal} />;
     }
     return (
-      <Flex direction="column" className={styles.cart}>
-        <div className={styles.cartItems}>
-          {cart.items.map((item, index) =>
-            <CartItem
-              key={index}
-              id={item.id}
-              subProduct={item.subProduct}
-              price={item.price}
-              amount={item.amount}
-            />
-          )}
+      <Flex direction="column" className={styles.Cart}>
+        <div className={styles.content}>
+          <div className={styles.title}>
+            Итого к оплате <Price price={totalPrice} />
+          </div>
+          <div className={styles.items}>
+            {cart.items.map((item, index) =>
+              <CartItem
+                key={index}
+                id={item.id}
+                subProduct={item.subProduct}
+                price={item.price}
+                amount={item.amount}
+              />
+            )}
+          </div>
+          <div className={styles.footer} />
         </div>
         <CheckoutTrigger totalPrice={totalPrice} />
       </Flex>

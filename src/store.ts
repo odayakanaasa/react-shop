@@ -10,7 +10,7 @@ const initialState = {};
 
 const middlewares = [thunk, routerMiddleware(history), client.middleware()];
 if (process.env.DEBUG) {
-  middlewares.push(logger);
+  // middlewares.push(logger);
 }
 
 declare var window: { __REDUX_DEVTOOLS_EXTENSION__: () => any };
