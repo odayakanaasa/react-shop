@@ -76,7 +76,7 @@ class Cart extends React.Component<
       <Flex direction="column" className={styles.Cart}>
         <div className={styles.content}>
           <div className={styles.title}>
-            Итого к оплате <Price price={totalPrice} />
+            Итого к оплате: <Price price={totalPrice} />
           </div>
           <div className={styles.items}>
             {cart.items.map((item, index) =>
