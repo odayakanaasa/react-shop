@@ -14,22 +14,18 @@ class Price extends React.Component<IPriceProps, any> {
   render() {
     const { price, oldPrice } = this.props;
     const currency = this.props.currency || "грн";
-    return (
-      <span className={styles.price}>
-        {!!oldPrice
-          ? <span>
-              <div>
-                {prettyPrice(price)} {currency}
-              </div>
-              <div className={styles.oldValue}>
-                {prettyPrice(oldPrice)} {currency}
-              </div>
-            </span>
-          : <span className={styles.value}>
-              {prettyPrice(price)} {currency}
-            </span>}
-      </span>
-    );
+    return !!oldPrice
+      ? <Flex className={styles.Price} direction="column" justify="center">
+          <div className={styles.value}>
+            {prettyPrice(price)} {currency}
+          </div>
+          <div className={styles.oldValue}>
+            {prettyPrice(oldPrice)} {currency}
+          </div>
+        </Flex>
+      : <span className={styles.value}>
+          {prettyPrice(price)} {currency}
+        </span>;
   }
 }
 

@@ -4,6 +4,7 @@ import { compose, gql, graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
+import { IRouterReducer } from "../../../interfaces";
 import { IData } from "../../../model";
 import { ACTION_ADD_VIEWED_PRODUCT } from "../../catalog/constants";
 import { HEIGHT } from "../../layout/Header/Header";
@@ -24,6 +25,7 @@ interface IConnectedProductProps {
   data: IDataProduct;
   product: ICurrentProduct;
   dispatch: Dispatch<{}>;
+  router: IRouterReducer;
 }
 
 interface IProductProps {
@@ -68,16 +70,17 @@ class Product extends React.Component<
   };
 
   render() {
-    const { data } = this.props;
+    const { data, router } = this.props;
     const { loading, product } = data;
     const { colorId } = this.props.product;
     const subProductId = parseInt(this.props.product.subProductId, 0);
     if (loading === true || subProductId === null) {
       return <Loading />;
     }
-    const { brand, images, subProducts } = product;
+    const { id, brand, images, subProducts } = product;
     const activeSubProduct = getActiveSubProduct(subProducts, subProductId);
     const { price, oldPrice } = activeSubProduct;
+
     return (
       <Flex direction="column" className={styles.product}>
         <div className={styles.productContent}>
@@ -110,7 +113,8 @@ class Product extends React.Component<
 }
 
 const mapStateToProps: any = state => ({
-  product: state.product
+  product: state.product,
+  router: state.router
 });
 
 const options = {
@@ -123,5 +127,5 @@ const options = {
 
 export default compose(
   connect<IConnectedProductProps, {}, IProductProps>(mapStateToProps),
-  graphql(gql(PRODUCT_QUERY), options),
+  graphql(gql(PRODUCT_QUERY), options)
 )(Product);
