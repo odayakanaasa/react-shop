@@ -1,36 +1,47 @@
 import { MyIcon } from "@src/modules/common";
 import { IImages } from "@src/modules/product/model";
-import { IRootReducer } from "@src/rootReducer";
 import { Accordion, Flex, List, Switch } from "antd-mobile";
+import gql from "graphql-tag";
 import * as React from "react";
-import { connect } from "react-redux";
+import { graphql, OperationOption, QueryProps } from "react-apollo";
+import { compose } from "redux";
 
-import { MyTouchFeedback } from "../../common/utils";
+import Loading from "../../common/Loading/Loading";
+import { MyTouchFeedback, Aux } from "../../common/utils";
 import { IFilter } from "../model";
 
 const styles = require("./styles.css");
-
-interface StateProps {
-  // catalog: ICatalogReducer;
-}
 
 interface IAmount {
   current: number;
   total: number;
 }
 
+interface IDataFilteredProducts extends QueryProps {
+  filteredProducts: {
+    filters: [IFilter];
+    total: number;
+    // products?: IProduct[];
+  };
+}
+
 interface OwnProps {
   categoryId: number;
-  filters: [IFilter];
-  amount: IAmount;
-  refetch: (variables) => void;
+  // filters: [IFilter];
+  // amount: IAmount;
 }
 
 interface State {
   titleImage: IImages;
 }
 
-class Filters extends React.Component<StateProps & OwnProps, State> {
+export interface GraphQLProps {
+  dataFilteredProducts: IDataFilteredProducts;
+}
+
+interface Props extends OwnProps, GraphQLProps {}
+
+class Filters extends React.Component<Props, State> {
   // render() {
   //   const { filters, amount } = this.props;
   //   return (
@@ -71,13 +82,21 @@ class Filters extends React.Component<StateProps & OwnProps, State> {
   // }
 
   handleClick = url => {
-    const { refetch, categoryId } = this.props;
-    refetch({ categoryId, filterStr: url });
+    const {
+      dataFilteredProducts: { refetch, loading },
+      categoryId
+    } = this.props;
+    if (!loading) {
+      refetch({ categoryId, filterStr: url });
+    }
   };
 
-  getFilter = (filter: IFilter) => {
+  getFilter = (filter: IFilter, total) => {
     const { categoryId } = this.props;
-    const refetch = this.props.refetch as any;
+    const { dataFilteredProducts } = this.props;
+    const { refetch } = dataFilteredProducts;
+
+    /* Colors */
     if (filter.isColor) {
       return (
         <Accordion.Panel
@@ -96,38 +115,47 @@ class Filters extends React.Component<StateProps & OwnProps, State> {
                 marginLeft: 10
               }}
             >
-              {filter.values!.map(
-                (value, i) =>
-                  value.isChecked
-                    ? <MyIcon
-                        key={i}
-                        className={styles.colorIcon}
+              {filter.values!
+                .filter(color => color.count !== total)
+                .map((value, i) =>
+                  <div
+                    onClick={() => this.handleClick(value.url)}
+                    key={i}
+                    className={styles.colorItem}
+                  >
+                    <div className={styles.colorCount}>
+                      {value.count}
+                    </div>
+                    <MyIcon
+                      className={styles.color}
+                      // type={require("svg-sprite-loader!./checked-circle.svg")}
+                      type={require("svg-sprite-loader!./circle.svg")}
+                      style={{
+                        fill: value.value
+                      }}
+                    />
+                    {value.isChecked &&
+                      <MyIcon
+                        className={styles.color}
                         type={require("svg-sprite-loader!./checked-circle.svg")}
-                        onClick={() => this.handleClick(value.url)}
                         style={{
-                          fill: value.value,
-                          width: "2.4rem",
-                          height: "2rem"
+                          fill: "green",
+                          width: "1.1rem",
+                          height: "1.1rem",
+                          position: "absolute",
+                          top: -4,
+                          right: -4,
                         }}
-                      />
-                    : <MyTouchFeedback key={i}>
-                        <MyIcon
-                          className={styles.colorIcon}
-                          onClick={() => this.handleClick(value.url)}
-                          type={require("svg-sprite-loader!./circle.svg")}
-                          style={{
-                            fill: value.value,
-                            width: "2.4rem",
-                            height: "2rem"
-                          }}
-                        />
-                      </MyTouchFeedback>
-              )}
+                      />}
+                  </div>
+                )}
             </Flex>
           }
         />
       );
     }
+
+    /* Bolean */
     if (filter.type === "B") {
       return (
         <Accordion.Panel
@@ -137,32 +165,63 @@ class Filters extends React.Component<StateProps & OwnProps, State> {
             <Flex
               justify="between"
               style={{ paddingLeft: 0, marginRight: "-20px" }}
+              onClick={() => this.handleClick(filter.values[0].url)}
             >
               <div>
                 {filter.name}
+                <div className={styles.count}>
+                  {filter.values[0].count}
+                </div>
               </div>
-              <Switch checked={true} />
+              <Switch
+                checked={filter.values[0].isChecked}
+                onChange={() => this.handleClick(filter.values[0].url)}
+              />
             </Flex>
           }
         />
       );
+
+      /* Multi Select */
     } else if (filter.type !== "B") {
       return (
         <Accordion.Panel
           key={String(filter.id)}
           accordion={true}
-          showArrow={true}
+          // showArrow={true}
+          showArrow={false}
           header={filter.name}
         >
           <List>
-            {filter.values!.map((value, ii) =>
+            {filter.values!.filter(value => value.count).map((value, ii) =>
               <List.Item
+                disabled={!value.isChecked && value.count === total}
                 onClick={() => this.handleClick(value.url)}
                 key={ii}
                 className={styles.value}
-                extra={value.isChecked && <MyIcon type="check" size="md" />}
+                thumb={
+                  value.isChecked
+                    ? <MyIcon
+                        className={styles.checkIcon}
+                        type={require("svg-sprite-loader!./checked-circle.svg")}
+                        style={{
+                          fill: "green"
+                        }}
+                      />
+                    : <MyIcon
+                        className={styles.checkIcon}
+                        type={require("svg-sprite-loader!./empty-circle.svg")}
+                        style={{
+                          fill: "gray"
+                        }}
+                      />
+                }
               >
                 {value.name}
+                <div className={styles.count}>
+                  {value.count}
+                </div>
+                {value.isChecked === true}
               </List.Item>
             )}
           </List>
@@ -171,27 +230,55 @@ class Filters extends React.Component<StateProps & OwnProps, State> {
     }
   };
 
-  onChange() {
-    console.log("he");
-  }
   render() {
-    const { filters, amount } = this.props;
+    const { dataFilteredProducts: { loading, filteredProducts } } = this.props;
+    if (loading && !filteredProducts) {
+      return <Loading />;
+    }
+    const { filters, total } = filteredProducts;
+    const amount = {
+      current: 10,
+      total
+    };
 
     return (
-      <div>
-        <div className={styles.amount}>
-          Товаров: {amount.current} / {amount.total}
-        </div>
-        <Accordion
-          activeKey={filters.map(filter => String(filter.id))}
+      <div style={{ height: "100%", widht: "100%" }}>
+        {loading &&
+          <div className={styles.loading}>
+            <MyIcon type="loading" size="lg" />
+          </div>}
+        <Flex
+          direction="column"
           className={styles.Filters}
+          style={{ opacity: loading ? 0.7 : 1 }}
         >
-          {filters.map(filter => this.getFilter(filter))}
-        </Accordion>
+          <div className={styles.title}>
+            Товаров:
+            {amount.current} / {amount.total}
+          </div>
+          <Accordion
+            activeKey={filters.map(filter => String(filter.id))}
+            className={styles.accordion}
+          >
+            {filters.map(filter => this.getFilter(filter, total))}
+          </Accordion>
+        </Flex>
       </div>
     );
   }
 }
+
+const FILTERED_PRODUCTS_QUERY = gql(require("./filteredProducts.gql"));
+const filteredProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
+  options: props => ({
+    // fetchPolicy: "cache-first",
+    variables: {
+      categoryId: props.categoryId,
+      filterStr: ""
+    }
+  }),
+  name: "dataFilteredProducts"
+};
 
 // <List className={styles.content}>
 // {filter.values!.map((value, i) =>
@@ -201,8 +288,9 @@ class Filters extends React.Component<StateProps & OwnProps, State> {
 // )}
 // </List>
 
-const mapStateToProps = (state: IRootReducer): StateProps => ({
-  // catalog: state.catalog
-});
-
-export default connect<StateProps, {}, OwnProps>(mapStateToProps)(Filters);
+export default compose(
+  graphql<GraphQLProps, OwnProps>(
+    FILTERED_PRODUCTS_QUERY,
+    filteredProductsOptions
+  )
+)(Filters as any) as any;

@@ -24,5 +24,6 @@ export interface IFilter {
   isColor: boolean;
   help: string;
   position: number;
-  values?: [IFilterValue];
+  hasChecked: boolean;
+  values: [IFilterValue];
 }

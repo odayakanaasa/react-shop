@@ -38,7 +38,7 @@ interface StateProps {
 
 export interface GraphQLProps {
   dataCategory: IDataCategory;
-  dataFilteredProducts: IDataFilteredProducts;
+  // dataFilteredProducts: IDataFilteredProducts;
 }
 
 interface OwnProps extends IPage {}
@@ -55,7 +55,10 @@ class CategoryPage extends React.Component<Props, State> {
   state = { title: "", filterEnabled: true };
 
   componentWillReceiveProps(nextProps: Props) {
-    const { dataCategory, dataFilteredProducts } = nextProps;
+    const {
+      dataCategory,
+      // dataFilteredProducts
+    } = nextProps;
     if (!dataCategory.loading) {
       this.setState({
         title: dataCategory.category!.name
@@ -67,7 +70,7 @@ class CategoryPage extends React.Component<Props, State> {
     // FIXME: Temp hack https://github.com/FormidableLabs/nuka-carousel/issues/103
     const {
       dataCategory,
-      dataFilteredProducts,
+      // dataFilteredProducts,
       history,
       match: { params: { id } },
       location
@@ -80,7 +83,7 @@ class CategoryPage extends React.Component<Props, State> {
 
     const pathname = compile(PATH_NAMES.category)({ id });
     if (
-      !dataFilteredProducts.loading &&
+      // !dataFilteredProducts.loading &&
       history.location.pathname === location.pathname
     ) {
       setTimeout(() => {
@@ -105,8 +108,10 @@ class CategoryPage extends React.Component<Props, State> {
       location,
       history,
       dataCategory,
-      dataFilteredProducts
+      // dataFilteredProducts
     } = this.props;
+
+        // {dataCategory.loading || dataFilteredProducts.loading
 
     return (
       <Layout
@@ -114,7 +119,7 @@ class CategoryPage extends React.Component<Props, State> {
         history={history}
         {...this.getLayoutOptions()}
       >
-        {dataCategory.loading || dataFilteredProducts.loading
+        {dataCategory.loading
           ? <Loading />
           : <Flex className={styles.CategoryPage}>
               <Button
@@ -143,18 +148,17 @@ class CategoryPage extends React.Component<Props, State> {
                 Фильтры
               </Button>
               <Sidebar
-                dragToggleDistance={0}
                 sidebarClassName={styles.sidebar}
                 pullRight={true}
+                touch={false}
                 sidebar={
                   <Filters
                     categoryId={id}
-                    filters={dataFilteredProducts.filteredProducts.filters}
-                    amount={{
-                      current: 10,
-                      total: dataFilteredProducts.filteredProducts.total
-                    }}
-                    refetch={dataFilteredProducts.refetch}
+                    // filters={dataFilteredProducts.filteredProducts.filters}
+                    // amount={{
+                    //   current: 10,
+                    //   total: dataFilteredProducts.filteredProducts.total
+                    // }}
                   />
                 }
                 open={this.state.filterEnabled}
@@ -180,19 +184,19 @@ const categoryOptions: OperationOption<OwnProps, GraphQLProps> = {
   name: "dataCategory"
 };
 
-const FILTERED_PRODUCTS_QUERY = gql(require("./filteredProducts.gql"));
-const filteredProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
-  options: props => ({
-    fetchPolicy: "cache-first",
-    variables: {
-      categoryId: parseInt(props.match.params.id, 0),
-      filterStr: "61=7962;brand=cat"
-    }
-  }),
-  name: "dataFilteredProducts"
-};
+// const FILTERED_PRODUCTS_QUERY = gql(require("./filteredProducts.gql"));
+// const filteredProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
+//   options: props => ({
+//     fetchPolicy: "cache-first",
+//     variables: {
+//       categoryId: parseInt(props.match.params.id, 0),
+//       filterStr: "61=7962;brand=cat"
+//     }
+//   }),
+//   name: "dataFilteredProducts"
+// };
 
 export default compose(
-  graphql<GraphQLProps>(FILTERED_PRODUCTS_QUERY, filteredProductsOptions),
+  // graphql<GraphQLProps>(FILTERED_PRODUCTS_QUERY, filteredProductsOptions),
   graphql<GraphQLProps>(CATEGORY_QUERY, categoryOptions)
 )(CategoryPage as any) as any;

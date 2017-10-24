@@ -1,0 +1,28 @@
+query filteredProducts($categoryId: Int, $filterStr: String) {
+  filteredProducts(categoryId: $categoryId, filterStr: $filterStr) {
+    total
+    filters {
+      id
+      name
+      isColor
+      hasChecked
+      help
+      type
+      position
+      values {
+        id
+        name
+        isChecked
+        filterValue
+        help
+        count
+        position
+        url
+        value
+      }
+    }
+    products {
+      id
+    }
+  }
+}
