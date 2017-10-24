@@ -1,0 +1,27 @@
+query filteredProducts($categoryId: Int) {
+  filteredProducts(categoryId:$categoryId) {
+    total
+    filters {
+      id
+      name
+      isColor
+      help
+      type
+      position
+      values {
+        id
+        name
+        isChecked
+        filterValue
+        help
+        count
+        position
+        url
+        value
+      }
+    }
+    products {
+      id
+    }
+  }
+}

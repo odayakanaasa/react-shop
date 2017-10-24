@@ -1,0 +1,16 @@
+.Filters {
+
+}
+
+.value {
+  padding-left: 2rem;
+}
+
+.amount {
+  height: 2.8rem;
+}
+
+.colors {
+  height: 100% !important;
+  padding: 0 1rem !important;
+}

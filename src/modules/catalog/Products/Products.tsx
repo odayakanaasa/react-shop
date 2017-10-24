@@ -141,6 +141,7 @@ class Products extends React.Component<Props, State> {
     const { data, catalog: { showOnlyViewed, viewedProductIds } } = this.props;
     const { loading, allProducts, fetchMore } = data;
 
+    console.log('Products redner')
     if (loading === true) {
       return <Loading />;
     }

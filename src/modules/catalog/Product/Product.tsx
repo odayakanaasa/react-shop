@@ -1,14 +1,15 @@
 import { MyIcon } from "@src/modules/common";
 import { MyTouchFeedback } from "@src/modules/common/utils";
-import { Images, scaleImageSize } from "@src/modules/product";
-import { IImageWithColor, IProduct } from "@src/modules/product/model";
+import { Images } from "@src/modules/product";
+import { IImages } from "@src/modules/product/model";
 import { IRootReducer } from "@src/rootReducer";
-import { Card, WhiteSpace } from "antd-mobile";
+import { Card } from "antd-mobile";
 import { compile } from "path-to-regexp";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
+import { IProduct } from "../../product/model";
 import { ICatalogReducer } from "../reducer";
 
 const styles = require("./styles.css");
@@ -24,7 +25,7 @@ interface StateProps {
 interface OwnProps extends IProduct {}
 
 interface State {
-  titleImage: IImageWithColor;
+  titleImage: IImages;
 }
 
 class Product extends React.Component<StateProps & OwnProps, State> {

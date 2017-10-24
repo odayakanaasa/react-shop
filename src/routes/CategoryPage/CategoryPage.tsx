@@ -1,14 +1,22 @@
 import { Products } from "@src/modules/catalog";
+import Filters from "@src/modules/catalog/Filters/Filters";
+import { IFilter } from "@src/modules/catalog/model";
 import { Loading } from "@src/modules/common";
+import MyIcon from "@src/modules/common/MyIcon/MyIcon";
 import { Layout } from "@src/modules/layout";
 import { ICategory } from "@src/modules/product/model";
+import { PATH_NAMES } from "@src/routes/index";
+import { Button, Flex, List } from "antd-mobile";
 import gql from "graphql-tag";
 import { compile } from "path-to-regexp";
 import * as React from "react";
 import { graphql, OperationOption, QueryProps } from "react-apollo";
+import Sidebar from "react-sidebar";
+import { compose } from "redux";
 
 import { IPage, IRouterReducer } from "../interfaces";
-import { PATH_NAMES } from "../RouteSwitch/RouteSwitch";
+
+const { Item } = List;
 
 const styles = require("./styles.css");
 
@@ -16,12 +24,21 @@ interface IDataCategory extends QueryProps {
   category?: ICategory;
 }
 
+interface IDataFilteredProducts extends QueryProps {
+  filteredProducts: {
+    filters: [IFilter];
+    total: number;
+    // products?: IProduct[];
+  };
+}
+
 interface StateProps {
   router: IRouterReducer;
 }
 
 export interface GraphQLProps {
-  data: IDataCategory;
+  dataCategory: IDataCategory;
+  dataFilteredProducts: IDataFilteredProducts;
 }
 
 interface OwnProps extends IPage {}
@@ -30,22 +47,27 @@ interface Props extends OwnProps, GraphQLProps {}
 
 interface State {
   title: string;
+  filterEnabled: boolean;
 }
 
 class CategoryPage extends React.Component<Props, State> {
-  state = { title: "" };
+  // state = { title: "", filterEnabled: false };
+  state = { title: "", filterEnabled: true };
 
   componentWillReceiveProps(nextProps: Props) {
-    const { loading, category } = nextProps.data;
-    if (!loading) {
-      this.setState({ title: category!.name });
+    const { dataCategory, dataFilteredProducts } = nextProps;
+    if (!dataCategory.loading) {
+      this.setState({
+        title: dataCategory.category!.name
+      });
     }
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     // FIXME: Temp hack https://github.com/FormidableLabs/nuka-carousel/issues/103
     const {
-      data: { loading },
+      dataCategory,
+      dataFilteredProducts,
       history,
       match: { params: { id } },
       location
@@ -57,7 +79,10 @@ class CategoryPage extends React.Component<Props, State> {
     }
 
     const pathname = compile(PATH_NAMES.category)({ id });
-    if (!loading && history.location.pathname === location.pathname) {
+    if (
+      !dataFilteredProducts.loading &&
+      history.location.pathname === location.pathname
+    ) {
       setTimeout(() => {
         window.dispatchEvent(new Event("resize"));
       }, 0);
@@ -66,7 +91,7 @@ class CategoryPage extends React.Component<Props, State> {
   }
 
   getLayoutOptions = () => {
-    const { location, data: { category } } = this.props;
+    const { location, dataCategory: { category } } = this.props;
     return {
       header: {
         title: this.state.title
@@ -79,34 +104,95 @@ class CategoryPage extends React.Component<Props, State> {
       match: { params: { id } },
       location,
       history,
-      data: { loading }
+      dataCategory,
+      dataFilteredProducts
     } = this.props;
+
     return (
       <Layout
         location={location}
         history={history}
         {...this.getLayoutOptions()}
       >
-        {loading
+        {dataCategory.loading || dataFilteredProducts.loading
           ? <Loading />
-          : <div className={styles.CategoryPage}>
-              <Products categoryId={id} />
-            </div>}
+          : <Flex className={styles.CategoryPage}>
+              <Button
+                type="primary"
+                onClick={() => {
+                  this.setState({
+                    filterEnabled: !this.state.filterEnabled
+                  });
+                }}
+                style={{
+                  zIndex: 10,
+                  width: "100%",
+                  height: 40,
+                  margin: "0 0.2rem"
+                }}
+              >
+                <MyIcon
+                  style={{
+                    padding: "0 5px",
+                    height: 15,
+                    width: 15,
+                    fill: "white"
+                  }}
+                  type={require("!svg-sprite-loader!./filter.svg")}
+                />
+                Фильтры
+              </Button>
+              <Sidebar
+                dragToggleDistance={0}
+                sidebarClassName={styles.sidebar}
+                pullRight={true}
+                sidebar={
+                  <Filters
+                    categoryId={id}
+                    filters={dataFilteredProducts.filteredProducts.filters}
+                    amount={{
+                      current: 10,
+                      total: dataFilteredProducts.filteredProducts.total
+                    }}
+                    refetch={dataFilteredProducts.refetch}
+                  />
+                }
+                open={this.state.filterEnabled}
+                onSetOpen={() =>
+                  this.setState({ filterEnabled: !this.state.filterEnabled })}
+              >
+                <Products categoryId={id} />
+              </Sidebar>
+            </Flex>}
       </Layout>
     );
   }
 }
 
 const CATEGORY_QUERY = gql(require("./category.gql"));
-const options: OperationOption<OwnProps, GraphQLProps> = {
+const categoryOptions: OperationOption<OwnProps, GraphQLProps> = {
   options: props => ({
     fetchPolicy: "cache-first",
     variables: {
-      id: props.match.params.id
+      id: parseInt(props.match.params.id, 0)
     }
-  })
+  }),
+  name: "dataCategory"
 };
 
-export default graphql<GraphQLProps, any>(CATEGORY_QUERY, options)(
-  CategoryPage as any
-) as any;
+const FILTERED_PRODUCTS_QUERY = gql(require("./filteredProducts.gql"));
+const filteredProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
+  options: props => ({
+    fetchPolicy: "cache-first",
+    variables: {
+      categoryId: parseInt(props.match.params.id, 0),
+      filterStr: "61=7962;brand=cat"
+    }
+  }),
+  name: "dataFilteredProducts"
+};
+
+export default compose(
+  graphql<GraphQLProps>(FILTERED_PRODUCTS_QUERY, filteredProductsOptions),
+  graphql<GraphQLProps>(CATEGORY_QUERY, categoryOptions)
+)(CategoryPage as any) as any;

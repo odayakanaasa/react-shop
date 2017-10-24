@@ -6,11 +6,11 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 
 import { Aux, MyTouchFeedback } from "../../common/utils";
-import { IImage } from "../model";
+import { IImages } from "../model";
 
 const styles = require("./styles.css");
 
-export const getImagesWithColor = (images: IImage[]): IImage[] => {
+export const getImagesWithColor = (images: IImages[]): IImages[] => {
   return images.filter(image => image.colorValue !== "");
 };
 
@@ -25,7 +25,7 @@ const LAZY_OFFSET = 400;
 
 interface OwnProps {
   containerHeight?: number;
-  images: [IImage];
+  images: [IImages];
   dotHeight: number;
   selectedImageIndex?: number;
   objectFitSize?: {
@@ -56,7 +56,7 @@ class Images extends React.Component<OwnProps, State> {
     this.setState({ selectedImageIndex });
   }
 
-  getHeight = (image?: IImage): number => {
+  getHeight = (image?: IImages): number => {
     const { containerHeight } = this.props;
     if (!image || containerHeight) {
       return containerHeight!;
