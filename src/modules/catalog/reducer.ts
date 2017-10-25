@@ -14,7 +14,8 @@ export interface ICatalogReducer {
 const DEFAULT_CATALOG: ICatalogReducer = {
   showOnlyViewed: false,
   viewedCategoryIds: [],
-  viewedProductIds: []
+  viewedProductIds: [],
+  // productIds: []
 };
 
 const catalog = (state = DEFAULT_CATALOG, action) => {

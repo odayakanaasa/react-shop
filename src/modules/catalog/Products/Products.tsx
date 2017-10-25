@@ -84,13 +84,14 @@ class Products extends React.Component<Props, State> {
       const { products, total } = allProducts!;
 
       // Calculate scrolled products
-      const scrollTop = window.pageYOffset;
+      const scrollTop = event.srcElement.scrollTop;
+
       // const scrollTop = document.body.scrollTop;
       const { scrolledProducts, haveMoreProducts } = this.state;
       const scrolled = Math.round(
         scrollTop / this.bottomHeight * products.length
       );
-      this.setState({ scrolledProducts: scrolled });
+      // this.setState({ scrolledProducts: scrolled });
 
       if (scrollTop > this.bottomHeight && haveMoreProducts === true) {
         fetchMore({} as any);
@@ -109,7 +110,6 @@ class Products extends React.Component<Props, State> {
     // https://stackoverflow.com/questions/36207398/not-getting-callback-after-adding-an-event-listener-for-scroll-event-in-react-js/36207913#36207913
     window.addEventListener("scroll", this.handleScrollThrottle, true);
   }
-
   componentWillUnmount() {
     window.removeEventListener("scroll", this.handleScrollThrottle, true);
   }
@@ -141,7 +141,7 @@ class Products extends React.Component<Props, State> {
     const { data, catalog: { showOnlyViewed, viewedProductIds } } = this.props;
     const { loading, allProducts, fetchMore } = data;
 
-    console.log('Products redner')
+    console.log("Products redner");
     if (loading === true) {
       return <Loading />;
     }

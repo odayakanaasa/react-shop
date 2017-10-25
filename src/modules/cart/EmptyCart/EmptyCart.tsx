@@ -19,7 +19,7 @@ class EmptyCart extends React.Component<OwnProps, State> {
   };
 
   handleScroll = event => {
-    this.setState({ imageSize: initialImageSize + window.pageYOffset });
+    this.setState({ imageSize: initialImageSize + event.srcElement.scrollTop });
   };
 
   componentDidMount() {

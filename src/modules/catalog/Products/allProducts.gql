@@ -1,5 +1,5 @@
-query allProducts($categoryId: Int, $offset: Int, $first: Int) {
-  allProducts(categoryId: $categoryId, offset: $offset, first: $first) {
+query allProducts($ids: List, $categoryId: Int, $offset: Int, $first: Int) {
+  allProducts(ids: $ids, categoryId: $categoryId, offset: $offset, first: $first) {
     total
     products {
       id

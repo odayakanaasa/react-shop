@@ -5,6 +5,7 @@ import { Loading } from "@src/modules/common";
 import MyIcon from "@src/modules/common/MyIcon/MyIcon";
 import { Layout } from "@src/modules/layout";
 import { ICategory } from "@src/modules/product/model";
+import { IRootReducer } from "@src/rootReducer";
 import { PATH_NAMES } from "@src/routes/index";
 import { Button, Flex, List } from "antd-mobile";
 import gql from "graphql-tag";
@@ -14,6 +15,8 @@ import { graphql, OperationOption, QueryProps } from "react-apollo";
 import Sidebar from "react-sidebar";
 import { compose } from "redux";
 
+import { Dispatch } from "../../interfaces";
+import { ICatalogReducer } from "../../modules/catalog/reducer";
 import { IPage, IRouterReducer } from "../interfaces";
 
 const { Item } = List;
@@ -34,6 +37,11 @@ interface IDataFilteredProducts extends QueryProps {
 
 interface StateProps {
   router: IRouterReducer;
+  catalog: ICatalogReducer;
+}
+
+interface DispatchProps {
+  dispath: Dispatch
 }
 
 export interface GraphQLProps {
@@ -47,16 +55,20 @@ interface Props extends OwnProps, GraphQLProps {}
 
 interface State {
   title: string;
-  filterEnabled: boolean;
+  openFilters: boolean;
 }
 
 class CategoryPage extends React.Component<Props, State> {
   // state = { title: "", filterEnabled: false };
-  state = { title: "", filterEnabled: true };
+  state = {
+    title: "",
+    // filterEnabled: true
+    openFilters: false
+  };
 
   componentWillReceiveProps(nextProps: Props) {
     const {
-      dataCategory,
+      dataCategory
       // dataFilteredProducts
     } = nextProps;
     if (!dataCategory.loading) {
@@ -107,11 +119,11 @@ class CategoryPage extends React.Component<Props, State> {
       match: { params: { id } },
       location,
       history,
-      dataCategory,
+      dataCategory
       // dataFilteredProducts
     } = this.props;
 
-        // {dataCategory.loading || dataFilteredProducts.loading
+    // {dataCategory.loading || dataFilteredProducts.loading
 
     return (
       <Layout
@@ -126,7 +138,7 @@ class CategoryPage extends React.Component<Props, State> {
                 type="primary"
                 onClick={() => {
                   this.setState({
-                    filterEnabled: !this.state.filterEnabled
+                    openFilters: !this.state.openFilters
                   });
                 }}
                 style={{
@@ -161,17 +173,22 @@ class CategoryPage extends React.Component<Props, State> {
                     // }}
                   />
                 }
-                open={this.state.filterEnabled}
+                open={this.state.openFilters}
                 onSetOpen={() =>
-                  this.setState({ filterEnabled: !this.state.filterEnabled })}
+                  this.setState({ openFilters: !this.state.openFilters })}
               >
-                <Products categoryId={id} />
+                <Products ids={catalog.productIds} />
               </Sidebar>
             </Flex>}
       </Layout>
     );
   }
 }
+
+const mapStateToProps = (state: IRootReducer): StateProps => ({
+  catalog: state.catalog
+});
+
 
 const CATEGORY_QUERY = gql(require("./category.gql"));
 const categoryOptions: OperationOption<OwnProps, GraphQLProps> = {

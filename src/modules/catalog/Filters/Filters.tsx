@@ -7,7 +7,6 @@ import { graphql, OperationOption, QueryProps } from "react-apollo";
 import { compose } from "redux";
 
 import Loading from "../../common/Loading/Loading";
-import { MyTouchFeedback, Aux } from "../../common/utils";
 import { IFilter } from "../model";
 
 const styles = require("./styles.css");
@@ -144,7 +143,7 @@ class Filters extends React.Component<Props, State> {
                           height: "1.1rem",
                           position: "absolute",
                           top: -4,
-                          right: -4,
+                          right: -4
                         }}
                       />}
                   </div>
@@ -193,37 +192,39 @@ class Filters extends React.Component<Props, State> {
           header={filter.name}
         >
           <List>
-            {filter.values!.filter(value => value.count).map((value, ii) =>
-              <List.Item
-                disabled={!value.isChecked && value.count === total}
-                onClick={() => this.handleClick(value.url)}
-                key={ii}
-                className={styles.value}
-                thumb={
-                  value.isChecked
-                    ? <MyIcon
-                        className={styles.checkIcon}
-                        type={require("svg-sprite-loader!./checked-circle.svg")}
-                        style={{
-                          fill: "green"
-                        }}
-                      />
-                    : <MyIcon
-                        className={styles.checkIcon}
-                        type={require("svg-sprite-loader!./empty-circle.svg")}
-                        style={{
-                          fill: "gray"
-                        }}
-                      />
-                }
-              >
-                {value.name}
-                <div className={styles.count}>
-                  {value.count}
-                </div>
-                {value.isChecked === true}
-              </List.Item>
-            )}
+            {filter.values!
+              .filter(value => value.count !== total || value.isChecked)
+              .map((value, ii) =>
+                <List.Item
+                  disabled={!value.isChecked && value.count === total}
+                  onClick={() => this.handleClick(value.url)}
+                  key={ii}
+                  className={styles.value}
+                  thumb={
+                    value.isChecked
+                      ? <MyIcon
+                          className={styles.checkIcon}
+                          type={require("svg-sprite-loader!./checked-circle.svg")}
+                          style={{
+                            fill: "green"
+                          }}
+                        />
+                      : <MyIcon
+                          className={styles.checkIcon}
+                          type={require("svg-sprite-loader!./empty-circle.svg")}
+                          style={{
+                            fill: "gray"
+                          }}
+                        />
+                  }
+                >
+                  {value.name}
+                  <div className={styles.count}>
+                    {value.count}
+                  </div>
+                  {value.isChecked === true}
+                </List.Item>
+              )}
           </List>
         </Accordion.Panel>
       );
@@ -237,8 +238,8 @@ class Filters extends React.Component<Props, State> {
     }
     const { filters, total } = filteredProducts;
     const amount = {
-      current: 10,
-      total
+      current: total,
+      total: 999
     };
 
     return (
@@ -253,8 +254,7 @@ class Filters extends React.Component<Props, State> {
           style={{ opacity: loading ? 0.7 : 1 }}
         >
           <div className={styles.title}>
-            Товаров:
-            {amount.current} / {amount.total}
+            Найдено {amount.current} товаров
           </div>
           <Accordion
             activeKey={filters.map(filter => String(filter.id))}
@@ -293,4 +293,4 @@ export default compose(
     FILTERED_PRODUCTS_QUERY,
     filteredProductsOptions
   )
-)(Filters as any) as any;
+)(Filters);
