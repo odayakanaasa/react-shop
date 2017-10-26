@@ -6,10 +6,11 @@ import MyIcon from "@src/modules/common/MyIcon/MyIcon";
 import { Layout } from "@src/modules/layout";
 import { ICategory, IProduct } from "@src/modules/product/model";
 import { PATH_NAMES } from "@src/routes/index";
-import { Flex, List } from "antd-mobile";
+import { Flex } from "antd-mobile";
 import Progress from "antd-mobile/lib/progress";
 import gql from "graphql-tag";
 import update from "immutability-helper";
+import { throttle } from "lodash";
 import { compile } from "path-to-regexp";
 import * as React from "react";
 import { graphql, OperationOption, QueryProps } from "react-apollo";
@@ -21,10 +22,16 @@ import { ICatalogReducer } from "../../modules/catalog/reducer";
 import { MyTouchFeedback } from "../../modules/common/utils";
 import { IPage, IRouterReducer } from "../interfaces";
 
-const { Item } = List;
+const styles = require("./styles.css");
+
 const LIMIT = 15;
 
-const styles = require("./styles.css");
+// miliseconds bettwen scroll event
+const SCROLL_THROTTLE = 250;
+
+// px from bottom to start fetch more products
+// const FETCH_MORE_THRESHOLD = window.innerHeight * 2;
+const FETCH_MORE_THRESHOLD = window.innerHeight * 1.5;
 
 interface IDataCategory extends QueryProps {
   category?: ICategory;
@@ -67,6 +74,9 @@ interface Props extends OwnProps, GraphQLProps {}
 interface State {
   title: string;
   openFilters: boolean;
+  haveMoreProducts?: boolean;
+  scrolledProducts?: number;
+  loading: boolean;
 }
 
 class CategoryPage extends React.Component<Props, State> {
@@ -74,19 +84,62 @@ class CategoryPage extends React.Component<Props, State> {
   state = {
     title: "",
     // filterEnabled: true
-    openFilters: false
+    loading: false,
+    openFilters: false,
+    haveMoreProducts: true,
+    scrolledProducts: 0
   };
 
+  ref;
+
+  bottomHeight: number;
+
+  handleScrollThrottle: (event) => void;
+
+  refineScrolledProducts = scrolledProducts => {
+    const { dataAllProducts } = this.props;
+    const { fetchMore, allProducts } = dataAllProducts;
+    const { products, found } = allProducts!;
+
+    if (scrolledProducts < LIMIT) {
+      scrolledProducts = LIMIT > found ? found : LIMIT;
+    } else if (scrolledProducts > found) {
+      scrolledProducts = found;
+    }
+    return scrolledProducts;
+  };
+
+  componentDidMount() {
+    // tslint:disable-next-line:max-line-length
+    // TODO: Bind to some element, but not window
+    // https://stackoverflow.com/questions/36207398/not-getting-callback-after-adding-an-event-listener-for-scroll-event-in-react-js/36207913#36207913
+    this.handleScrollThrottle = throttle(
+      event => this.handleScroll(event),
+      SCROLL_THROTTLE
+    );
+    window.addEventListener("scroll", this.handleScrollThrottle, true);
+  }
+
   componentWillReceiveProps(nextProps: Props) {
-    const {
-      dataCategory
-      // dataFilteredProducts
-    } = nextProps;
+    const { dataCategory, dataAllProducts } = nextProps;
+    if (!dataAllProducts.loading) {
+      this.setState({ loading: false });
+      const { products, found } = dataAllProducts.allProducts!;
+      if (products.length >= found) {
+        this.setState({
+          haveMoreProducts: false
+        });
+      }
+    }
     if (!dataCategory.loading) {
       this.setState({
         title: dataCategory.category!.name
       });
     }
+
+    // if (this.state.loading) {
+    //   window.removeEventListener("scroll", this.handleScrollThrottle, true);
+    // }
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
@@ -98,6 +151,11 @@ class CategoryPage extends React.Component<Props, State> {
       match: { params: { id } },
       location
     } = nextProps;
+
+    if (this.state.loading) {
+      // Prevent rerender till fetchMore
+      return false;
+    }
 
     if (history.location.pathname !== location.pathname) {
       // Prevent rerender cause two active routes (main and modal in RouteSwitch)
@@ -124,8 +182,19 @@ class CategoryPage extends React.Component<Props, State> {
     return true;
   }
 
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    const { loading, allProducts } = this.props.dataAllProducts;
+    if (!loading) {
+      this.bottomHeight =
+        this.ref.offsetTop +
+        this.ref.clientHeight -
+        window.innerHeight -
+        FETCH_MORE_THRESHOLD;
+    }
+  }
+
   componentWillUnmount() {
-    console.log(this.props);
+    window.removeEventListener("scroll", this.handleScrollThrottle, true);
   }
 
   getLayoutOptions = () => {
@@ -142,6 +211,32 @@ class CategoryPage extends React.Component<Props, State> {
     this.setState({ openFilters: false });
   };
 
+  handleScroll = event => {
+    const { location, dataAllProducts } = this.props;
+    if (location.pathname.search("category") !== -1) {
+      const { fetchMore, allProducts, loading } = dataAllProducts;
+      const { products, found } = allProducts!;
+
+      // Calculate scrolled products
+      const scrollTop = event.srcElement.scrollTop;
+
+      // const scrollTop = document.body.scrollTop;
+      const { scrolledProducts, haveMoreProducts } = this.state;
+      const scrolled = Math.round(
+        scrollTop / this.bottomHeight * products.length
+      );
+      // this.setState({ scrolledProducts: scrolled });
+      if (
+        scrollTop > this.bottomHeight &&
+        haveMoreProducts === true &&
+        !this.state.loading
+      ) {
+        this.setState({ loading: true }, () => fetchMore({} as any));
+        // window.removeEventListener("scroll", this.handleScrollThrottle, true);
+      }
+    }
+  };
+
   render() {
     const {
       match: { params: { id } },
@@ -156,6 +251,10 @@ class CategoryPage extends React.Component<Props, State> {
     // <ProductsCounter scrolled={this.refineScrolledProducts(this.state.scrolledProducts)} total={total} />
 
     const scrolled = 10;
+    if (!(dataCategory.loading || dataAllProducts.loading)) {
+      console.log("CategoryPage.render");
+    }
+
     return (
       <Layout
         location={location}
@@ -224,7 +323,18 @@ class CategoryPage extends React.Component<Props, State> {
                 open={this.state.openFilters}
                 onSetOpen={this.onSetOpen}
               >
-                <Products data={dataAllProducts} location={location} />
+                <div ref={element => (this.ref = element)}>
+                  <Products data={dataAllProducts} location={location} />
+                  {this.state.loading && <MyIcon type="loading" size="lg" />}
+                </div>
+                <div
+                  className={styles.loading}
+                  style={{
+                    display: this.state.haveMoreProducts ? "block" : "none"
+                  }}
+                >
+                  <MyIcon type="loading" size="lg" />
+                </div>
               </Sidebar>
             </Flex>}
       </Layout>
@@ -298,6 +408,7 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
         loading,
         refetch,
         fetchMore() {
+          console.log("fetchMore");
           return fetchMore({
             updateQuery: (prev, { fetchMoreResult }) => {
               if (!fetchMoreResult.allProducts) {

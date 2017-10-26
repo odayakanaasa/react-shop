@@ -266,7 +266,7 @@ class Filters extends React.Component<Props, State> {
     }
     const { filters, found } = allProducts;
     const total = this.state.total;
-
+    console.log("Filters.render()")
     return (
       <div style={{ height: "100%", widht: "100%" }}>
         <div
