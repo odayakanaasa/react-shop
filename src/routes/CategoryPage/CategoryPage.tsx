@@ -328,7 +328,9 @@ class CategoryPage extends React.Component<Props, State> {
               >
                 <div ref={element => (this.ref = element)}>
                   <Products data={dataAllProducts} location={location} />
-                  {this.state.loading && <MyIcon type="loading" size="lg" />}
+                  <div style={{ width: "100%", textAlign: "center", position: "relative", top: "-1rem" }}>
+                    {this.state.loading && <MyIcon type="loading" size="lg" />}
+                  </div>
                 </div>
                 <div
                   className={styles.loading}

@@ -27,7 +27,8 @@ def update():
 
 def test_update():
     with cd(REMOTE_PROJECT_DIR_TEST):
-        local('git push --set-upstream origin test')
+        # local('git push --set-upstream origin test')
+        local('git push')
         run('git pull -f')
         run('git reset --hard')
         run('git checkout filters')
