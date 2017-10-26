@@ -14,3 +14,49 @@
   background-color: white;
   z-index: 1000 !important;
 }
+
+.nav {
+  height: 2.5rem;
+  width: 100%;
+  position: fixed;
+  top: 2.8rem;
+  z-index: 1000;
+}
+
+.filterIcon {
+  padding: 0 5px;
+  height: 15px;
+  width: 15px;
+  fill: black;
+}
+
+.sortIcon {
+  padding: 0 5px;
+  height: 18px;
+  width: 18px;
+  fill: black;
+}
+
+.ProductsCounter {
+  margin-left: 1rem;
+  font-size: 0.8rem;
+  color: gray;
+}
+
+.progress {
+  width: 100%;
+  top: 3rem;
+  left: 0;
+  position: fixed;
+  right: 0;
+  opacity: 0.7;
+}
+
+.progress * {
+  border-color: orange !important;
+}
+
+.finished * {
+  border-color: green !important;
+}
+

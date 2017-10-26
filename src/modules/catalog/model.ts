@@ -3,6 +3,7 @@ import { IProduct } from "../product/model";
 export interface IAllProduct {
   total: number;
   products: [IProduct];
+  filters: [IFilter];
 }
 
 export interface IFilterValue {

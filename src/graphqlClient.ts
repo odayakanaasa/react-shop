@@ -1,8 +1,8 @@
 import ApolloClient, { createBatchingNetworkInterface } from "apollo-client";
 import { createNetworkInterface } from "react-apollo";
 
-const USE_QUERY_BATCHING = true;
-// const USE_QUERY_BATCHING = false;
+// const USE_QUERY_BATCHING = true;
+const USE_QUERY_BATCHING = false;
 
 const opts = {
   credentials: "include"

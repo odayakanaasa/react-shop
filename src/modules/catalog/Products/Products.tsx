@@ -140,8 +140,6 @@ class Products extends React.Component<Props, State> {
   render() {
     const { data, catalog: { showOnlyViewed, viewedProductIds } } = this.props;
     const { loading, allProducts, fetchMore } = data;
-
-    console.log("Products redner");
     if (loading === true) {
       return <Loading />;
     }
@@ -151,40 +149,25 @@ class Products extends React.Component<Props, State> {
       : products;
 
     const gutter = 3;
-    return (
-      <div className={styles.Products} ref={element => (this.ref = element)}>
-        <MasonryInfiniteScroller
-          sizes={[{ columns: 2, gutter }]}
-          loadMore={() => ""}
-        >
+    return <div className={styles.Products} ref={element => (this.ref = element)}>
+        <MasonryInfiniteScroller sizes={[{ columns: 2, gutter }]} loadMore={() => ""}>
           {filteredProducts.map((product, i) => {
             return <Product key={i} {...product} />;
           })}
         </MasonryInfiniteScroller>
 
-        <div
-          className={styles.loading}
-          style={{
-            display: this.state.haveMoreProducts ? "block" : "none"
-          }}
-        >
+        <div className={styles.loading} style={{ display: this.state.haveMoreProducts ? "block" : "none" }}>
           <MyIcon type="loading" size="lg" />
         </div>
 
-        <ProductsCounter
-          scrolled={this.refineScrolledProducts(this.state.scrolledProducts)}
-          total={total}
-        />
-
         {/*<ShowOnlyViewed/>*/}
-      </div>
-    );
+      </div>;
   }
 }
 
-const ALL_PRODUCTS_QUERY = gql(require("./allProducts.gql"));
+export const ALL_PRODUCTS_QUERY = gql(require("./allProducts.gql"));
 
-const options: OperationOption<OwnProps, GraphQLProps> = {
+export const options: OperationOption<OwnProps, GraphQLProps> = {
   options: ownProps => ({
     fetchPolicy: "network-only",
     variables: {
@@ -242,6 +225,5 @@ const mapStateToProps = (state: IRootReducer): StateProps => ({
 });
 
 export default compose(
-  graphql<GraphQLProps, OwnProps>(ALL_PRODUCTS_QUERY, options),
   connect<StateProps, {}, OwnProps>(mapStateToProps)
-)(Products);
+)(Products) as any;

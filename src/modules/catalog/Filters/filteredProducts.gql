@@ -1,6 +1,6 @@
 query filteredProducts($categoryId: Int, $filterStr: String) {
   filteredProducts(categoryId: $categoryId, filterStr: $filterStr) {
-    total
+    found
     filters {
       id
       name

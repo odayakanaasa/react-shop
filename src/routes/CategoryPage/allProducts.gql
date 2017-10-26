@@ -1,6 +1,15 @@
-query allProducts($categoryId: Int, $filterStr: String, $offset: Int, $first: Int) {
-  allProducts(categoryId: $categoryId, filterStr: $filterStr, offset: $offset, first: $first) {
-    total
+query allProducts(
+  $categoryId: Int
+  $filterStr: String
+  $offset: Int
+  $first: Int
+) {
+  allProducts(
+    categoryId: $categoryId
+    filterStr: $filterStr
+    offset: $offset
+    first: $first
+  ) {
     filters {
       id
       name
@@ -19,9 +28,7 @@ query allProducts($categoryId: Int, $filterStr: String, $offset: Int, $first: In
         position
         url
         value
-        __typename
       }
-      __typename
     }
     products {
       id
@@ -30,12 +37,10 @@ query allProducts($categoryId: Int, $filterStr: String, $offset: Int, $first: In
       brand {
         id
         name
-        __typename
       }
       category {
         id
         name
-        __typename
       }
       images(size: SM, withColorOnly: true) {
         id
@@ -45,7 +50,6 @@ query allProducts($categoryId: Int, $filterStr: String, $offset: Int, $first: In
         colorName
         colorValue
         isTitle
-        __typename
       }
       subProducts {
         id
@@ -53,10 +57,8 @@ query allProducts($categoryId: Int, $filterStr: String, $offset: Int, $first: In
         price
         oldPrice
         discount
-        __typename
       }
-      __typename
     }
-    __typename
+    found
   }
 }

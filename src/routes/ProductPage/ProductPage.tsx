@@ -4,7 +4,10 @@ import { Devider, Loading, MyIcon } from "@src/modules/common";
 import { Aux, MyTouchFeedback } from "@src/modules/common/utils";
 import { Layout } from "@src/modules/layout";
 import { Images, ProductToCart, SubProducts } from "@src/modules/product";
-import { ACTION_SELECT_COLOR, ACTION_UNSELECT_ALL } from "@src/modules/product/constants";
+import {
+  ACTION_SELECT_COLOR,
+  ACTION_UNSELECT_ALL
+} from "@src/modules/product/constants";
 import { ACTION_SELECT_SUB_PRODUCT } from "@src/modules/product/constants";
 import { getImagesWithColor } from "@src/modules/product/Images/Images";
 import { ISubProduct } from "@src/modules/product/model";
@@ -107,7 +110,10 @@ class Product extends React.Component<Props, {}> {
             <MyTouchFeedback>
               <Link
                 className={styles.headerLeft}
-                to={compile(PATH_NAMES.category)({ id: category.id })}
+                to={compile(PATH_NAMES.category)({
+                  id: category.id
+                  //  filter_str: ""
+                })}
               >
                 <MyIcon
                   className={styles.headerLeftIcon}

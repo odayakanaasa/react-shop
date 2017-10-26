@@ -13,7 +13,7 @@ import { compose } from "redux";
 import { CART_QUERY, getCartAmount, IDataCart } from "../Cart/Cart";
 
 interface OwnProps {
-  onTop: boolean;
+  isTransporant: boolean;
 }
 
 interface StateProps {
@@ -35,7 +35,7 @@ class CartTrigger extends React.Component<Props, {}> {
   };
 
   render() {
-    const { data, router, onTop } = this.props;
+    const { data, router, isTransporant } = this.props;
     const { loading, cart } = data;
     const amount = getCartAmount(cart);
     return (
@@ -54,7 +54,7 @@ class CartTrigger extends React.Component<Props, {}> {
               </Flex>
             : null}
           <MyIcon
-            style={{ fill: onTop ? "black" : "white" }}
+            style={{ fill: isTransporant ? "black" : "white" }}
             type={require("!svg-sprite-loader!./cart.svg")}
             size="md"
           />

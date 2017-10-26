@@ -4,11 +4,12 @@ import { IFilter } from "@src/modules/catalog/model";
 import { Loading } from "@src/modules/common";
 import MyIcon from "@src/modules/common/MyIcon/MyIcon";
 import { Layout } from "@src/modules/layout";
-import { ICategory } from "@src/modules/product/model";
-import { IRootReducer } from "@src/rootReducer";
+import { ICategory, IProduct } from "@src/modules/product/model";
 import { PATH_NAMES } from "@src/routes/index";
-import { Button, Flex, List } from "antd-mobile";
+import { Flex, List } from "antd-mobile";
+import Progress from "antd-mobile/lib/progress";
 import gql from "graphql-tag";
+import update from "immutability-helper";
 import { compile } from "path-to-regexp";
 import * as React from "react";
 import { graphql, OperationOption, QueryProps } from "react-apollo";
@@ -17,9 +18,11 @@ import { compose } from "redux";
 
 import { Dispatch } from "../../interfaces";
 import { ICatalogReducer } from "../../modules/catalog/reducer";
+import { MyTouchFeedback } from "../../modules/common/utils";
 import { IPage, IRouterReducer } from "../interfaces";
 
 const { Item } = List;
+const LIMIT = 15;
 
 const styles = require("./styles.css");
 
@@ -34,6 +37,13 @@ interface IDataFilteredProducts extends QueryProps {
     // products?: IProduct[];
   };
 }
+export interface IDataAllProduct extends QueryProps {
+  allProducts: {
+    filters: [IFilter];
+    products: IProduct[];
+    found: number;
+  };
+}
 
 interface StateProps {
   router: IRouterReducer;
@@ -41,11 +51,12 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  dispath: Dispatch
+  dispath: Dispatch;
 }
 
 export interface GraphQLProps {
   dataCategory: IDataCategory;
+  dataAllProducts: IDataAllProduct;
   // dataFilteredProducts: IDataFilteredProducts;
 }
 
@@ -93,6 +104,14 @@ class CategoryPage extends React.Component<Props, State> {
       return false;
     }
 
+    if (
+      this.state.openFilters &&
+      !this.props.dataAllProducts.loading &&
+      nextProps.dataAllProducts.loading
+    ) {
+      return false;
+    }
+
     const pathname = compile(PATH_NAMES.category)({ id });
     if (
       // !dataFilteredProducts.loading &&
@@ -105,6 +124,10 @@ class CategoryPage extends React.Component<Props, State> {
     return true;
   }
 
+  componentWillUnmount() {
+    console.log(this.props);
+  }
+
   getLayoutOptions = () => {
     const { location, dataCategory: { category } } = this.props;
     return {
@@ -114,70 +137,94 @@ class CategoryPage extends React.Component<Props, State> {
     };
   };
 
+  onSetOpen = () => {
+    // this.setState({ openFilters: !this.state.openFilters });
+    this.setState({ openFilters: false });
+  };
+
   render() {
     const {
       match: { params: { id } },
       location,
       history,
-      dataCategory
+      dataCategory,
+      dataAllProducts
       // dataFilteredProducts
     } = this.props;
 
     // {dataCategory.loading || dataFilteredProducts.loading
+    // <ProductsCounter scrolled={this.refineScrolledProducts(this.state.scrolledProducts)} total={total} />
 
+    const scrolled = 10;
     return (
       <Layout
         location={location}
         history={history}
         {...this.getLayoutOptions()}
       >
-        {dataCategory.loading
+        {dataCategory.loading || dataAllProducts.loading
           ? <Loading />
           : <Flex className={styles.CategoryPage}>
-              <Button
-                type="primary"
-                onClick={() => {
-                  this.setState({
-                    openFilters: !this.state.openFilters
-                  });
-                }}
-                style={{
-                  zIndex: 10,
-                  width: "100%",
-                  height: 40,
-                  margin: "0 0.2rem"
-                }}
-              >
-                <MyIcon
-                  style={{
-                    padding: "0 5px",
-                    height: 15,
-                    width: 15,
-                    fill: "white"
-                  }}
-                  type={require("!svg-sprite-loader!./filter.svg")}
+              <Flex className={styles.nav}>
+                <Flex
+                  className={styles.nav}
+                  style={{ background: "white", width: "100%" }}
+                >
+                  <div style={{ width: "50%", marginLeft: "1rem" }}>
+                    <MyIcon
+                      className={styles.sortIcon}
+                      type={require("!svg-sprite-loader!./sort.svg")}
+                    />
+                    Сортировка
+                  </div>
+
+                  <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+                    <Flex
+                      style={{ width: "50%", height: "100%" }}
+                      onClick={() => {
+                        this.setState({
+                          openFilters: !this.state.openFilters
+                        });
+                      }}
+                    >
+                      <MyIcon
+                        className={styles.filterIcon}
+                        type={require("!svg-sprite-loader!./filter.svg")}
+                      />
+                      Фильтр
+                      <div className={styles.ProductsCounter}>
+                        {scrolled} / {dataAllProducts.allProducts.found}
+                      </div>
+                    </Flex>
+                  </MyTouchFeedback>
+                </Flex>
+                <Progress
+                  className={`${styles.progress} ${scrolled ===
+                    dataAllProducts.allProducts.found && styles.finished}`}
+                  percent={Math.round(
+                    scrolled / dataAllProducts.allProducts.found * 100
+                  )}
+                  position="normal"
+                  // unfilled={false}
+                  unfilled={true}
                 />
-                Фильтры
-              </Button>
+              </Flex>
               <Sidebar
                 sidebarClassName={styles.sidebar}
                 pullRight={true}
                 touch={false}
                 sidebar={
                   <Filters
+                    dataAllProducts={dataAllProducts}
                     categoryId={id}
-                    // filters={dataFilteredProducts.filteredProducts.filters}
-                    // amount={{
-                    //   current: 10,
-                    //   total: dataFilteredProducts.filteredProducts.total
-                    // }}
+                    onSetOpen={this.onSetOpen}
+                    history={history}
                   />
                 }
                 open={this.state.openFilters}
-                onSetOpen={() =>
-                  this.setState({ openFilters: !this.state.openFilters })}
+                onSetOpen={this.onSetOpen}
               >
-                <Products ids={catalog.productIds} />
+                <Products data={dataAllProducts} />
               </Sidebar>
             </Flex>}
       </Layout>
@@ -185,10 +232,9 @@ class CategoryPage extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: IRootReducer): StateProps => ({
-  catalog: state.catalog
-});
-
+// const mapStateToProps = (state: IRootReducer): StateProps => ({
+//   // catalog: state.catalog
+// });
 
 const CATEGORY_QUERY = gql(require("./category.gql"));
 const categoryOptions: OperationOption<OwnProps, GraphQLProps> = {
@@ -199,6 +245,62 @@ const categoryOptions: OperationOption<OwnProps, GraphQLProps> = {
     }
   }),
   name: "dataCategory"
+};
+
+export const ALL_PRODUCTS_QUERY = gql(require("./allProducts.gql"));
+
+export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
+  options: ownProps => ({
+    // fetchPolicy: "network-only",
+    variables: {
+      categoryId: ownProps.match.params.id,
+      filterStr: ownProps.location.search.replace("?query=", ""),
+      first: LIMIT,
+      offset: 0
+    }
+  }),
+  props: (ownProps: any) => {
+    const { data } = ownProps;
+    const { loading, fetchMore, refetch } = data;
+    let allProducts;
+    if (!loading) {
+      // This is temp hack to exclude products without subProducts
+      // TODO: Should be solved in GraphQL server
+      allProducts = update(data.allProducts, {
+        products: {
+          $set: data.allProducts.products.filter(
+            p => p.subProducts.length !== 0
+          )
+        }
+      });
+    }
+    return {
+      dataAllProducts: {
+        allProducts,
+        loading,
+        refetch,
+        fetchMore() {
+          return fetchMore({
+            updateQuery: (prev, { fetchMoreResult }) => {
+              if (!fetchMoreResult.allProducts) {
+                return prev;
+              }
+              return update(prev, {
+                allProducts: {
+                  products: {
+                    $push: fetchMoreResult.allProducts.products
+                  }
+                }
+              });
+            },
+            variables: {
+              offset: allProducts.products.length
+            }
+          });
+        }
+      }
+    };
+  }
 };
 
 // const FILTERED_PRODUCTS_QUERY = gql(require("./filteredProducts.gql"));
@@ -214,6 +316,6 @@ const categoryOptions: OperationOption<OwnProps, GraphQLProps> = {
 // };
 
 export default compose(
-  // graphql<GraphQLProps>(FILTERED_PRODUCTS_QUERY, filteredProductsOptions),
-  graphql<GraphQLProps>(CATEGORY_QUERY, categoryOptions)
+  graphql<GraphQLProps>(CATEGORY_QUERY, categoryOptions),
+  graphql<GraphQLProps, OwnProps>(ALL_PRODUCTS_QUERY, allProductsOptions)
 )(CategoryPage as any) as any;

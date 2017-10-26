@@ -1,41 +1,47 @@
 import { MyIcon } from "@src/modules/common";
-import { IImages } from "@src/modules/product/model";
-import { Accordion, Flex, List, Switch } from "antd-mobile";
-import gql from "graphql-tag";
+import { MyTouchFeedback } from "@src/modules/common/utils";
+import { IDataAllProduct } from "@src/routes/CategoryPage/CategoryPage";
+import { Accordion, Flex, List, Progress, Switch } from "antd-mobile";
+import { compile } from "path-to-regexp";
 import * as React from "react";
-import { graphql, OperationOption, QueryProps } from "react-apollo";
-import { compose } from "redux";
+import { QueryProps } from "react-apollo";
 
+import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
 import Loading from "../../common/Loading/Loading";
-import { IFilter } from "../model";
+import { IAllProduct, IFilter } from "../model";
 
 const styles = require("./styles.css");
 
 interface IAmount {
-  current: number;
-  total: number;
+  found: number;
+  total?: number;
 }
 
 interface IDataFilteredProducts extends QueryProps {
-  filteredProducts: {
-    filters: [IFilter];
-    total: number;
-    // products?: IProduct[];
-  };
+  // filteredProducts: {
+  //   filters: [IFilter];
+  //   total: number;
+  //   // products?: IProduct[];
+  // };
+  allProducts: IAllProduct;
 }
 
 interface OwnProps {
   categoryId: number;
+  history: any;
+  onSetOpen: () => void;
   // filters: [IFilter];
   // amount: IAmount;
 }
 
-interface State {
-  titleImage: IImages;
+export interface GraphQLProps {
+  // dataFilteredProducts: IDataFilteredProducts;
+  dataAllProducts: IDataAllProduct;
 }
 
-export interface GraphQLProps {
-  dataFilteredProducts: IDataFilteredProducts;
+interface State {
+  loading: boolean;
+  total?: number;
 }
 
 interface Props extends OwnProps, GraphQLProps {}
@@ -79,21 +85,28 @@ class Filters extends React.Component<Props, State> {
   //     </div>
   //   );
   // }
-
-  handleClick = url => {
+  state = {
+    loading: false,
+    total: undefined
+  };
+  handleClick = filterStr => {
     const {
-      dataFilteredProducts: { refetch, loading },
-      categoryId
+      categoryId,
+      // dataFilteredProducts: { refetch, loading },
+      dataAllProducts: { refetch, loading },
+      history
     } = this.props;
     if (!loading) {
-      refetch({ categoryId, filterStr: url });
+      refetch({ categoryId, filterStr, offset: 0 });
+      this.setState({ loading: true });
     }
+    history.replace(`${compile(PATH_NAMES.category)({ id: categoryId })}?query=${filterStr}`);
   };
 
-  getFilter = (filter: IFilter, total) => {
+  getFilter = (filter: IFilter, found) => {
     const { categoryId } = this.props;
-    const { dataFilteredProducts } = this.props;
-    const { refetch } = dataFilteredProducts;
+    const { dataAllProducts } = this.props;
+    const { refetch } = dataAllProducts;
 
     /* Colors */
     if (filter.isColor) {
@@ -115,14 +128,15 @@ class Filters extends React.Component<Props, State> {
               }}
             >
               {filter.values!
-                .filter(color => color.count !== total)
+                .filter(color => color.count !== found)
                 .map((value, i) =>
                   <div
-                    onClick={() => this.handleClick(value.url)}
                     key={i}
                     className={styles.colorItem}
+                    onClick={() => this.handleClick(value.url)}
                   >
                     <div className={styles.colorCount}>
+                      {filter.hasChecked && "+"}
                       {value.count}
                     </div>
                     <MyIcon
@@ -193,10 +207,10 @@ class Filters extends React.Component<Props, State> {
         >
           <List>
             {filter.values!
-              .filter(value => value.count !== total || value.isChecked)
+              .filter(value => value.count !== found || value.isChecked)
               .map((value, ii) =>
                 <List.Item
-                  disabled={!value.isChecked && value.count === total}
+                  disabled={!value.isChecked && value.count === found}
                   onClick={() => this.handleClick(value.url)}
                   key={ii}
                   className={styles.value}
@@ -220,6 +234,7 @@ class Filters extends React.Component<Props, State> {
                 >
                   {value.name}
                   <div className={styles.count}>
+                    {filter.hasChecked && "+"}
                     {value.count}
                   </div>
                   {value.isChecked === true}
@@ -231,54 +246,106 @@ class Filters extends React.Component<Props, State> {
     }
   };
 
+  componentWillReceiveProps(nextProps) {
+    const { dataAllProducts: { loading, allProducts } } = nextProps;
+    if (this.state.loading) {
+      this.setState({ loading: false });
+    }
+    if (!loading && !this.state.total) {
+      const total = allProducts.found;
+      this.setState({ total });
+    }
+  }
+
   render() {
-    const { dataFilteredProducts: { loading, filteredProducts } } = this.props;
-    if (loading && !filteredProducts) {
+    const { onSetOpen, dataAllProducts: { loading, allProducts } } = this.props;
+    if (loading && !allProducts) {
       return <Loading />;
     }
-    const { filters, total } = filteredProducts;
-    const amount = {
-      current: total,
-      total: 999
-    };
+    const { filters, found } = allProducts;
+    const total = this.state.total;
 
     return (
       <div style={{ height: "100%", widht: "100%" }}>
-        {loading &&
+        <div
+          className={styles.darkMask}
+          style={{ opacity: this.state.loading ? 0.8 : 0 }}
+        />
+        {this.state.loading &&
           <div className={styles.loading}>
             <MyIcon type="loading" size="lg" />
           </div>}
         <Flex
           direction="column"
           className={styles.Filters}
-          style={{ opacity: loading ? 0.7 : 1 }}
+          style={{ opacity: this.state.loading ? 0.7 : 1, transition: "1s" }}
         >
-          <div className={styles.title}>
-            Найдено {amount.current} товаров
-          </div>
+          <Flex className={styles.title}>
+            <MyTouchFeedback>
+              <MyIcon
+                className={styles.closeIcon}
+                type={require("!svg-sprite-loader!./close.svg")}
+                onClick={onSetOpen}
+              />
+            </MyTouchFeedback>
+            <div>
+              Найдено {found}
+              {found === total ? "" : ` из ${total}`}
+            </div>
+          </Flex>
+          <Progress
+            className={`${styles.progress} ${found === this.state.total &&
+              styles.finished}`}
+            percent={Math.round(found / this.state.total! * 100)}
+            position="normal"
+            // unfilled={false}
+            unfilled={true}
+          />
           <Accordion
             activeKey={filters.map(filter => String(filter.id))}
             className={styles.accordion}
           >
-            {filters.map(filter => this.getFilter(filter, total))}
+            {filters.map(filter => this.getFilter(filter, found))}
           </Accordion>
+
+          <Flex className={styles.buttons} align="center">
+            <MyTouchFeedback>
+              <div className={styles.button} onClick={onSetOpen}>
+                ЗАКРЫТЬ
+              </div>
+            </MyTouchFeedback>
+
+            <MyTouchFeedback>
+              <div
+                style={{
+                  display: found === total ? "none" : "block",
+                  color: "red"
+                  // opacity: found === total ? 0.5 : 1
+                }}
+                className={styles.button}
+                onClick={() => this.handleClick("")}
+              >
+                СБРОСИТЬ
+              </div>
+            </MyTouchFeedback>
+          </Flex>
         </Flex>
       </div>
     );
   }
 }
 
-const FILTERED_PRODUCTS_QUERY = gql(require("./filteredProducts.gql"));
-const filteredProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
-  options: props => ({
-    // fetchPolicy: "cache-first",
-    variables: {
-      categoryId: props.categoryId,
-      filterStr: ""
-    }
-  }),
-  name: "dataFilteredProducts"
-};
+// const FILTERED_PRODUCTS_QUERY = gql(require("./filteredProducts.gql"));
+// const filteredProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
+//   options: props => ({
+//     // fetchPolicy: "cache-first",
+//     variables: {
+//       categoryId: props.categoryId,
+//       filterStr: ""
+//     }
+//   }),
+//   name: "dataFilteredProducts"
+// };
 
 // <List className={styles.content}>
 // {filter.values!.map((value, i) =>
@@ -288,9 +355,11 @@ const filteredProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
 // )}
 // </List>
 
-export default compose(
-  graphql<GraphQLProps, OwnProps>(
-    FILTERED_PRODUCTS_QUERY,
-    filteredProductsOptions
-  )
-)(Filters);
+// export default compose(
+//   graphql<GraphQLProps, OwnProps>(
+//     FILTERED_PRODUCTS_QUERY,
+//     filteredProductsOptions
+//   )
+// )(Filters);
+
+export default Filters;

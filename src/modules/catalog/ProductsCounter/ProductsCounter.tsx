@@ -21,7 +21,8 @@ class ProductsCounter extends React.Component<OwnProps, {}> {
             styles.finished}`}
           percent={Math.round(scrolled / total * 100)}
           position="normal"
-          unfilled={false}
+          // unfilled={false}
+          unfilled={true}
         />
       </div>
     );

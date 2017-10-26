@@ -30,6 +30,6 @@ def test_update():
         local('git push --set-upstream origin test')
         run('git pull -f')
         run('git reset --hard')
-        run('git checkout test')
+        run('git checkout filters')
         run('yarn')
         run('yarn run publish')
