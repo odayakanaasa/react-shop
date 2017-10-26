@@ -16,13 +16,13 @@ interface StateProps {
 const Logo = ({ isActive }) => {
   return (
     <Flex className={styles.HomeTrigger} align="center">
-      REACT
+      BUY
       <MyIcon
         className={styles.icon}
         type={require("!svg-sprite-loader!./logo.svg")}
         size="md"
       />
-      SHOP
+      BAG
     </Flex>
   );
 };

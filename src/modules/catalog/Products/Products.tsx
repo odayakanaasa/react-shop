@@ -1,20 +1,14 @@
 import { Loading, MyIcon } from "@src/modules/common";
 import { IRootReducer } from "@src/rootReducer";
-import { IRouterReducer } from "@src/routes/interfaces";
+import { MyLocation } from "@src/routes/interfaces";
 import update from "immutability-helper";
 import { throttle } from "lodash";
 import * as React from "react";
-import {
-  compose,
-  gql,
-  graphql,
-  OperationOption,
-  QueryProps
-} from "react-apollo";
+import { compose, gql, OperationOption, QueryProps } from "react-apollo";
 import MasonryInfiniteScroller from "react-masonry-infinite";
 import { connect } from "react-redux";
 
-import { Product, ProductsCounter } from "../index";
+import { Product } from "../index";
 import { IAllProduct } from "../model";
 import { ICatalogReducer } from "../reducer";
 
@@ -26,7 +20,8 @@ const LIMIT = 15;
 const SCROLL_THROTTLE = 250;
 
 // px from bottom to start fetch more products
-const FETCH_MORE_THRESHOLD = window.innerHeight * 2;
+// const FETCH_MORE_THRESHOLD = window.innerHeight * 2;
+const FETCH_MORE_THRESHOLD = window.innerHeight;
 
 interface IDataProducts extends QueryProps {
   allProducts?: IAllProduct;
@@ -38,11 +33,11 @@ interface GraphQLProps {
 
 interface StateProps {
   catalog: ICatalogReducer;
-  router: IRouterReducer;
 }
 
 interface OwnProps {
   categoryId: string;
+  location: MyLocation;
 }
 
 interface State {
@@ -78,9 +73,9 @@ class Products extends React.Component<Props, State> {
   };
 
   handleScroll = event => {
-    const { router, data } = this.props;
-    if (router.location.pathname.search("category") !== -1) {
-      const { fetchMore, allProducts } = data;
+    const { location, data } = this.props;
+    if (location.pathname.search("category") !== -1) {
+      const { fetchMore, allProducts, loading } = data;
       const { products, total } = allProducts!;
 
       // Calculate scrolled products
@@ -100,11 +95,18 @@ class Products extends React.Component<Props, State> {
   };
 
   componentDidMount() {
+    const { loading, allProducts } = this.props.data;
     this.handleScrollThrottle = throttle(
       event => this.handleScroll(event),
       SCROLL_THROTTLE
     );
-
+    if (!loading) {
+      this.bottomHeight =
+        this.ref.offsetTop +
+        this.ref.clientHeight -
+        window.innerHeight -
+        FETCH_MORE_THRESHOLD;
+    }
     // tslint:disable-next-line:max-line-length
     // TODO: Bind to some element, but not window
     // https://stackoverflow.com/questions/36207398/not-getting-callback-after-adding-an-event-listener-for-scroll-event-in-react-js/36207913#36207913
@@ -116,7 +118,7 @@ class Products extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     const { loading, allProducts } = this.props.data;
-    if (loading === false) {
+    if (!loading) {
       this.bottomHeight =
         this.ref.offsetTop +
         this.ref.clientHeight -
@@ -140,7 +142,7 @@ class Products extends React.Component<Props, State> {
   render() {
     const { data, catalog: { showOnlyViewed, viewedProductIds } } = this.props;
     const { loading, allProducts, fetchMore } = data;
-    if (loading === true) {
+    if (loading) {
       return <Loading />;
     }
     const { products, total } = allProducts!;
@@ -149,81 +151,34 @@ class Products extends React.Component<Props, State> {
       : products;
 
     const gutter = 3;
-    return <div className={styles.Products} ref={element => (this.ref = element)}>
-        <MasonryInfiniteScroller sizes={[{ columns: 2, gutter }]} loadMore={() => ""}>
+    return (
+      <div className={styles.Products} ref={element => (this.ref = element)}>
+        <MasonryInfiniteScroller
+          sizes={[{ columns: 2, gutter }]}
+          loadMore={() => ""}
+        >
           {filteredProducts.map((product, i) => {
             return <Product key={i} {...product} />;
           })}
         </MasonryInfiniteScroller>
 
-        <div className={styles.loading} style={{ display: this.state.haveMoreProducts ? "block" : "none" }}>
+        <div
+          className={styles.loading}
+          style={{ display: this.state.haveMoreProducts ? "block" : "none" }}
+        >
           <MyIcon type="loading" size="lg" />
         </div>
 
         {/*<ShowOnlyViewed/>*/}
-      </div>;
+      </div>
+    );
   }
 }
 
-export const ALL_PRODUCTS_QUERY = gql(require("./allProducts.gql"));
-
-export const options: OperationOption<OwnProps, GraphQLProps> = {
-  options: ownProps => ({
-    fetchPolicy: "network-only",
-    variables: {
-      categoryId: ownProps.categoryId,
-      first: LIMIT,
-      offset: 0
-    }
-  }),
-  props: (props: any) => {
-    const { data } = props;
-    const { loading, fetchMore } = data;
-    let allProducts;
-    if (!loading) {
-      // This is temp hack to exclude products without subProducts
-      // TODO: Should be solved in GraphQL server
-      allProducts = update(data.allProducts, {
-        products: {
-          $set: data.allProducts.products.filter(
-            p => p.subProducts.length !== 0
-          )
-        }
-      });
-    }
-    return {
-      data: {
-        allProducts,
-        loading,
-        fetchMore() {
-          return fetchMore({
-            updateQuery: (prev, { fetchMoreResult }) => {
-              if (!fetchMoreResult.allProducts) {
-                return prev;
-              }
-              return update(prev, {
-                allProducts: {
-                  products: {
-                    $push: fetchMoreResult.allProducts.products
-                  }
-                }
-              });
-            },
-            variables: {
-              offset: allProducts.products.length
-            }
-          });
-        }
-      }
-    };
-  }
-};
-
 const mapStateToProps = (state: IRootReducer): StateProps => ({
-  catalog: state.catalog,
-  router: state.router
+  catalog: state.catalog
 });
 
-export default compose(
-  connect<StateProps, {}, OwnProps>(mapStateToProps)
-)(Products) as any;
+export default compose(connect<StateProps, {}, OwnProps>(mapStateToProps))(
+  Products
+) as any;

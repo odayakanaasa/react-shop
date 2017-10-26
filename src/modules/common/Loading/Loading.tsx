@@ -7,9 +7,9 @@ const Loading = () => {
   return (
     <div className={styles.Loading}>
       <Flex alignContent="center">
-        React
+        BUY
         <Icon type="loading" className={styles.icon} />
-        Shop
+        BAG
       </Flex>
     </div>
   );

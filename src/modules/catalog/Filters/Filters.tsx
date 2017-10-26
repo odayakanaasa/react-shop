@@ -100,7 +100,9 @@ class Filters extends React.Component<Props, State> {
       refetch({ categoryId, filterStr, offset: 0 });
       this.setState({ loading: true });
     }
-    history.replace(`${compile(PATH_NAMES.category)({ id: categoryId })}?query=${filterStr}`);
+    history.replace(
+      `${compile(PATH_NAMES.category)({ id: categoryId })}?query=${filterStr}`
+    );
   };
 
   getFilter = (filter: IFilter, found) => {

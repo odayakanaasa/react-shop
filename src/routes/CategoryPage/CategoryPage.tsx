@@ -224,13 +224,31 @@ class CategoryPage extends React.Component<Props, State> {
                 open={this.state.openFilters}
                 onSetOpen={this.onSetOpen}
               >
-                <Products data={dataAllProducts} />
+                <Products data={dataAllProducts} location={location} />
               </Sidebar>
             </Flex>}
       </Layout>
     );
   }
 }
+
+// <Sidebar
+// sidebarClassName={styles.sidebar}
+// pullRight={true}
+// touch={false}
+// sidebar={
+//   <Filters
+//     dataAllProducts={dataAllProducts}
+//     categoryId={id}
+//     onSetOpen={this.onSetOpen}
+//     history={history}
+//   />
+// }
+// open={this.state.openFilters}
+// onSetOpen={this.onSetOpen}
+// >
+// <Products data={dataAllProducts} />
+// </Sidebar>
 
 // const mapStateToProps = (state: IRootReducer): StateProps => ({
 //   // catalog: state.catalog
