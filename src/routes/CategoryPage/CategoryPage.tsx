@@ -19,7 +19,7 @@ import { compose } from "redux";
 
 import { Dispatch } from "../../interfaces";
 import { ICatalogReducer } from "../../modules/catalog/reducer";
-import { MyTouchFeedback } from "../../modules/common/utils";
+import { MyTouchFeedback, Aux } from "../../modules/common/utils";
 import { IPage, IRouterReducer } from "../interfaces";
 
 const styles = require("./styles.css");
@@ -225,7 +225,7 @@ class CategoryPage extends React.Component<Props, State> {
       const scrolled = Math.round(
         scrollTop / this.bottomHeight * products.length
       );
-      // this.setState({ scrolledProducts: scrolled });
+      this.setState({ scrolledProducts: scrolled });
       if (
         scrollTop > this.bottomHeight &&
         haveMoreProducts === true &&
@@ -250,7 +250,7 @@ class CategoryPage extends React.Component<Props, State> {
     // {dataCategory.loading || dataFilteredProducts.loading
     // <ProductsCounter scrolled={this.refineScrolledProducts(this.state.scrolledProducts)} total={total} />
 
-    const scrolled = 10;
+    const scrolled = this.state.scrolledProducts;
     if (!(dataCategory.loading || dataAllProducts.loading)) {
       console.log("CategoryPage.render");
     }
@@ -264,7 +264,7 @@ class CategoryPage extends React.Component<Props, State> {
         {dataCategory.loading || dataAllProducts.loading
           ? <Loading />
           : <Flex className={styles.CategoryPage}>
-              <Flex className={styles.nav}>
+              <Flex className={styles.navigation} direction="column">
                 <Flex
                   className={styles.nav}
                   style={{ background: "white", width: "100%" }}
@@ -313,12 +313,15 @@ class CategoryPage extends React.Component<Props, State> {
                 pullRight={true}
                 touch={false}
                 sidebar={
-                  <Filters
-                    dataAllProducts={dataAllProducts}
-                    categoryId={id}
-                    onSetOpen={this.onSetOpen}
-                    history={history}
-                  />
+                  <Aux>
+                    <Filters
+                      dataAllProducts={dataAllProducts}
+                      categoryId={id}
+                      open={this.state.openFilters}
+                      onSetOpen={this.onSetOpen}
+                      history={history}
+                    />
+                  </Aux>
                 }
                 open={this.state.openFilters}
                 onSetOpen={this.onSetOpen}

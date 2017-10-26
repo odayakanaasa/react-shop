@@ -29,6 +29,7 @@ interface IDataFilteredProducts extends QueryProps {
 interface OwnProps {
   categoryId: number;
   history: any;
+  open: boolean;
   onSetOpen: () => void;
   // filters: [IFilter];
   // amount: IAmount;
@@ -257,6 +258,14 @@ class Filters extends React.Component<Props, State> {
       const total = allProducts.found;
       this.setState({ total });
     }
+  }
+
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (!this.props.open) {
+      return false;
+    }
+
+    return true;
   }
 
   render() {
