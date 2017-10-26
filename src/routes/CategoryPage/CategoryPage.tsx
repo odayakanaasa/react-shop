@@ -1,5 +1,4 @@
 import { Products } from "@src/modules/catalog";
-import Filters from "@src/modules/catalog/Filters/Filters";
 import { IFilter } from "@src/modules/catalog/model";
 import { Loading } from "@src/modules/common";
 import MyIcon from "@src/modules/common/MyIcon/MyIcon";
@@ -14,12 +13,11 @@ import { throttle } from "lodash";
 import { compile } from "path-to-regexp";
 import * as React from "react";
 import { graphql, OperationOption, QueryProps } from "react-apollo";
-import Sidebar from "react-sidebar";
 import { compose } from "redux";
 
 import { Dispatch } from "../../interfaces";
 import { ICatalogReducer } from "../../modules/catalog/reducer";
-import { MyTouchFeedback, Aux } from "../../modules/common/utils";
+import { MyTouchFeedback } from "../../modules/common/utils";
 import { IPage, IRouterReducer } from "../interfaces";
 
 const styles = require("./styles.css");
@@ -261,9 +259,9 @@ class CategoryPage extends React.Component<Props, State> {
         history={history}
         {...this.getLayoutOptions()}
       >
-        {dataCategory.loading || dataAllProducts.loading
+        {dataCategory.loading || dataAllProducts.loading || !dataAllProducts.allProducts
           ? <Loading />
-          : <Flex className={styles.CategoryPage}>
+          : <Flex className={styles.CategoryPage} direction="column">
               <Flex className={styles.navigation} direction="column">
                 <Flex
                   className={styles.nav}
@@ -308,7 +306,7 @@ class CategoryPage extends React.Component<Props, State> {
                   unfilled={true}
                 />
               </Flex>
-              <Sidebar
+{/*               <Sidebar
                 sidebarClassName={styles.sidebar}
                 pullRight={true}
                 touch={false}
@@ -325,22 +323,34 @@ class CategoryPage extends React.Component<Props, State> {
                 }
                 open={this.state.openFilters}
                 onSetOpen={this.onSetOpen}
-              >
+              > */}
                 <div ref={element => (this.ref = element)}>
-                  <Products data={dataAllProducts} location={location} />
-                  <div style={{ width: "100%", textAlign: "center", position: "relative", top: "-1rem" }}>
+                  <Products
+                    allProducts={dataAllProducts.allProducts}
+                    location={location}
+                  />
+                  <div
+                    style={{
+                      width: "100%",
+                      textAlign: "center",
+                      position: "relative",
+                      top: "-1rem"
+                    }}
+                  >
                     {this.state.loading && <MyIcon type="loading" size="lg" />}
                   </div>
                 </div>
                 <div
                   className={styles.loading}
                   style={{
+                    width: "100%",
+                    clear: "both",
                     display: this.state.haveMoreProducts ? "block" : "none"
                   }}
                 >
                   <MyIcon type="loading" size="lg" />
                 </div>
-              </Sidebar>
+              {/* </Sidebar> */}
             </Flex>}
       </Layout>
     );

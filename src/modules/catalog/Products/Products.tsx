@@ -12,14 +12,6 @@ import { ICatalogReducer } from "../reducer";
 
 const styles = require("./styles.css");
 
-interface IDataProducts extends QueryProps {
-  allProducts?: IAllProduct;
-}
-
-interface GraphQLProps {
-  data: IDataProducts;
-}
-
 interface StateProps {
   catalog: ICatalogReducer;
 }
@@ -27,26 +19,26 @@ interface StateProps {
 interface OwnProps {
   categoryId: string;
   location: MyLocation;
+  allProducts: IAllProduct;
 }
 
 interface State {}
 
-interface Props extends StateProps, GraphQLProps, OwnProps {}
+interface Props extends StateProps, OwnProps {}
 
 class Products extends React.Component<Props, State> {
   render() {
-    const { data, catalog: { showOnlyViewed, viewedProductIds } } = this.props;
-    const { loading, allProducts, fetchMore } = data;
-    if (loading) {
-      return <Loading />;
-    }
-    const { products, total } = allProducts!;
+    const {
+      allProducts: { products, total },
+      catalog: { showOnlyViewed, viewedProductIds }
+    } = this.props;
     const filteredProducts = showOnlyViewed
       ? products.filter(p => viewedProductIds.indexOf(parseInt(p.id, 0)) !== -1)
       : products;
 
     const gutter = 3;
     console.log("Products.render");
+
     return (
       <div className={styles.Products}>
         <MasonryInfiniteScroller
