@@ -11,8 +11,10 @@
 
 .sidebar {
   width: 80%;
-  background-color: white;
-  z-index: 1000 !important;
+  /* background-color: white; */
+  background-color: red;
+  opacity: 0 !important;
+  /* z-index: 1000 !important; */
 }
 
 .navigation {
@@ -68,3 +70,14 @@
   border-color: green !important;
 }
 
+.sidebarContent {
+  /* position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  transition: "left .3s ease-out, right .3s ease-out";
+  z-index: 10000000; */
+}

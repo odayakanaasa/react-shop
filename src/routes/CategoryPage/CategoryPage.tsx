@@ -1,4 +1,4 @@
-import { Products } from "@src/modules/catalog";
+import { Filters, Products } from "@src/modules/catalog";
 import { IFilter } from "@src/modules/catalog/model";
 import { Loading } from "@src/modules/common";
 import MyIcon from "@src/modules/common/MyIcon/MyIcon";
@@ -13,11 +13,12 @@ import { throttle } from "lodash";
 import { compile } from "path-to-regexp";
 import * as React from "react";
 import { graphql, OperationOption, QueryProps } from "react-apollo";
+import Sidebar from "react-sidebar";
 import { compose } from "redux";
 
 import { Dispatch } from "../../interfaces";
 import { ICatalogReducer } from "../../modules/catalog/reducer";
-import { MyTouchFeedback } from "../../modules/common/utils";
+import { Aux, MyTouchFeedback } from "../../modules/common/utils";
 import { IPage, IRouterReducer } from "../interfaces";
 
 const styles = require("./styles.css");
@@ -259,7 +260,9 @@ class CategoryPage extends React.Component<Props, State> {
         history={history}
         {...this.getLayoutOptions()}
       >
-        {dataCategory.loading || dataAllProducts.loading || !dataAllProducts.allProducts
+        {dataCategory.loading ||
+        dataAllProducts.loading ||
+        !dataAllProducts.allProducts
           ? <Loading />
           : <Flex className={styles.CategoryPage} direction="column">
               <Flex className={styles.navigation} direction="column">
@@ -306,7 +309,7 @@ class CategoryPage extends React.Component<Props, State> {
                   unfilled={true}
                 />
               </Flex>
-{/*               <Sidebar
+              {/*<Sidebar
                 sidebarClassName={styles.sidebar}
                 pullRight={true}
                 touch={false}
@@ -323,8 +326,8 @@ class CategoryPage extends React.Component<Props, State> {
                 }
                 open={this.state.openFilters}
                 onSetOpen={this.onSetOpen}
-              > */}
-                <div ref={element => (this.ref = element)}>
+              >*/}
+                <div className={styles.sidebarContent} ref={element => (this.ref = element)}>
                   <Products
                     allProducts={dataAllProducts.allProducts}
                     location={location}
@@ -350,7 +353,7 @@ class CategoryPage extends React.Component<Props, State> {
                 >
                   <MyIcon type="loading" size="lg" />
                 </div>
-              {/* </Sidebar> */}
+              {/*</Sidebar>*/}
             </Flex>}
       </Layout>
     );
