@@ -12,16 +12,14 @@
 .sidebar {
   width: 80%;
   /* background-color: white; */
-  background-color: red;
-  opacity: 0 !important;
-  /* z-index: 1000 !important; */
+  z-index: 1000 !important;
 }
 
 .navigation {
   width: 100%;
   position: fixed;
   top: 2.8rem;
-  z-index: 1000;
+  z-index: 1;
 }
 
 .nav {

@@ -18,7 +18,7 @@ import { compose } from "redux";
 
 import { Dispatch } from "../../interfaces";
 import { ICatalogReducer } from "../../modules/catalog/reducer";
-import { Aux, MyTouchFeedback } from "../../modules/common/utils";
+import { MyTouchFeedback } from "../../modules/common/utils";
 import { IPage, IRouterReducer } from "../interfaces";
 
 const styles = require("./styles.css");
@@ -123,6 +123,7 @@ class CategoryPage extends React.Component<Props, State> {
       SCROLL_THROTTLE
     );
     window.addEventListener("scroll", this.handleScrollThrottle, true);
+    console.log("addEvent");
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -160,7 +161,6 @@ class CategoryPage extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    // FIXME: Temp hack https://github.com/FormidableLabs/nuka-carousel/issues/103
     const {
       dataCategory,
       // dataFilteredProducts,
@@ -169,10 +169,9 @@ class CategoryPage extends React.Component<Props, State> {
       location
     } = nextProps;
 
-    // if (this.state.loading) {
-    //   // Prevent rerender till fetchMore
-    //   return false;
-    // }
+    if (nextProps.dataAllProducts.loading) {
+      return false;
+    }
 
     if (this.state.scrolledProducts !== nextState.scrolledProducts) {
       return false;
@@ -182,14 +181,6 @@ class CategoryPage extends React.Component<Props, State> {
       // Prevent rerender cause two active routes (main and modal in RouteSwitch)
       return false;
     }
-
-    // if (
-    //   this.state.openFilters &&
-    //   !this.props.dataAllProducts.loading &&
-    //   nextProps.dataAllProducts.loading
-    // ) {
-    //   return false;
-    // }
 
     const pathname = compile(PATH_NAMES.category)({ id });
     if (
@@ -201,10 +192,15 @@ class CategoryPage extends React.Component<Props, State> {
       }, 0);
     }
 
-    // if (
-    //   JSON.stringify(this.props) === JSON.stringify(nextProps) &&
-    //   JSON.stringify(this.state) === JSON.stringify(nextState)
-    // ) {
+    if (
+      JSON.stringify(this.props) === JSON.stringify(nextProps) &&
+      JSON.stringify(this.state) === JSON.stringify(nextState)
+    ) {
+      return false;
+    }
+
+    // if (this.state.openFilters && nextState.openFilters) {
+    //   // Prevent rerender whan sidebar is opened
     //   return false;
     // }
 
@@ -223,6 +219,7 @@ class CategoryPage extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
+    console.log("removeEventListener");
     window.removeEventListener("scroll", this.handleScrollThrottle, true);
   }
 
@@ -235,16 +232,26 @@ class CategoryPage extends React.Component<Props, State> {
     };
   };
 
-  onSetOpen = () => {
-    // this.setState({ openFilters: !this.state.openFilters });
-    this.setState({ openFilters: false });
+  toggleOpenFilters = () => {
+    this.setState({ openFilters: !this.state.openFilters }, () => {
+      this.state.openFilters
+        ? window.removeEventListener("scroll", this.handleScrollThrottle, true)
+        : window.addEventListener("scroll", this.handleScrollThrottle, true);
+    });
   };
 
   handleScroll = event => {
-    const { location, dataAllProducts } = this.props;
+    const {
+      location,
+      dataAllProducts: { allProducts, loading, fetchMore }
+    } = this.props;
+    console.log("scroll");
+    // if (loading) {
+    //   return;
+    // }
+
     if (location.pathname.search("category") !== -1) {
-      const { fetchMore, allProducts, loading } = dataAllProducts;
-      const { products, found } = allProducts!;
+      const { products, found } = allProducts;
 
       // Calculate scrolled products
       const scrollTop = event.srcElement.scrollTop;
@@ -262,8 +269,10 @@ class CategoryPage extends React.Component<Props, State> {
       ) {
         // this.setState({ loading: true }, () => fetchMore({} as any));
         window.removeEventListener("scroll", this.handleScrollThrottle, true);
+        console.log("removeEventListener");
         fetchMore({} as any).then(res => {
           window.addEventListener("scroll", this.handleScrollThrottle, true);
+          console.log("addEvent");
         });
       }
     }
@@ -314,11 +323,7 @@ class CategoryPage extends React.Component<Props, State> {
                   <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
                     <Flex
                       style={{ width: "50%", height: "100%" }}
-                      onClick={() => {
-                        this.setState({
-                          openFilters: !this.state.openFilters
-                        });
-                      }}
+                      onClick={this.toggleOpenFilters}
                     >
                       <MyIcon
                         className={styles.filterIcon}
@@ -351,12 +356,12 @@ class CategoryPage extends React.Component<Props, State> {
                     dataAllProducts={dataAllProducts}
                     categoryId={id}
                     open={this.state.openFilters}
-                    onSetOpen={this.onSetOpen}
+                    onSetOpen={this.toggleOpenFilters}
                     history={history}
                   />
                 }
                 open={this.state.openFilters}
-                onSetOpen={this.onSetOpen}
+                onSetOpen={this.toggleOpenFilters}
               >
                 <div
                   className={styles.sidebarContent}
@@ -367,9 +372,10 @@ class CategoryPage extends React.Component<Props, State> {
                     location={location}
                   />
                 </div>
-                <div className={styles.loading}>
-                  <MyIcon type="loading" size="lg" />
-                </div>
+                {this.state.haveMoreProducts &&
+                  <div className={styles.loading}>
+                    <MyIcon type="loading" size="lg" />
+                  </div>}
               </Sidebar>
             </Flex>}
       </Layout>

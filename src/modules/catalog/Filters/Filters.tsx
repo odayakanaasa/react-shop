@@ -1,5 +1,5 @@
 import { MyIcon } from "@src/modules/common";
-import { MyTouchFeedback } from "@src/modules/common/utils";
+import { MyTouchFeedback, Aux } from "@src/modules/common/utils";
 import { IDataAllProduct } from "@src/routes/CategoryPage/CategoryPage";
 import { Accordion, Flex, List, Progress, Switch } from "antd-mobile";
 import { compile } from "path-to-regexp";
@@ -8,7 +8,7 @@ import { QueryProps } from "react-apollo";
 
 import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
 import Loading from "../../common/Loading/Loading";
-import { IAllProduct, IFilter } from "../model";
+import { IAllProduct, IFilter, IFilterValue } from "../model";
 
 const styles = require("./styles.css");
 
@@ -43,6 +43,7 @@ export interface GraphQLProps {
 interface State {
   loading: boolean;
   total?: number;
+  checkedValueIds: number[];
 }
 
 interface Props extends OwnProps, GraphQLProps {}
@@ -88,28 +89,49 @@ class Filters extends React.Component<Props, State> {
   // }
   state = {
     loading: false,
-    total: undefined
+    total: undefined,
+    checkedValueIds: [] as number[]
   };
-  handleClick = filterStr => {
+
+  handleClick = (value?: IFilterValue) => {
     const {
       categoryId,
       // dataFilteredProducts: { refetch, loading },
-      dataAllProducts: { refetch, loading },
+      dataAllProducts: { refetch },
       history
     } = this.props;
-    if (!loading) {
-      refetch({ categoryId, filterStr, offset: 0 });
-      this.setState({ loading: true });
+
+    let checkedValueIds = this.state.checkedValueIds;
+    if (value) {
+      if (checkedValueIds.indexOf(value.id) === -1) {
+        checkedValueIds.push(value.id);
+      } else {
+        checkedValueIds = checkedValueIds.filter(id => id !== value.id);
+      }
+    } else {
+      checkedValueIds = [];
     }
-    history.replace(
-      `${compile(PATH_NAMES.category)({ id: categoryId })}?query=${filterStr}`
-    );
+    if (!this.state.loading) {
+      this.setState({ loading: true, checkedValueIds }, () =>
+        refetch({
+          categoryId,
+          filterStr: value ? value.url : "",
+          offset: 0
+        }).then(res => {
+          this.setState({ loading: false });
+        })
+      );
+    }
+    // history.replace(
+    //   `${compile(PATH_NAMES.category)({ id: categoryId })}?query=${filterStr}`
+    // );
   };
 
   getFilter = (filter: IFilter, found) => {
     const { categoryId } = this.props;
     const { dataAllProducts } = this.props;
     const { refetch } = dataAllProducts;
+    const { checkedValueIds } = this.state;
 
     /* Colors */
     if (filter.isColor) {
@@ -136,7 +158,7 @@ class Filters extends React.Component<Props, State> {
                   <div
                     key={i}
                     className={styles.colorItem}
-                    onClick={() => this.handleClick(value.url)}
+                    onClick={() => this.handleClick(value)}
                   >
                     <div className={styles.colorCount}>
                       {filter.hasChecked && "+"}
@@ -150,7 +172,7 @@ class Filters extends React.Component<Props, State> {
                         fill: value.value
                       }}
                     />
-                    {value.isChecked &&
+                    {checkedValueIds.indexOf(value.id) !== -1 &&
                       <MyIcon
                         className={styles.color}
                         type={require("svg-sprite-loader!./checked-circle.svg")}
@@ -181,7 +203,7 @@ class Filters extends React.Component<Props, State> {
             <Flex
               justify="between"
               style={{ paddingLeft: 0, marginRight: "-20px" }}
-              onClick={() => this.handleClick(filter.values[0].url)}
+              onClick={() => this.handleClick(filter.values[0])}
             >
               <div>
                 {filter.name}
@@ -190,8 +212,11 @@ class Filters extends React.Component<Props, State> {
                 </div>
               </div>
               <Switch
-                checked={filter.values[0].isChecked}
-                onChange={() => this.handleClick(filter.values[0].url)}
+                // checked={filter.values[0].isChecked}
+                checked={checkedValueIds.indexOf(filter.values[0].id) !== -1}
+                onChange={() => {
+                  this.handleClick(filter.values[0]);
+                }}
               />
             </Flex>
           }
@@ -214,11 +239,11 @@ class Filters extends React.Component<Props, State> {
               .map((value, ii) =>
                 <List.Item
                   disabled={!value.isChecked && value.count === found}
-                  onClick={() => this.handleClick(value.url)}
+                  onClick={() => this.handleClick(value)}
                   key={ii}
                   className={styles.value}
                   thumb={
-                    value.isChecked
+                    checkedValueIds.indexOf(value.id) !== -1
                       ? <MyIcon
                           className={styles.checkIcon}
                           type={require("svg-sprite-loader!./checked-circle.svg")}
@@ -261,35 +286,27 @@ class Filters extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    // if (!this.props.open) {
-    //   return false;
-    // }
+    if (!this.props.open) {
+      return false;
+    }
     return true;
   }
 
   render() {
-    const { onSetOpen, dataAllProducts: { loading, allProducts } } = this.props;
-    if (loading && !allProducts) {
-      return <Loading />;
-    }
+    const { onSetOpen, dataAllProducts: { allProducts } } = this.props;
     const { filters, found } = allProducts;
     const total = this.state.total;
-    console.log("Filters.render()")
+    console.log("Filters.render()");
     return (
       <div style={{ height: "100%", widht: "100%" }}>
-        <div
-          className={styles.darkMask}
-          style={{ opacity: this.state.loading ? 0.8 : 0 }}
-        />
         {this.state.loading &&
-          <div className={styles.loading}>
-            <MyIcon type="loading" size="lg" />
+          <div className={styles.darkMask}>
+            <div className={styles.loading}>
+              <MyIcon type="loading" size="lg" />
+            </div>}
           </div>}
-        <Flex
-          direction="column"
-          className={styles.Filters}
-          style={{ opacity: this.state.loading ? 0.7 : 1, transition: "1s" }}
-        >
+
+        <Flex direction="column" className={styles.Filters}>
           <Flex className={styles.title}>
             <MyTouchFeedback>
               <MyIcon
@@ -333,7 +350,7 @@ class Filters extends React.Component<Props, State> {
                   // opacity: found === total ? 0.5 : 1
                 }}
                 className={styles.button}
-                onClick={() => this.handleClick("")}
+                onClick={() => this.handleClick()}
               >
                 СБРОСИТЬ
               </div>
