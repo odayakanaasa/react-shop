@@ -75,31 +75,15 @@ interface State {
   openFilters: boolean;
   haveMoreProducts?: boolean;
   scrolledProducts?: number;
-  loading: boolean;
+  // loading: boolean;
 }
-
-const FetchMoreLoading = ({ loading }) => {
-  console.log(`LOADING: ${loading}`);
-  return loading
-    ? <div
-        style={{
-          width: "100%",
-          textAlign: "center",
-          position: "relative",
-          top: "-1rem"
-        }}
-      >
-        <MyIcon type="loading" size="lg" />
-      </div>
-    : null;
-};
 
 class CategoryPage extends React.Component<Props, State> {
   // state = { title: "", filterEnabled: false };
   state = {
     title: "",
-    // filterEnabled: true
-    loading: false,
+    // loading: false,
+    // openFilters: false,
     openFilters: false,
     haveMoreProducts: true,
     scrolledProducts: 0
@@ -124,10 +108,16 @@ class CategoryPage extends React.Component<Props, State> {
     return scrolledProducts;
   };
 
+  isLoading = () => {
+    const { dataCategory, dataAllProducts } = this.props;
+    return dataCategory.loading || dataAllProducts.loading;
+  };
+
   componentDidMount() {
     // tslint:disable-next-line:max-line-length
     // TODO: Bind to some element, but not window
     // https://stackoverflow.com/questions/36207398/not-getting-callback-after-adding-an-event-listener-for-scroll-event-in-react-js/36207913#36207913
+
     this.handleScrollThrottle = throttle(
       event => this.handleScroll(event),
       SCROLL_THROTTLE
@@ -143,9 +133,12 @@ class CategoryPage extends React.Component<Props, State> {
     //   return false;
     // }
 
-    if (!dataAllProducts.loading && this.state.loading) {
-      state.loading = false;
-      console.log('loading=false')
+    // if (!dataAllProducts.loading && this.state.loading) {
+    if (!dataAllProducts.loading) {
+      // window.addEventListener("scroll", this.handleScrollThrottle, true);
+
+      // state.loading = false;
+      console.log("loading=false");
       const { products, found } = dataAllProducts.allProducts!;
       if (products.length >= found) {
         state.haveMoreProducts = false;
@@ -176,10 +169,10 @@ class CategoryPage extends React.Component<Props, State> {
       location
     } = nextProps;
 
-    if (this.state.loading) {
-      // Prevent rerender till fetchMore
-      return false;
-    }
+    // if (this.state.loading) {
+    //   // Prevent rerender till fetchMore
+    //   return false;
+    // }
 
     if (this.state.scrolledProducts !== nextState.scrolledProducts) {
       return false;
@@ -190,13 +183,13 @@ class CategoryPage extends React.Component<Props, State> {
       return false;
     }
 
-    if (
-      this.state.openFilters &&
-      !this.props.dataAllProducts.loading &&
-      nextProps.dataAllProducts.loading
-    ) {
-      return false;
-    }
+    // if (
+    //   this.state.openFilters &&
+    //   !this.props.dataAllProducts.loading &&
+    //   nextProps.dataAllProducts.loading
+    // ) {
+    //   return false;
+    // }
 
     const pathname = compile(PATH_NAMES.category)({ id });
     if (
@@ -208,12 +201,12 @@ class CategoryPage extends React.Component<Props, State> {
       }, 0);
     }
 
-    if (
-      JSON.stringify(this.props) === JSON.stringify(nextProps) &&
-      JSON.stringify(this.state) === JSON.stringify(nextState)
-    ) {
-      return false;
-    }
+    // if (
+    //   JSON.stringify(this.props) === JSON.stringify(nextProps) &&
+    //   JSON.stringify(this.state) === JSON.stringify(nextState)
+    // ) {
+    //   return false;
+    // }
 
     return true;
   }
@@ -264,11 +257,14 @@ class CategoryPage extends React.Component<Props, State> {
       this.setState({ scrolledProducts: scrolled });
       if (
         scrollTop > this.bottomHeight &&
-        haveMoreProducts === true &&
-        !this.state.loading
+        haveMoreProducts === true
+        // !this.state.loading
       ) {
-        this.setState({ loading: true }, () => fetchMore({} as any));
-        // window.removeEventListener("scroll", this.handleScrollThrottle, true);
+        // this.setState({ loading: true }, () => fetchMore({} as any));
+        window.removeEventListener("scroll", this.handleScrollThrottle, true);
+        fetchMore({} as any).then(res => {
+          window.addEventListener("scroll", this.handleScrollThrottle, true);
+        });
       }
     }
   };
@@ -351,15 +347,13 @@ class CategoryPage extends React.Component<Props, State> {
                 pullRight={true}
                 touch={false}
                 sidebar={
-                  <Aux>
-                    <Filters
-                      dataAllProducts={dataAllProducts}
-                      categoryId={id}
-                      open={this.state.openFilters}
-                      onSetOpen={this.onSetOpen}
-                      history={history}
-                    />
-                  </Aux>
+                  <Filters
+                    dataAllProducts={dataAllProducts}
+                    categoryId={id}
+                    open={this.state.openFilters}
+                    onSetOpen={this.onSetOpen}
+                    history={history}
+                  />
                 }
                 open={this.state.openFilters}
                 onSetOpen={this.onSetOpen}
@@ -372,16 +366,8 @@ class CategoryPage extends React.Component<Props, State> {
                     allProducts={dataAllProducts.allProducts}
                     location={location}
                   />
-                  <FetchMoreLoading loading={this.state.loading} />
                 </div>
-                <div
-                  className={styles.loading}
-                  style={{
-                    width: "100%",
-                    clear: "both",
-                    display: this.state.haveMoreProducts ? "block" : "none"
-                  }}
-                >
+                <div className={styles.loading}>
                   <MyIcon type="loading" size="lg" />
                 </div>
               </Sidebar>
@@ -472,7 +458,8 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
               });
             },
             variables: {
-              offset: allProducts.products.length
+              offset: allProducts.products.length,
+              first: 20
             }
           });
         }

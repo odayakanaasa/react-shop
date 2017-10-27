@@ -24,4 +24,13 @@ const client = new ApolloClient({
   networkInterface
 });
 
+// (networkInterface as any).useAfter([{
+//   applyAfterware(props, next) {
+//     if (props.response.status === 401) {
+//       logout();
+//     }
+//     next();
+//   }
+// }]);
+
 export default client;

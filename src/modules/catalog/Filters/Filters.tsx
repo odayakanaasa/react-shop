@@ -261,10 +261,9 @@ class Filters extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    if (!this.props.open) {
-      return false;
-    }
-
+    // if (!this.props.open) {
+    //   return false;
+    // }
     return true;
   }
 

@@ -169,14 +169,22 @@ class Product extends React.Component<Props, {}> {
     }
   };
 
+  shouldComponentUpdate(nextProps: Props, nextState) {
+    if (nextProps.dataCart.loading || nextProps.dataProduct.loading) {
+      return false;
+    }
+    return true;
+  }
+
   render() {
     const { location, history, dataProduct, dataCart } = this.props;
     if (dataProduct.loading || !this.props.product.subProductId) {
-      return (
-        <Layout {...this.getLayoutOptions()}>
-          <Loading />
-        </Layout>
-      );
+      return <div style={{opacity: 0}}/>
+      // return (
+      //   <Layout {...this.getLayoutOptions()}>
+      //     <Loading />
+      //   </Layout>
+      // );
     }
 
     const { product } = dataProduct;
@@ -189,7 +197,7 @@ class Product extends React.Component<Props, {}> {
       images,
       subProducts
     } = product!;
-    const activeSubProduct = getActiveSubProduct(subProducts, subProductId);
+    const activeSubProduct = getActiveSubProduct(subProducts, subProductId!);
     const activeImage =
       parseInt(activeSubProduct.id, 0) === subProductId
         ? images.filter(image => parseInt(image.id, 0) === colorId)[0]
@@ -326,10 +334,10 @@ class Product extends React.Component<Props, {}> {
 
             {/* Add to cart */}
             <ProductToCart
-              subProductId={subProductId}
+              subProductId={subProductId!}
               price={price}
               oldPrice={oldPrice}
-              inCart={subProductIdsInCart.indexOf(subProductId) !== -1}
+              inCart={subProductIdsInCart.indexOf(subProductId!) !== -1}
             />
           </div>
         </Layout>
