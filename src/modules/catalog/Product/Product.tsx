@@ -85,7 +85,6 @@ class Product extends React.Component<StateProps & OwnProps, State> {
               dotHeight={10}
               linkProps={this.getLinkProps()}
             />
-
             <MyTouchFeedback>
               <Link {...this.getLinkProps()}>
                 <div className={styles.info}>

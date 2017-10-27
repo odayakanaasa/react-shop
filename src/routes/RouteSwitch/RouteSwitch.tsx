@@ -23,6 +23,10 @@ const styles = require("./styles.css");
 
 interface Props extends IPage {}
 
+const AdminPage = ({ history }) => {
+  history.push("http://buybag.com.ua/admin");
+};
+
 const Routes = ({ Component, params }) => {
   return (
     <Component {...params}>

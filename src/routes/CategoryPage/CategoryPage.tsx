@@ -78,6 +78,22 @@ interface State {
   loading: boolean;
 }
 
+const FetchMoreLoading = ({ loading }) => {
+  console.log(`LOADING: ${loading}`);
+  return loading
+    ? <div
+        style={{
+          width: "100%",
+          textAlign: "center",
+          position: "relative",
+          top: "-1rem"
+        }}
+      >
+        <MyIcon type="loading" size="lg" />
+      </div>
+    : null;
+};
+
 class CategoryPage extends React.Component<Props, State> {
   // state = { title: "", filterEnabled: false };
   state = {
@@ -121,21 +137,30 @@ class CategoryPage extends React.Component<Props, State> {
 
   componentWillReceiveProps(nextProps: Props) {
     const { dataCategory, dataAllProducts } = nextProps;
-    if (!dataAllProducts.loading) {
-      this.setState({ loading: false });
+    const state: any = {};
+
+    // if (this.state.loading) {
+    //   return false;
+    // }
+
+    if (!dataAllProducts.loading && this.state.loading) {
+      state.loading = false;
+      console.log('loading=false')
       const { products, found } = dataAllProducts.allProducts!;
       if (products.length >= found) {
-        this.setState({
-          haveMoreProducts: false
-        });
+        state.haveMoreProducts = false;
       }
     }
-    if (!dataCategory.loading) {
-      this.setState({
-        title: dataCategory.category!.name
-      });
+    if (
+      !dataCategory.loading &&
+      dataCategory.category!.name !== this.state.title
+    ) {
+      state.title = dataCategory.category!.name;
     }
 
+    if (Object.keys(state).length > 0) {
+      this.setState(state);
+    }
     // if (this.state.loading) {
     //   window.removeEventListener("scroll", this.handleScrollThrottle, true);
     // }
@@ -153,6 +178,10 @@ class CategoryPage extends React.Component<Props, State> {
 
     if (this.state.loading) {
       // Prevent rerender till fetchMore
+      return false;
+    }
+
+    if (this.state.scrolledProducts !== nextState.scrolledProducts) {
       return false;
     }
 
@@ -178,10 +207,18 @@ class CategoryPage extends React.Component<Props, State> {
         window.dispatchEvent(new Event("resize"));
       }, 0);
     }
+
+    if (
+      JSON.stringify(this.props) === JSON.stringify(nextProps) &&
+      JSON.stringify(this.state) === JSON.stringify(nextState)
+    ) {
+      return false;
+    }
+
     return true;
   }
 
-  componentDidUpdate(prevProps: Props, prevState: State) {
+  componentDidUpdate(prevProps: Props, prezvState: State) {
     const { loading, allProducts } = this.props.dataAllProducts;
     if (!loading) {
       this.bottomHeight =
@@ -309,7 +346,7 @@ class CategoryPage extends React.Component<Props, State> {
                   unfilled={true}
                 />
               </Flex>
-              {/*<Sidebar
+              <Sidebar
                 sidebarClassName={styles.sidebar}
                 pullRight={true}
                 touch={false}
@@ -326,22 +363,16 @@ class CategoryPage extends React.Component<Props, State> {
                 }
                 open={this.state.openFilters}
                 onSetOpen={this.onSetOpen}
-              >*/}
-                <div className={styles.sidebarContent} ref={element => (this.ref = element)}>
+              >
+                <div
+                  className={styles.sidebarContent}
+                  ref={element => (this.ref = element)}
+                >
                   <Products
                     allProducts={dataAllProducts.allProducts}
                     location={location}
                   />
-                  <div
-                    style={{
-                      width: "100%",
-                      textAlign: "center",
-                      position: "relative",
-                      top: "-1rem"
-                    }}
-                  >
-                    {this.state.loading && <MyIcon type="loading" size="lg" />}
-                  </div>
+                  <FetchMoreLoading loading={this.state.loading} />
                 </div>
                 <div
                   className={styles.loading}
@@ -353,7 +384,7 @@ class CategoryPage extends React.Component<Props, State> {
                 >
                   <MyIcon type="loading" size="lg" />
                 </div>
-              {/*</Sidebar>*/}
+              </Sidebar>
             </Flex>}
       </Layout>
     );
