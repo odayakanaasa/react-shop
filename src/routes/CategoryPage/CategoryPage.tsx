@@ -316,9 +316,9 @@ class CategoryPage extends React.Component<Props, State> {
           ? <Loading />
           : <div className={styles.CategoryPage}>
               <Nav
+                dataAllProducts={dataAllProducts}
+                categoryId={id}
                 toggleFilters={this.toggleFilters}
-                foundProducts={dataAllProducts.allProducts.found}
-                refetch={dataAllProducts.refetch}
               />
               <Sidebar
                 sidebarClassName={styles.sidebar}
@@ -341,11 +341,6 @@ class CategoryPage extends React.Component<Props, State> {
                   className={styles.sidebarContent}
                   ref={element => (this.ref = element)}
                 >
-                  <SelectedFilters
-                    categoryId={id}
-                    filters={dataAllProducts.allProducts.filters}
-                  />
-
                   <Products
                     allProducts={dataAllProducts.allProducts}
                     location={location}
