@@ -84,7 +84,7 @@ class CategoryPage extends React.Component<Props, State> {
     // openFilters: false,
     openFilters: false,
     haveMoreProducts: true,
-    scrolledProducts: 0
+    scrolledProducts: undefined
   };
 
   ref;
@@ -126,7 +126,10 @@ class CategoryPage extends React.Component<Props, State> {
 
   componentWillReceiveProps(nextProps: Props) {
     const { dataCategory, dataAllProducts } = nextProps;
-    const state: any = {};
+
+    if (this.props.match.params.id !== nextProps.match.params.id) {
+      console.log('this.props.match.params.id !== nextProps.match.params.id')
+    }
 
     // if (this.state.loading) {
     //   return false;
@@ -138,21 +141,21 @@ class CategoryPage extends React.Component<Props, State> {
 
       // state.loading = false;
       console.log("loading=false");
+      this.setState({
+        scrolledProducts: dataAllProducts.allProducts.products.length
+      });
       const { products, found } = dataAllProducts.allProducts!;
       if (products.length >= found) {
-        state.haveMoreProducts = false;
+        this.setState({ haveMoreProducts: false });
       }
     }
     if (
       !dataCategory.loading &&
       dataCategory.category!.name !== this.state.title
     ) {
-      state.title = dataCategory.category!.name;
+      this.setState({ title: dataCategory.category!.name });
     }
 
-    if (Object.keys(state).length > 0) {
-      this.setState(state);
-    }
     // if (this.state.loading) {
     //   window.removeEventListener("scroll", this.handleScrollThrottle, true);
     // }
@@ -174,7 +177,7 @@ class CategoryPage extends React.Component<Props, State> {
       }, 0);
     }
 
-    if (nextProps.dataAllProducts.loading) {
+    if (nextProps.dataAllProducts.loading || nextProps.dataCategory.loading) {
       return false;
     }
 
@@ -235,6 +238,15 @@ class CategoryPage extends React.Component<Props, State> {
     });
   };
 
+  getScrolledProducts = scrollTop => {
+    const { dataAllProducts } = this.props;
+    return Math.round(
+      scrollTop /
+        this.bottomHeight *
+        dataAllProducts.allProducts.products.length
+    );
+  };
+
   handleScroll = event => {
     const {
       location,
@@ -253,9 +265,7 @@ class CategoryPage extends React.Component<Props, State> {
 
       // const scrollTop = document.body.scrollTop;
       const { scrolledProducts, haveMoreProducts } = this.state;
-      const scrolled = Math.round(
-        scrollTop / this.bottomHeight * products.length
-      );
+      const scrolled = this.getScrolledProducts(scrollTop);
 
       // FIXME: uncomment
       // this.setState({ scrolledProducts: scrolled });
@@ -328,7 +338,8 @@ class CategoryPage extends React.Component<Props, State> {
                       />
                       Фильтр
                       <div className={styles.ProductsCounter}>
-                        {scrolled} / {dataAllProducts.allProducts.found}
+                        <span style={{ color: "orange" }}>{scrolled}</span> /{" "}
+                        {dataAllProducts.allProducts.found}
                         <br />
                         товара
                       </div>
@@ -339,7 +350,7 @@ class CategoryPage extends React.Component<Props, State> {
                   className={`${styles.progress} ${scrolled ===
                     dataAllProducts.allProducts.found && styles.finished}`}
                   percent={Math.round(
-                    scrolled / dataAllProducts.allProducts.found * 100
+                    scrolled! / dataAllProducts.allProducts.found * 100
                   )}
                   position="normal"
                   unfilled={false}
