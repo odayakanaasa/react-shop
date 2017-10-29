@@ -42,6 +42,8 @@ class Products extends React.Component<Props, State> {
     return (
       <div className={styles.Products}>
         <MasonryInfiniteScroller
+          pack={true}
+          // pack={false}
           sizes={[{ columns: 2, gutter }]}
           loadMore={() => ""}
         >

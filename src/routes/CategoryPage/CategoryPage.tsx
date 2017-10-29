@@ -1,10 +1,13 @@
-import { Filters, Products } from "@src/modules/catalog";
+import { Dispatch } from "@src/interfaces";
+import { Filters, Products, SelectedFilters } from "@src/modules/catalog";
 import { IFilter } from "@src/modules/catalog/model";
-import { Loading } from "@src/modules/common";
-import MyIcon from "@src/modules/common/MyIcon/MyIcon";
+import { ICatalogReducer } from "@src/modules/catalog/reducer";
+import { Loading, MyIcon } from "@src/modules/common";
+import { MyTouchFeedback } from "@src/modules/common/utils";
 import { Layout } from "@src/modules/layout";
 import { ICategory, IProduct } from "@src/modules/product/model";
 import { PATH_NAMES } from "@src/routes/index";
+import { IPage, IRouterReducer } from "@src/routes/interfaces";
 import { Flex } from "antd-mobile";
 import Progress from "antd-mobile/lib/progress";
 import gql from "graphql-tag";
@@ -15,11 +18,6 @@ import * as React from "react";
 import { graphql, OperationOption, QueryProps } from "react-apollo";
 import Sidebar from "react-sidebar";
 import { compose } from "redux";
-
-import { Dispatch } from "../../interfaces";
-import { ICatalogReducer } from "../../modules/catalog/reducer";
-import { MyTouchFeedback } from "../../modules/common/utils";
-import { IPage, IRouterReducer } from "../interfaces";
 
 const styles = require("./styles.css");
 
@@ -169,27 +167,24 @@ class CategoryPage extends React.Component<Props, State> {
       location
     } = nextProps;
 
+    const pathname = compile(PATH_NAMES.category)({ id });
+    if (history.location.pathname === location.pathname) {
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 0);
+    }
+
     if (nextProps.dataAllProducts.loading) {
       return false;
     }
 
-    if (this.state.scrolledProducts !== nextState.scrolledProducts) {
-      return false;
-    }
+    // if (this.state.scrolledProducts !== nextState.scrolledProducts) {
+    //   return false;
+    // }
 
     if (history.location.pathname !== location.pathname) {
       // Prevent rerender cause two active routes (main and modal in RouteSwitch)
       return false;
-    }
-
-    const pathname = compile(PATH_NAMES.category)({ id });
-    if (
-      // !dataFilteredProducts.loading &&
-      history.location.pathname === location.pathname
-    ) {
-      setTimeout(() => {
-        window.dispatchEvent(new Event("resize"));
-      }, 0);
     }
 
     if (
@@ -245,7 +240,7 @@ class CategoryPage extends React.Component<Props, State> {
       location,
       dataAllProducts: { allProducts, loading, fetchMore }
     } = this.props;
-    console.log("scroll");
+    console.log("window.pageYOffset", window.pageYOffset);
     // if (loading) {
     //   return;
     // }
@@ -306,24 +301,23 @@ class CategoryPage extends React.Component<Props, State> {
         dataAllProducts.loading ||
         !dataAllProducts.allProducts
           ? <Loading />
-          : <Flex className={styles.CategoryPage} direction="column">
+          : <div className={styles.CategoryPage}>
               <Flex className={styles.navigation} direction="column">
-                <Flex
-                  className={styles.nav}
-                  style={{ background: "white", width: "100%" }}
-                >
-                  <div style={{ width: "50%", marginLeft: "1rem" }}>
-                    <MyIcon
-                      className={styles.sortIcon}
-                      type={require("!svg-sprite-loader!./sort.svg")}
-                    />
-                    Сортировка
-                  </div>
-
+                <Flex className={styles.nav} justify="center" align="center">
+                  <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+                    <div className={styles.navSorting}>
+                      <MyIcon
+                        className={styles.sortIcon}
+                        type={require("!svg-sprite-loader!./sort.svg")}
+                      />
+                      Сортировка
+                    </div>
+                  </MyTouchFeedback>
                   <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
                     <Flex
                       style={{ width: "50%", height: "100%" }}
                       onClick={this.toggleOpenFilters}
+                      className={styles.navFilter}
                     >
                       <MyIcon
                         className={styles.filterIcon}
@@ -332,6 +326,8 @@ class CategoryPage extends React.Component<Props, State> {
                       Фильтр
                       <div className={styles.ProductsCounter}>
                         {scrolled} / {dataAllProducts.allProducts.found}
+                        <br />
+                        товара
                       </div>
                     </Flex>
                   </MyTouchFeedback>
@@ -343,14 +339,14 @@ class CategoryPage extends React.Component<Props, State> {
                     scrolled / dataAllProducts.allProducts.found * 100
                   )}
                   position="normal"
-                  // unfilled={false}
-                  unfilled={true}
+                  unfilled={false}
                 />
               </Flex>
               <Sidebar
                 sidebarClassName={styles.sidebar}
                 pullRight={true}
                 touch={false}
+                shadow={true}
                 sidebar={
                   <Filters
                     dataAllProducts={dataAllProducts}
@@ -367,17 +363,22 @@ class CategoryPage extends React.Component<Props, State> {
                   className={styles.sidebarContent}
                   ref={element => (this.ref = element)}
                 >
+                  <SelectedFilters
+                    categoryId={id}
+                    filters={dataAllProducts.allProducts.filters}
+                  />
+
                   <Products
                     allProducts={dataAllProducts.allProducts}
                     location={location}
                   />
+                  {this.state.haveMoreProducts &&
+                    <div className={styles.loading}>
+                      <MyIcon type="loading" size="lg" />
+                    </div>}
                 </div>
-                {this.state.haveMoreProducts &&
-                  <div className={styles.loading}>
-                    <MyIcon type="loading" size="lg" />
-                  </div>}
               </Sidebar>
-            </Flex>}
+            </div>}
       </Layout>
     );
   }

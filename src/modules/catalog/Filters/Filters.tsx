@@ -12,6 +12,8 @@ import { IAllProduct, IFilter, IFilterValue } from "../model";
 
 const styles = require("./styles.css");
 
+const getSelected = (fitlers: IFilter[]) => {};
+
 interface IAmount {
   found: number;
   total?: number;
@@ -102,7 +104,9 @@ class Filters extends React.Component<Props, State> {
     } = this.props;
 
     let checkedValueIds = this.state.checkedValueIds;
+    let url = "";
     if (value) {
+      url = value.url;
       if (checkedValueIds.indexOf(value.id) === -1) {
         checkedValueIds.push(value.id);
       } else {
@@ -122,9 +126,9 @@ class Filters extends React.Component<Props, State> {
         })
       );
     }
-    // history.replace(
-    //   `${compile(PATH_NAMES.category)({ id: categoryId })}?query=${filterStr}`
-    // );
+    history.replace(
+      `${compile(PATH_NAMES.category)({ id: categoryId })}?query=${url}`
+    );
   };
 
   getFilter = (filter: IFilter, found) => {
@@ -161,7 +165,7 @@ class Filters extends React.Component<Props, State> {
                     onClick={() => this.handleClick(value)}
                   >
                     <div className={styles.colorCount}>
-                      {filter.hasChecked && "+"}
+                      {filter.hasChecked && !value.isChecked && "+"}
                       {value.count}
                     </div>
                     <MyIcon
@@ -308,7 +312,7 @@ class Filters extends React.Component<Props, State> {
 
         <Flex direction="column" className={styles.Filters}>
           <Flex className={styles.title}>
-            <MyTouchFeedback>
+            <MyTouchFeedback style={{ background: "#19599e" }}>
               <MyIcon
                 className={styles.closeIcon}
                 type={require("!svg-sprite-loader!./close.svg")}
@@ -317,13 +321,13 @@ class Filters extends React.Component<Props, State> {
             </MyTouchFeedback>
             <div>
               Найдено {found}
-              {found === total ? "" : ` из ${total}`}
+              {!total || found === total ? "" : ` из ${total}`}
             </div>
           </Flex>
           <Progress
-            className={`${styles.progress} ${found === this.state.total &&
+            className={`${styles.progress} ${found === total &&
               styles.finished}`}
-            percent={Math.round(found / this.state.total! * 100)}
+            percent={Math.round(found / total! * 100)}
             position="normal"
             // unfilled={false}
             unfilled={true}
@@ -336,25 +340,32 @@ class Filters extends React.Component<Props, State> {
           </Accordion>
 
           <Flex className={styles.buttons} align="center">
-            <MyTouchFeedback>
-              <div className={styles.button} onClick={onSetOpen}>
+            <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+              <div
+                onClick={() => {
+                  console.log("close");
+                  onSetOpen();
+                }}
+                className={styles.button}
+              >
                 ЗАКРЫТЬ
               </div>
             </MyTouchFeedback>
 
-            <MyTouchFeedback>
-              <div
-                style={{
-                  display: found === total ? "none" : "block",
-                  color: "red"
-                  // opacity: found === total ? 0.5 : 1
-                }}
-                className={styles.button}
-                onClick={() => this.handleClick()}
-              >
-                СБРОСИТЬ
-              </div>
-            </MyTouchFeedback>
+            {filters.filter(filter => filter.hasChecked).length > 0 &&
+              <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+                <div
+                  style={{
+                    display: found === total ? "none" : "block",
+                    color: "red"
+                    // opacity: found === total ? 0.5 : 1
+                  }}
+                  className={styles.button}
+                  onClick={() => this.handleClick()}
+                >
+                  СБРОСИТЬ
+                </div>
+              </MyTouchFeedback>}
           </Flex>
         </Flex>
       </div>

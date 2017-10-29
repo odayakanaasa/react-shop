@@ -17,7 +17,7 @@ class CartPage extends React.Component<OwnProps, {}> {
       history,
       header: {
         title: "Корзина",
-        right: null
+        // right: null
       },
       footer: null
     };

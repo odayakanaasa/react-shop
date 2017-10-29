@@ -22,11 +22,15 @@ class FinishedCart extends React.Component<OwnProps, State> {
   };
 
   handleScroll = event => {
-    this.setState({ imageSize: initialImageSize + event.srcElement.scrollTop });
+    this.setState({ imageSize: initialImageSize + event.pageYOffset });
   };
 
   componentDidMount() {
     window.addEventListener("scroll", this.handleScroll, true);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleScroll, true);
   }
 
   render() {

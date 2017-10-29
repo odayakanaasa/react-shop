@@ -30,7 +30,7 @@ class Layout extends React.Component<Props, State> {
   setOnTopWithThrottle: (event) => void;
 
   setOnTop = event => {
-    const onTop = event.srcElement.scrollTop < 40;
+    const onTop = window.pageYOffset < 100;
     if (onTop !== this.state.onTop) {
       this.setState({ onTop });
     }

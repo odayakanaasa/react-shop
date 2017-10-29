@@ -1,4 +1,4 @@
-import { MyIcon } from "@src/modules/common";
+import { MyIcon, Price } from "@src/modules/common";
 import { MyTouchFeedback } from "@src/modules/common/utils";
 import { Images } from "@src/modules/product";
 import { IImages } from "@src/modules/product/model";
@@ -93,12 +93,16 @@ class Product extends React.Component<StateProps & OwnProps, State> {
                     <br />
                     {brand.name} {subProduct.article}
                   </div>
-                  <div className={styles.price}>
-                    <div>
-                      {isSinglePrice ? "" : "от "}
-                      {parseInt(minPrice, 10)} грн
-                    </div>
-                  </div>
+                  <Price
+                    style={{
+                      height: subProduct.oldPrice ? "3.5rem" : "3rem",
+                      justifyContent: subProduct.oldPrice ? "center" : "left",
+                      display: "flex",
+                      alignItems: subProduct.oldPrice ? "left" : "center",
+                    }}
+                    price={subProduct.price}
+                    oldPrice={subProduct.oldPrice}
+                  />
                 </div>
               </Link>
             </MyTouchFeedback>

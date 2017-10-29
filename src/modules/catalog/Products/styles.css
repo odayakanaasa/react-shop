@@ -1,6 +1,7 @@
 .Products {
-  /* margin: 0.2rem 0.2rem 2.5rem; */
-  margin: 5.8rem 0.2rem 2.5rem;
+  /* margin: 5.8rem 0.2rem 2.5rem; */
+  margin: 5.8rem 0 2.5rem;
+  width: 100%;
 }
 
 .loading {
