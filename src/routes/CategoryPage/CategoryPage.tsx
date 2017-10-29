@@ -256,7 +256,10 @@ class CategoryPage extends React.Component<Props, State> {
       const scrolled = Math.round(
         scrollTop / this.bottomHeight * products.length
       );
-      this.setState({ scrolledProducts: scrolled });
+
+      // FIXME: uncomment
+      // this.setState({ scrolledProducts: scrolled });
+
       if (
         scrollTop > this.bottomHeight &&
         haveMoreProducts === true
