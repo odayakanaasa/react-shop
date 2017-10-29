@@ -1,5 +1,5 @@
 import { Dispatch } from "@src/interfaces";
-import { Filters, Products, SelectedFilters } from "@src/modules/catalog";
+import { Filters, Products, SelectedFilters, Nav } from "@src/modules/catalog";
 import { IFilter } from "@src/modules/catalog/model";
 import { ICatalogReducer } from "@src/modules/catalog/reducer";
 import { Loading, MyIcon } from "@src/modules/common";
@@ -128,7 +128,7 @@ class CategoryPage extends React.Component<Props, State> {
     const { dataCategory, dataAllProducts } = nextProps;
 
     if (this.props.match.params.id !== nextProps.match.params.id) {
-      console.log('this.props.match.params.id !== nextProps.match.params.id')
+      console.log("this.props.match.params.id !== nextProps.match.params.id");
     }
 
     // if (this.state.loading) {
@@ -230,7 +230,7 @@ class CategoryPage extends React.Component<Props, State> {
     };
   };
 
-  toggleOpenFilters = () => {
+  toggleFilters = () => {
     this.setState({ openFilters: !this.state.openFilters }, () => {
       this.state.openFilters
         ? window.removeEventListener("scroll", this.handleScrollThrottle, true)
@@ -315,47 +315,11 @@ class CategoryPage extends React.Component<Props, State> {
         !dataAllProducts.allProducts
           ? <Loading />
           : <div className={styles.CategoryPage}>
-              <Flex className={styles.navigation} direction="column">
-                <Flex className={styles.nav} justify="center" align="center">
-                  <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-                    <div className={styles.navSorting}>
-                      <MyIcon
-                        className={styles.sortIcon}
-                        type={require("!svg-sprite-loader!./sort.svg")}
-                      />
-                      Сортировка
-                    </div>
-                  </MyTouchFeedback>
-                  <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-                    <Flex
-                      style={{ width: "50%", height: "100%" }}
-                      onClick={this.toggleOpenFilters}
-                      className={styles.navFilter}
-                    >
-                      <MyIcon
-                        className={styles.filterIcon}
-                        type={require("!svg-sprite-loader!./filter.svg")}
-                      />
-                      Фильтр
-                      <div className={styles.ProductsCounter}>
-                        <span style={{ color: "orange" }}>{scrolled}</span> /{" "}
-                        {dataAllProducts.allProducts.found}
-                        <br />
-                        товара
-                      </div>
-                    </Flex>
-                  </MyTouchFeedback>
-                </Flex>
-                <Progress
-                  className={`${styles.progress} ${scrolled ===
-                    dataAllProducts.allProducts.found && styles.finished}`}
-                  percent={Math.round(
-                    scrolled! / dataAllProducts.allProducts.found * 100
-                  )}
-                  position="normal"
-                  unfilled={false}
-                />
-              </Flex>
+              <Nav
+                toggleFilters={this.toggleFilters}
+                foundProducts={dataAllProducts.allProducts.found}
+                refetch={dataAllProducts.refetch}
+              />
               <Sidebar
                 sidebarClassName={styles.sidebar}
                 pullRight={true}
@@ -366,12 +330,12 @@ class CategoryPage extends React.Component<Props, State> {
                     dataAllProducts={dataAllProducts}
                     categoryId={id}
                     open={this.state.openFilters}
-                    onSetOpen={this.toggleOpenFilters}
+                    onSetOpen={this.toggleFilters}
                     history={history}
                   />
                 }
                 open={this.state.openFilters}
-                onSetOpen={this.toggleOpenFilters}
+                onSetOpen={this.toggleFilters}
               >
                 <div
                   className={styles.sidebarContent}

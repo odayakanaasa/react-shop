@@ -1,0 +1,66 @@
+.Nav {
+  width: 100%;
+  position: fixed;
+  top: 2.8rem;
+  z-index: 1;
+}
+
+.nav {
+  height: 2.7rem;
+  width: 100%;
+  align-content: center;
+  /* position: fixed;
+  top: 2.8rem; */
+  z-index: 1000;
+  box-shadow: 1px 2px 4px -1px lightgrey;
+  background: white;
+}
+
+.navSorting {
+  display: flex;
+  width: 50%;
+  padding-left: 0.5rem;
+}
+
+.navFilter {
+  height: 2.7rem;
+  width: 50%;
+}
+
+.filterIcon {
+  padding: 0 5px;
+  height: 15px;
+  width: 15px;
+  fill: black;
+}
+
+.sortIcon {
+  padding: 0 5px;
+  height: 18px;
+  width: 18px;
+  fill: black;
+}
+
+.ProductsCounter {
+  margin-left: 1rem;
+  font-size: 0.8rem;
+  color: gray;
+  text-align: right;
+}
+
+.progress {
+  width: 100%;
+  /* top: 3rem; */
+  /* left: 0; */
+  /* position: fixed; */
+  /* right: 0; */
+  opacity: 0.7;
+}
+
+.progress * {
+  border-color: orange !important;
+}
+
+.finished * {
+  border-color: green !important;
+}

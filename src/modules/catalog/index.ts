@@ -1,4 +1,5 @@
 import Filters from "./Filters/Filters";
+import Nav from "./Nav/Nav";
 import Product from "./Product/Product";
 import Products from "./Products/Products";
 import ProductsCounter from "./ProductsCounter/ProductsCounter";
@@ -7,4 +8,4 @@ import ShowOnlyViewed from "./ShowOnlyViewed/ShowOnlyViewed";
 
 import * as model from "./model";
 
-export { Filters, Products, Product, ProductsCounter, SelectedFilters, ShowOnlyViewed, model };
+export { Filters, Nav, Products, Product, ProductsCounter, SelectedFilters, ShowOnlyViewed, model };
