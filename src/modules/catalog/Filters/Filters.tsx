@@ -1,5 +1,5 @@
 import { MyIcon } from "@src/modules/common";
-import { MyTouchFeedback, Aux } from "@src/modules/common/utils";
+import { MyTouchFeedback } from "@src/modules/common/utils";
 import { IDataAllProduct } from "@src/routes/CategoryPage/CategoryPage";
 import { Accordion, Flex, List, Progress, Switch } from "antd-mobile";
 import { compile } from "path-to-regexp";
@@ -7,7 +7,6 @@ import * as React from "react";
 import { QueryProps } from "react-apollo";
 
 import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
-import Loading from "../../common/Loading/Loading";
 import { IAllProduct, IFilter, IFilterValue } from "../model";
 
 const styles = require("./styles.css");
@@ -89,6 +88,7 @@ class Filters extends React.Component<Props, State> {
   //     </div>
   //   );
   // }
+
   state = {
     loading: false,
     total: undefined,
@@ -302,7 +302,11 @@ class Filters extends React.Component<Props, State> {
     const total = this.state.total;
     console.log("Filters.render()");
     return (
-      <div style={{ height: "100%", widht: "100%" }}>
+      <Flex
+        className={styles.Filters}
+        direction="column"
+        style={{ height: "100%", widht: "100%", overflowY: "hidden" }}
+      >
         {this.state.loading &&
           <div className={styles.darkMask}>
             <div className={styles.loading}>
@@ -310,65 +314,62 @@ class Filters extends React.Component<Props, State> {
             </div>}
           </div>}
 
-        <Flex direction="column" className={styles.Filters}>
-          <Flex className={styles.title}>
-            <MyTouchFeedback style={{ background: "#19599e" }}>
-              <MyIcon
-                className={styles.closeIcon}
-                type={require("!svg-sprite-loader!./close.svg")}
-                onClick={onSetOpen}
-              />
-            </MyTouchFeedback>
-            <div>
-              Найдено {found}
-              {!total || found === total ? "" : ` из ${total}`}
-            </div>
-          </Flex>
-          <Progress
-            className={`${styles.progress} ${found === total &&
-              styles.finished}`}
-            percent={Math.round(found / total! * 100)}
-            position="normal"
-            // unfilled={false}
-            unfilled={true}
-          />
-          <Accordion
-            activeKey={filters.map(filter => String(filter.id))}
-            className={styles.accordion}
-          >
-            {filters.map(filter => this.getFilter(filter, found))}
-          </Accordion>
+        <Flex className={styles.title}>
+          <MyTouchFeedback style={{ background: "#19599e" }}>
+            <MyIcon
+              className={styles.closeIcon}
+              type={require("!svg-sprite-loader!./close.svg")}
+              onClick={onSetOpen}
+            />
+          </MyTouchFeedback>
+          <div>
+            Найдено {found}
+            {!total || found === total ? "" : ` из ${total}`}
+          </div>
+        </Flex>
+        <Progress
+          className={`${styles.progress} ${found === total && styles.finished}`}
+          percent={Math.round(found / total! * 100)}
+          position="normal"
+          // unfilled={false}
+          unfilled={true}
+        />
+        <Accordion
+          activeKey={filters.map(filter => String(filter.id))}
+          className={styles.accordion}
+        >
+          {filters.map(filter => this.getFilter(filter, found))}
+        </Accordion>
 
-          <Flex className={styles.buttons} align="center">
+        <Flex className={styles.buttons} align="center">
+          <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+            <div
+              onClick={() => {
+                console.log("close");
+                onSetOpen();
+              }}
+              className={styles.button}
+            >
+              ЗАКРЫТЬ
+            </div>
+          </MyTouchFeedback>
+
+          {filters.filter(filter => filter.hasChecked).length > 0 &&
             <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
               <div
-                onClick={() => {
-                  console.log("close");
-                  onSetOpen();
+                style={{
+                  display: found === total ? "none" : "block",
+                  color: "red"
+                  // opacity: found === total ? 0.5 : 1
                 }}
                 className={styles.button}
+                onClick={() => this.handleClick()}
               >
-                ЗАКРЫТЬ
+                СБРОСИТЬ
               </div>
-            </MyTouchFeedback>
-
-            {filters.filter(filter => filter.hasChecked).length > 0 &&
-              <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-                <div
-                  style={{
-                    display: found === total ? "none" : "block",
-                    color: "red"
-                    // opacity: found === total ? 0.5 : 1
-                  }}
-                  className={styles.button}
-                  onClick={() => this.handleClick()}
-                >
-                  СБРОСИТЬ
-                </div>
-              </MyTouchFeedback>}
-          </Flex>
+            </MyTouchFeedback>}
         </Flex>
-      </div>
+      </Flex>
     );
   }
 }

@@ -67,10 +67,6 @@ class Nav extends React.Component<Props, State> {
           position="normal"
           unfilled={false}
         />
-        <SelectedFilters
-          categoryId={categoryId}
-          filters={dataAllProducts.allProducts.filters}
-        />
       </Flex>
     );
   }

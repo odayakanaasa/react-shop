@@ -1,15 +1,13 @@
+import { getSelectedFilters } from "../../modules/catalog/SelectedFilters/SelectedFilters";
 import { Dispatch } from "@src/interfaces";
-import { Filters, Products, SelectedFilters, Nav } from "@src/modules/catalog";
+import { Filters, Nav, Products, SelectedFilters } from "@src/modules/catalog";
 import { IFilter } from "@src/modules/catalog/model";
 import { ICatalogReducer } from "@src/modules/catalog/reducer";
 import { Loading, MyIcon } from "@src/modules/common";
-import { MyTouchFeedback } from "@src/modules/common/utils";
 import { Layout } from "@src/modules/layout";
 import { ICategory, IProduct } from "@src/modules/product/model";
 import { PATH_NAMES } from "@src/routes/index";
 import { IPage, IRouterReducer } from "@src/routes/interfaces";
-import { Flex } from "antd-mobile";
-import Progress from "antd-mobile/lib/progress";
 import gql from "graphql-tag";
 import update from "immutability-helper";
 import { throttle } from "lodash";
@@ -21,7 +19,7 @@ import { compose } from "redux";
 
 const styles = require("./styles.css");
 
-const LIMIT = 15;
+export const LIMIT = 15;
 
 // miliseconds bettwen scroll event
 const SCROLL_THROTTLE = 250;
@@ -145,8 +143,9 @@ class CategoryPage extends React.Component<Props, State> {
         scrolledProducts: dataAllProducts.allProducts.products.length
       });
       const { products, found } = dataAllProducts.allProducts!;
-      if (products.length >= found) {
-        this.setState({ haveMoreProducts: false });
+      const haveMoreProducts = products.length >= LIMIT;
+      if (haveMoreProducts !== this.state.haveMoreProducts) {
+        this.setState({ haveMoreProducts });
       }
     }
     if (
@@ -231,6 +230,7 @@ class CategoryPage extends React.Component<Props, State> {
   };
 
   toggleFilters = () => {
+    document.body.style.overflow = this.state.openFilters ? "scroll" : "hidden";
     this.setState({ openFilters: !this.state.openFilters }, () => {
       this.state.openFilters
         ? window.removeEventListener("scroll", this.handleScrollThrottle, true)
@@ -261,7 +261,8 @@ class CategoryPage extends React.Component<Props, State> {
       const { products, found } = allProducts;
 
       // Calculate scrolled products
-      const scrollTop = event.srcElement.scrollTop;
+      // const scrollTop = event.srcElement.scrollTop;
+      const scrollTop = window.pageYOffset;
 
       // const scrollTop = document.body.scrollTop;
       const { scrolledProducts, haveMoreProducts } = this.state;
@@ -321,7 +322,11 @@ class CategoryPage extends React.Component<Props, State> {
                 toggleFilters={this.toggleFilters}
               />
               <Sidebar
+                rootClassName={`${styles.root} ${this.state.openFilters &&
+                  styles.rootOpened}`}
                 sidebarClassName={styles.sidebar}
+                overlayClassName={styles.overlay}
+                contentClassName={styles.content}
                 pullRight={true}
                 touch={false}
                 shadow={true}
@@ -341,9 +346,23 @@ class CategoryPage extends React.Component<Props, State> {
                   className={styles.sidebarContent}
                   ref={element => (this.ref = element)}
                 >
+                  <SelectedFilters
+                    categoryId={id}
+                    filters={dataAllProducts.allProducts.filters}
+                    style={{
+                      flexDirection: this.state.openFilters ? "column" : "row",
+                    }}
+                  />
                   <Products
                     allProducts={dataAllProducts.allProducts}
                     location={location}
+                    style={{
+                      marginTop:
+                        getSelectedFilters(dataAllProducts.allProducts.filters)
+                          .length > 0
+                          ? "2.4rem"
+                          : 0
+                    }}
                   />
                   {this.state.haveMoreProducts &&
                     <div className={styles.loading}>

@@ -10,12 +10,16 @@
 }
 
 .sidebar {
+  position: fixed !important;
+  top: 0;
+  right: 0;
   width: 80%;
   /* background-color: white; */
-  z-index: 1000 !important;
+  z-index: 10000000 !important;
 }
 
 .sidebarContent {
+  margin: 3.1rem 0 2.5rem;
   overflow-x: hidden;
   width: 100%;
   /* position: absolute;
@@ -36,4 +40,31 @@
   position: relative;
   top: -1.5rem;
   margin-bottom: 2.8rem;
+}
+
+.sidebarContent {
+  /* position: absolute; */
+  position: relative !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: hidden;
+  transition: left 0.3s ease-out, right 0.3s ease-out;
+}
+
+.overlay {
+}
+
+.root {
+  overflow: scroll !important;
+  position: relative !important;
+}
+
+.rootOpened {
+  /* position: absolute !important; */
+}
+
+.content {
+  position: relative !important;
 }

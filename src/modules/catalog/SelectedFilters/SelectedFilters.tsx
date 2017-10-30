@@ -10,11 +10,14 @@ import { IFilter } from "../model";
 
 const styles = require("./styles.css");
 
-const getSelected = (fitlers: IFilter[]) => {};
+export const getSelectedFilters = (filters: IFilter[]) => {
+  return filters.filter(filter => filter.hasChecked);
+};
 
 interface OwnProps {
   categoryId: number;
   filters: IFilter[];
+  style?: any;
 }
 
 interface State {
@@ -29,15 +32,15 @@ class SelectedFilters extends React.Component<Props, State> {
   };
   render() {
     console.log("SelectedFilters.render");
-    const { filters, categoryId } = this.props;
-    const checkedFilters = filters.filter(
-      filter => filter.hasChecked && filter.id !== this.state.uncheckedFilterId
+    const { filters, categoryId, style } = this.props;
+    const checkedFilters = getSelectedFilters(filters).filter(
+      filter => filter.id !== this.state.uncheckedFilterId
     );
     if (checkedFilters.length === 0) {
       return null;
     }
     return (
-      <Flex className={styles.SelectedFilters} wrap="wrap">
+      <Flex style={style} className={styles.SelectedFilters} wrap="wrap">
         {checkedFilters.map((filter, i) =>
           <MyTouchFeedback key={i}>
             <Link
