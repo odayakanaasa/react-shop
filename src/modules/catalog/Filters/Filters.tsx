@@ -266,7 +266,7 @@ class Filters extends React.Component<Props, State> {
                 >
                   {value.name}
                   <div className={styles.count}>
-                    {filter.hasChecked && "+"}
+                    {filter.hasChecked && !value.isChecked && "+"}
                     {value.count}
                   </div>
                   {value.isChecked === true}
@@ -342,30 +342,32 @@ class Filters extends React.Component<Props, State> {
         </Accordion>
 
         <Flex className={styles.buttons} align="center">
-            <div
-              onClick={() => {
-                console.log("close");
-                onSetOpen();
-              }}
-              className={styles.button}
-            >
-              ЗАКРЫТЬ
-            </div>
+          <div
+            onClick={() => {
+              console.log("close");
+              onSetOpen();
+            }}
+            className={styles.button}
+          >
+            <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+              <div>ЗАКРЫТЬ</div>
+            </MyTouchFeedback>
+          </div>
 
           {filters.filter(filter => filter.hasChecked).length > 0 &&
-            <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-              <div
-                style={{
-                  display: found === total ? "none" : "block",
-                  color: "red"
-                  // opacity: found === total ? 0.5 : 1
-                }}
-                className={styles.button}
-                onClick={() => this.handleClick()}
-              >
-                СБРОСИТЬ
-              </div>
-            </MyTouchFeedback>}
+            <div
+              style={{
+                display: found === total ? "none" : "block",
+                color: "red"
+                // opacity: found === total ? 0.5 : 1
+              }}
+              className={styles.button}
+              onClick={() => this.handleClick()}
+            >
+              <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+                <div>СБРОСИТЬ</div>
+              </MyTouchFeedback>
+            </div>}
         </Flex>
       </Flex>
     );
