@@ -13,7 +13,8 @@ import { ICatalogReducer } from "../reducer";
 const styles = require("./styles.css");
 
 interface StateProps {
-  catalog: ICatalogReducer;
+  showOnlyViewed: boolean;
+  viewedProductIds: any;
 }
 
 interface OwnProps {
@@ -30,15 +31,16 @@ interface Props extends StateProps, OwnProps {}
 class Products extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props, prezvState: State) {
     const { products } = this.props.allProducts;
-    if (products.length <= LIMIT) {
-      window.scrollTo(0, 0);
-    }
+    // if (products.length <= LIMIT) {
+    //   window.scrollTo(0, 0);
+    // }
   }
 
   render() {
     const {
       allProducts: { products, total },
-      catalog: { showOnlyViewed, viewedProductIds },
+      showOnlyViewed,
+      viewedProductIds,
       style
     } = this.props;
     const filteredProducts = showOnlyViewed
@@ -66,8 +68,11 @@ class Products extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: IRootReducer): StateProps => ({
-  catalog: state.catalog
+const mapStateToProps = ({
+  catalog: { showOnlyViewed, viewedProductIds }
+}: IRootReducer): StateProps => ({
+  showOnlyViewed,
+  viewedProductIds
 });
 
 export default compose(connect<StateProps, {}, OwnProps>(mapStateToProps))(

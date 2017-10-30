@@ -1,21 +1,24 @@
-import { getSelectedFilters } from "../../modules/catalog/SelectedFilters/SelectedFilters";
 import { Dispatch } from "@src/interfaces";
 import { Filters, Nav, Products, SelectedFilters } from "@src/modules/catalog";
+import { ACTION_SET_SCROLLED_PRODUCTS } from "@src/modules/catalog/constants";
 import { IFilter } from "@src/modules/catalog/model";
-import { ICatalogReducer } from "@src/modules/catalog/reducer";
 import { Loading, MyIcon } from "@src/modules/common";
 import { Layout } from "@src/modules/layout";
 import { ICategory, IProduct } from "@src/modules/product/model";
+import { IRootReducer } from "@src/rootReducer";
 import { PATH_NAMES } from "@src/routes/index";
-import { IPage, IRouterReducer } from "@src/routes/interfaces";
+import { IPage } from "@src/routes/interfaces";
 import gql from "graphql-tag";
 import update from "immutability-helper";
 import { throttle } from "lodash";
 import { compile } from "path-to-regexp";
 import * as React from "react";
 import { graphql, OperationOption, QueryProps } from "react-apollo";
+import { connect } from "react-redux";
 import Sidebar from "react-sidebar";
 import { compose } from "redux";
+
+import { getSelectedFilters } from "../../modules/catalog/SelectedFilters/SelectedFilters";
 
 const styles = require("./styles.css");
 
@@ -47,13 +50,10 @@ export interface IDataAllProduct extends QueryProps {
   };
 }
 
-interface StateProps {
-  router: IRouterReducer;
-  catalog: ICatalogReducer;
-}
+interface StateProps {}
 
 interface DispatchProps {
-  dispath: Dispatch;
+  dispatch: Dispatch;
 }
 
 export interface GraphQLProps {
@@ -64,13 +64,12 @@ export interface GraphQLProps {
 
 interface OwnProps extends IPage {}
 
-interface Props extends OwnProps, GraphQLProps {}
+interface Props extends OwnProps, StateProps, DispatchProps, GraphQLProps {}
 
 interface State {
   title: string;
   openFilters: boolean;
   haveMoreProducts?: boolean;
-  scrolledProducts?: number;
   // loading: boolean;
 }
 
@@ -139,8 +138,12 @@ class CategoryPage extends React.Component<Props, State> {
 
       // state.loading = false;
       console.log("loading=false");
-      this.setState({
-        scrolledProducts: dataAllProducts.allProducts.products.length
+      // this.setState({
+      //   scrolledProducts: dataAllProducts.allProducts.products.length
+      // });
+      this.props.dispatch({
+        type: ACTION_SET_SCROLLED_PRODUCTS,
+        value: dataAllProducts.allProducts.products.length
       });
       const { products, found } = dataAllProducts.allProducts!;
       const haveMoreProducts = products.length >= LIMIT;
@@ -265,10 +268,14 @@ class CategoryPage extends React.Component<Props, State> {
       const scrollTop = window.pageYOffset;
 
       // const scrollTop = document.body.scrollTop;
-      const { scrolledProducts, haveMoreProducts } = this.state;
-      const scrolled = this.getScrolledProducts(scrollTop);
+      const { haveMoreProducts } = this.state;
+      const scrolledProducts = this.getScrolledProducts(scrollTop);
 
-      // FIXME: uncomment
+      this.props.dispatch({
+        type: ACTION_SET_SCROLLED_PRODUCTS,
+        value: scrolledProducts
+      });
+
       // this.setState({ scrolledProducts: scrolled });
 
       if (
@@ -294,13 +301,9 @@ class CategoryPage extends React.Component<Props, State> {
       history,
       dataCategory,
       dataAllProducts
-      // dataFilteredProducts
     } = this.props;
 
-    // {dataCategory.loading || dataFilteredProducts.loading
-    // <ProductsCounter scrolled={this.refineScrolledProducts(this.state.scrolledProducts)} total={total} />
-
-    const scrolled = this.state.scrolledProducts;
+    const scrolledProducts = this.state.scrolledProducts;
     if (!(dataCategory.loading || dataAllProducts.loading)) {
       console.log("CategoryPage.render");
     }
@@ -350,7 +353,7 @@ class CategoryPage extends React.Component<Props, State> {
                     categoryId={id}
                     filters={dataAllProducts.allProducts.filters}
                     style={{
-                      flexDirection: this.state.openFilters ? "column" : "row",
+                      flexDirection: this.state.openFilters ? "column" : "row"
                     }}
                   />
                   <Products
@@ -479,7 +482,10 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
 //   name: "dataFilteredProducts"
 // };
 
+const mapStateToProps = (state: IRootReducer): StateProps => ({});
+
 export default compose(
+  connect<StateProps, DispatchProps, OwnProps>(mapStateToProps),
   graphql<GraphQLProps>(CATEGORY_QUERY, categoryOptions),
   graphql<GraphQLProps, OwnProps>(ALL_PRODUCTS_QUERY, allProductsOptions)
 )(CategoryPage as any) as any;

@@ -18,13 +18,14 @@
 
 .navSorting {
   display: flex;
-  width: 50%;
+  width: 40%;
   padding-left: 0.5rem;
 }
 
 .navFilter {
   height: 2.7rem;
-  width: 50%;
+  width: 60%;
+  padding-left: 3rem;
 }
 
 .filterIcon {
@@ -46,6 +47,7 @@
   font-size: 0.8rem;
   color: gray;
   text-align: right;
+  width: 33%;
 }
 
 .progress {

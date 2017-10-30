@@ -102,7 +102,7 @@ class Filters extends React.Component<Props, State> {
       dataAllProducts: { refetch },
       history
     } = this.props;
-
+    window.scrollTo(0, 0);
     let checkedValueIds = this.state.checkedValueIds;
     let url = "";
     if (value) {
@@ -342,7 +342,6 @@ class Filters extends React.Component<Props, State> {
         </Accordion>
 
         <Flex className={styles.buttons} align="center">
-          <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
             <div
               onClick={() => {
                 console.log("close");
@@ -352,7 +351,6 @@ class Filters extends React.Component<Props, State> {
             >
               ЗАКРЫТЬ
             </div>
-          </MyTouchFeedback>
 
           {filters.filter(filter => filter.hasChecked).length > 0 &&
             <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
