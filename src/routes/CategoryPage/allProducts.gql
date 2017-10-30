@@ -1,12 +1,14 @@
 query allProducts(
   $categoryId: Int
   $filterStr: String
+  $sorting: String
   $offset: Int
   $first: Int
 ) {
   allProducts(
     categoryId: $categoryId
     filterStr: $filterStr
+    sorting: $sorting
     offset: $offset
     first: $first
   ) {
@@ -18,6 +20,7 @@ query allProducts(
       help
       type
       position
+      resetUrl
       values {
         id
         name
@@ -29,6 +32,11 @@ query allProducts(
         url
         value
       }
+    }
+    sorting {
+      name
+      url
+      isChecked
     }
     products {
       id

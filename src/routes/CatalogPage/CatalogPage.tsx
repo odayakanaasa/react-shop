@@ -22,6 +22,7 @@ class CatalogPage extends React.Component<OwnProps, {}> {
   };
 
   render() {
+    window.scrollTo(0, 0);
     const { location, history } = this.props;
     return (
       <Layout {...this.getLayoutOptions()}>

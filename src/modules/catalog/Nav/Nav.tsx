@@ -2,7 +2,7 @@ import { ICatalogReducer } from "@src/modules/catalog/reducer";
 import { MyIcon } from "@src/modules/common";
 import { MyTouchFeedback } from "@src/modules/common/utils";
 import { IRootReducer } from "@src/rootReducer";
-import { Flex, Progress } from "antd-mobile";
+import { Flex, Progress, Modal } from "antd-mobile";
 import * as React from "react";
 import { connect } from "react-redux";
 
@@ -41,7 +41,14 @@ class Nav extends React.Component<Props, State> {
       <Flex className={styles.Nav} direction="column">
         <Flex className={styles.nav} justify="between" align="center">
           <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-            <div className={styles.navSorting}>
+            <div
+              onClick={() =>
+                Modal.operation([
+                  { text: "от дешевых к дорогим", onPress: () => console.log("标为未读被点击了") },
+                  { text: "от дорогих к дешевым", onPress: () => console.log("置顶聊天被点击了") }
+                ])}
+              className={styles.navSorting}
+            >
               <MyIcon
                 className={styles.sortIcon}
                 type={require("!svg-sprite-loader!./sort.svg")}

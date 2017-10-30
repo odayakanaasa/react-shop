@@ -26,5 +26,6 @@ export interface IFilter {
   help: string;
   position: number;
   hasChecked: boolean;
+  resetUrl?: string;
   values: [IFilterValue];
 }

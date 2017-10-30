@@ -125,6 +125,7 @@ class CategoryPage extends React.Component<Props, State> {
     const { dataCategory, dataAllProducts } = nextProps;
 
     if (this.props.match.params.id !== nextProps.match.params.id) {
+      window.scrollTo(0, 0);
       console.log("this.props.match.params.id !== nextProps.match.params.id");
     }
 
@@ -420,6 +421,7 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
     variables: {
       categoryId: ownProps.match.params.id,
       filterStr: ownProps.location.search.replace("?query=", ""),
+      sorting: "price",
       first: LIMIT,
       offset: 0
     }

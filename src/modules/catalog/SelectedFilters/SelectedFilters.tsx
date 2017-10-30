@@ -48,7 +48,7 @@ class SelectedFilters extends React.Component<Props, State> {
               className={styles.item}
               to={{
                 pathname: compile(PATH_NAMES.category)({ id: categoryId }),
-                search: `query=`
+                search: `query=${filter.resetUrl}`
               }}
               onClick={() => this.setState({ uncheckedFilterId: filter.id })}
             >
