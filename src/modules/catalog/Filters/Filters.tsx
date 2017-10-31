@@ -51,7 +51,6 @@ interface State {
 interface Props extends OwnProps, GraphQLProps {}
 
 class Filters extends React.Component<Props, State> {
-
   state = {
     loading: false,
     total: undefined,
@@ -257,9 +256,9 @@ class Filters extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    // if (!this.props.open) {
-    //   return false;
-    // }
+    if (nextProps.open !== this.props.open) {
+      return false;
+    }
     return true;
   }
 

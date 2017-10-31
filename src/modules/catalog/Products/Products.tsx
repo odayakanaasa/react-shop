@@ -22,6 +22,7 @@ interface OwnProps {
   location: MyLocation;
   allProducts: IAllProduct;
   style: any;
+  openFilters: boolean;
 }
 
 interface State {}
@@ -29,11 +30,16 @@ interface State {}
 interface Props extends StateProps, OwnProps {}
 
 class Products extends React.Component<Props, State> {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (this.props.openFilters !== nextProps.openFilters) {
+      // Prevent rerender whan sidebar is opened
+      return false;
+    }
+    return true;
+  }
+
   componentDidUpdate(prevProps: Props, prezvState: State) {
     const { products } = this.props.allProducts;
-    // if (products.length <= LIMIT) {
-    //   window.scrollTo(0, 0);
-    // }
   }
 
   render() {

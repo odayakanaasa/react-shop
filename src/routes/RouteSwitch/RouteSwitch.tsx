@@ -76,7 +76,6 @@ class RouteSwitch extends React.Component<Props, {}> {
           className={styles.mainRoute}
           style={{
             display: isModal ? "none" : "block",
-            // opacity: isModal ? 0.3 : 1,
           }}
         >
           <Routes

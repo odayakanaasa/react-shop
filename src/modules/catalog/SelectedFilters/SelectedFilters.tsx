@@ -20,6 +20,7 @@ interface OwnProps {
   filters: IFilter[];
   style?: any;
   history: MyHistory;
+  openFilters: boolean;
 }
 
 interface State {
@@ -44,6 +45,14 @@ class SelectedFilters extends React.Component<Props, State> {
     );
     this.setState({ uncheckedFilterId: filter.id });
   };
+
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (this.props.openFilters !== nextProps.openFilters) {
+      // Prevent rerender whan sidebar is toggled
+      return false;
+    }
+    return true;
+  }
 
   render() {
     console.log("SelectedFilters.render");

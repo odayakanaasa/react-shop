@@ -122,9 +122,11 @@ class CategoryPage extends React.Component<Props, State> {
   componentWillReceiveProps(nextProps: Props) {
     const { dataCategory, dataAllProducts } = nextProps;
 
-    if (this.props.match.params.id !== nextProps.match.params.id) {
+    if (
+      this.props.match.params.id !== nextProps.match.params.id ||
+      this.props.location.search !== nextProps.location.search
+    ) {
       window.scrollTo(0, 0);
-      console.log("this.props.match.params.id !== nextProps.match.params.id");
     }
 
     // if (this.state.loading) {
@@ -182,10 +184,6 @@ class CategoryPage extends React.Component<Props, State> {
       return false;
     }
 
-    // if (this.state.scrolledProducts !== nextState.scrolledProducts) {
-    //   return false;
-    // }
-
     if (history.location.pathname !== location.pathname) {
       // Prevent rerender cause two active routes (main and modal in RouteSwitch)
       return false;
@@ -197,11 +195,6 @@ class CategoryPage extends React.Component<Props, State> {
     ) {
       return false;
     }
-
-    // if (this.state.openFilters && nextState.openFilters) {
-    //   // Prevent rerender whan sidebar is opened
-    //   return false;
-    // }
 
     return true;
   }
@@ -349,6 +342,7 @@ class CategoryPage extends React.Component<Props, State> {
                   ref={element => (this.ref = element)}
                 >
                   <SelectedFilters
+                    openFilters={this.state.openFilters}
                     history={history}
                     categoryId={id}
                     filters={dataAllProducts.allProducts.filters}
@@ -366,6 +360,7 @@ class CategoryPage extends React.Component<Props, State> {
                           ? "2.4rem"
                           : 0
                     }}
+                    openFilters={this.state.openFilters}
                   />
                   {this.state.haveMoreProducts &&
                     <div className={styles.loading}>
@@ -378,28 +373,6 @@ class CategoryPage extends React.Component<Props, State> {
     );
   }
 }
-
-// <Sidebar
-// sidebarClassName={styles.sidebar}
-// pullRight={true}
-// touch={false}
-// sidebar={
-//   <Filters
-//     dataAllProducts={dataAllProducts}
-//     categoryId={id}
-//     onSetOpen={this.onSetOpen}
-//     history={history}
-//   />
-// }
-// open={this.state.openFilters}
-// onSetOpen={this.onSetOpen}
-// >
-// <Products data={dataAllProducts} />
-// </Sidebar>
-
-// const mapStateToProps = (state: IRootReducer): StateProps => ({
-//   // catalog: state.catalog
-// });
 
 const CATEGORY_QUERY = gql(require("./category.gql"));
 const categoryOptions: OperationOption<OwnProps, GraphQLProps> = {
