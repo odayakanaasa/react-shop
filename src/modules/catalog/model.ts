@@ -29,3 +29,10 @@ export interface IFilter {
   resetUrl?: string;
   values: [IFilterValue];
 }
+
+export interface ISort {
+  icon: string;
+  name: string;
+  isSelected: boolean;
+  value: string;
+}

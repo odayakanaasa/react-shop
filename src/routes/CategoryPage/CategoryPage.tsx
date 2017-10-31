@@ -1,13 +1,15 @@
 import { Dispatch } from "@src/interfaces";
 import { Filters, Nav, Products, SelectedFilters } from "@src/modules/catalog";
 import { ACTION_SET_SCROLLED_PRODUCTS } from "@src/modules/catalog/constants";
-import { IFilter } from "@src/modules/catalog/model";
+import { IFilter, ISort } from "@src/modules/catalog/model";
+import { getSelectedFilters } from "@src/modules/catalog/SelectedFilters/SelectedFilters";
 import { Loading, MyIcon } from "@src/modules/common";
 import { Layout } from "@src/modules/layout";
 import { ICategory, IProduct } from "@src/modules/product/model";
 import { IRootReducer } from "@src/rootReducer";
 import { PATH_NAMES } from "@src/routes/index";
 import { IPage } from "@src/routes/interfaces";
+import { getMapFromSearch } from "@src/utils";
 import gql from "graphql-tag";
 import update from "immutability-helper";
 import { throttle } from "lodash";
@@ -17,8 +19,6 @@ import { graphql, OperationOption, QueryProps } from "react-apollo";
 import { connect } from "react-redux";
 import Sidebar from "react-sidebar";
 import { compose } from "redux";
-
-import { getSelectedFilters } from "../../modules/catalog/SelectedFilters/SelectedFilters";
 
 const styles = require("./styles.css");
 
@@ -45,6 +45,7 @@ interface IDataFilteredProducts extends QueryProps {
 export interface IDataAllProduct extends QueryProps {
   allProducts: {
     filters: [IFilter];
+    sorting: [ISort];
     products: IProduct[];
     found: number;
   };
@@ -321,6 +322,7 @@ class CategoryPage extends React.Component<Props, State> {
           ? <Loading />
           : <div className={styles.CategoryPage}>
               <Nav
+                history={history}
                 dataAllProducts={dataAllProducts}
                 categoryId={id}
                 toggleFilters={this.toggleFilters}
@@ -416,31 +418,22 @@ const categoryOptions: OperationOption<OwnProps, GraphQLProps> = {
 export const ALL_PRODUCTS_QUERY = gql(require("./allProducts.gql"));
 
 export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
-  options: ownProps => ({
+  options: ownProps => {
     // fetchPolicy: "network-only",
-    variables: {
-      categoryId: ownProps.match.params.id,
-      filterStr: ownProps.location.search.replace("?query=", ""),
-      sorting: "price",
-      first: LIMIT,
-      offset: 0
-    }
-  }),
+    const searchMap = getMapFromSearch(ownProps.location.search);
+    return {
+      variables: {
+        categoryId: ownProps.match.params.id,
+        filterStr: searchMap.get("query") || "",
+        sorting: searchMap.get("sorting") || "",
+        first: LIMIT,
+        offset: 0
+      }
+    };
+  },
   props: (ownProps: any) => {
     const { data } = ownProps;
-    const { loading, fetchMore, refetch } = data;
-    let allProducts;
-    if (!loading) {
-      // This is temp hack to exclude products without subProducts
-      // TODO: Should be solved in GraphQL server
-      allProducts = update(data.allProducts, {
-        products: {
-          $set: data.allProducts.products.filter(
-            p => p.subProducts.length !== 0
-          )
-        }
-      });
-    }
+    const { allProducts, loading, fetchMore, refetch } = data;
     return {
       dataAllProducts: {
         allProducts,

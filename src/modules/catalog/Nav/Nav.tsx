@@ -2,14 +2,23 @@ import { ICatalogReducer } from "@src/modules/catalog/reducer";
 import { MyIcon } from "@src/modules/common";
 import { MyTouchFeedback } from "@src/modules/common/utils";
 import { IRootReducer } from "@src/rootReducer";
-import { Flex, Progress, Modal } from "antd-mobile";
+import { getMapFromSearch } from "@src/utils";
+import { Flex, Popover, Progress } from "antd-mobile";
+import { compile } from "path-to-regexp";
 import * as React from "react";
 import { connect } from "react-redux";
 
 import { IDataAllProduct } from "../../../routes/CategoryPage/CategoryPage";
+import { MyHistory } from "../../../routes/interfaces";
+import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
 import { IFilter } from "../model";
 
 const styles = require("./styles.css");
+
+const ICONS_MAP = {
+  "sort-asc": require("!svg-sprite-loader!./sort-asc.svg"),
+  "sort-desc": require("!svg-sprite-loader!./sort-desc.svg")
+};
 
 const getSelected = (fitlers: IFilter[]) => {};
 
@@ -19,6 +28,7 @@ interface OwnProps {
   categoryId: number;
   toggleFilters: () => void;
   dataAllProducts: IDataAllProduct;
+  history: MyHistory;
 }
 
 interface StateProps {
@@ -27,34 +37,80 @@ interface StateProps {
 
 interface Props extends OwnProps, StateProps {}
 
-interface State {}
+interface State {
+  sortingEnabled: boolean;
+}
 
 class Nav extends React.Component<Props, State> {
+  state = {
+    sortingEnabled: false
+  };
+
+  toggleSorting = () => {
+    this.setState({ sortingEnabled: !this.state.sortingEnabled });
+  };
+
   render() {
     const {
+      history,
       dataAllProducts,
       categoryId,
       catalog: { scrolledProducts }
     } = this.props;
     const { found } = dataAllProducts.allProducts;
+    const searchMap = getMapFromSearch(history.location.search);
+    const sortingProps: any = {
+      placement: "bottomLeft",
+      visible: this.state.sortingEnabled,
+      onVisibleChange: this.toggleSorting,
+      mask: true,
+      onSelect: (node, index) => {
+        history.replace(
+          `${compile(PATH_NAMES.category)({
+            id: categoryId
+          })}?query=${searchMap.get("query") || ""}&sorting=${node.props.value}`
+        );
+        this.toggleSorting();
+      }
+    };
+    const selectedSort = dataAllProducts.allProducts.sorting.filter(
+      sort => sort.isSelected
+    )[0];
     return (
       <Flex className={styles.Nav} direction="column">
         <Flex className={styles.nav} justify="between" align="center">
           <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-            <div
-              onClick={() =>
-                Modal.operation([
-                  { text: "от дешевых к дорогим", onPress: () => console.log("标为未读被点击了") },
-                  { text: "от дорогих к дешевым", onPress: () => console.log("置顶聊天被点击了") }
-                ])}
-              className={styles.navSorting}
+            <Popover
+              classNme={styles.sorting}
+              {...sortingProps}
+              overlay={dataAllProducts.allProducts.sorting.map(sort =>
+                <Popover.Item
+                  onVisibleChange={this.toggleSorting}
+                  style={{
+                    color: sort.isSelected ? "orange" : "black"
+                  }}
+                  value={sort.value}
+                  icon={<MyIcon type={ICONS_MAP[sort.icon]} size="md" />}
+                >
+                  {sort.name}
+                </Popover.Item>
+              )}
             >
-              <MyIcon
-                className={styles.sortIcon}
-                type={require("!svg-sprite-loader!./sort.svg")}
-              />
-              Сортировка
-            </div>
+              <Flex className={styles.navSorting}>
+                <div>
+                  <MyIcon
+                    className={styles.sortIcon}
+                    type={ICONS_MAP[selectedSort.icon]}
+                  />
+                </div>
+                <Flex direction="column">
+                  <div className={styles.navName}>Сортировка</div>
+                  <div className={styles.navValue}>
+                    {selectedSort.name}
+                  </div>
+                </Flex>
+              </Flex>
+            </Popover>
           </MyTouchFeedback>
           <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
             <Flex
@@ -62,17 +118,21 @@ class Nav extends React.Component<Props, State> {
               onClick={this.props.toggleFilters}
               className={styles.navFilter}
             >
-              <MyIcon
-                className={styles.filterIcon}
-                type={require("!svg-sprite-loader!./filter.svg")}
-              />
-              Фильтр
-              <div className={styles.ProductsCounter}>
-                <span style={{ color: "orange" }}>{scrolledProducts}</span> /{" "}
-                {found}
-                <br />
-                товара
+              <div>
+                <MyIcon
+                  className={styles.filterIcon}
+                  type={require("!svg-sprite-loader!./filter.svg")}
+                />
               </div>
+              <Flex direction="column">
+                <div className={styles.navName}>Фильтр</div>
+                <div
+                  // className={styles.ProductsCounter}
+                  className={styles.navValue}
+                >
+                  найдено <span style={{ color: "orange" }}>{found}</span> товара
+                </div>
+              </Flex>
             </Flex>
           </MyTouchFeedback>
         </Flex>

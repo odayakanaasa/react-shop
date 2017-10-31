@@ -6,7 +6,7 @@
 }
 
 .nav {
-  height: 2.7rem;
+  height: 3rem;
   width: 100%;
   align-content: center;
   /* position: fixed;
@@ -18,14 +18,16 @@
 
 .navSorting {
   display: flex;
-  width: 40%;
-  padding-left: 0.5rem;
+  justify-content: center;
+  width: 50%;
+  height: 3rem;
 }
 
 .navFilter {
-  height: 2.7rem;
-  width: 60%;
-  padding-left: 3rem;
+  height: 3rem;
+  width: 50%;
+  justify-content: center;
+  /* padding-left: 3rem; */
 }
 
 .filterIcon {
@@ -37,9 +39,17 @@
 
 .sortIcon {
   padding: 0 5px;
-  height: 18px;
-  width: 18px;
+  height: 1.2rem;
+  width: 1.2rem;
   fill: black;
+}
+
+.navName {
+}
+
+.navValue {
+  font-size: 0.6rem;
+  color: gray;
 }
 
 .ProductsCounter {
@@ -65,4 +75,8 @@
 
 .finished * {
   border-color: green !important;
+}
+
+.sorting {
+  z-index: 10000000;
 }

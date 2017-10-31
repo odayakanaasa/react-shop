@@ -34,9 +34,10 @@ query allProducts(
       }
     }
     sorting {
+      icon
       name
-      url
-      isChecked
+      value
+      isSelected
     }
     products {
       id
