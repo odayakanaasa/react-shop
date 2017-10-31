@@ -2,9 +2,10 @@ import { MyIcon } from "@src/modules/common";
 import { PATH_NAMES } from "@src/routes";
 import { Flex } from "antd-mobile";
 import { compile } from "path-to-regexp";
+import * as queryString from "query-string";
 import * as React from "react";
-import { Link } from "react-router-dom";
 
+import { MyHistory } from "../../../routes/interfaces";
 import { MyTouchFeedback } from "../../common/utils";
 import { IFilter } from "../model";
 
@@ -18,6 +19,7 @@ interface OwnProps {
   categoryId: number;
   filters: IFilter[];
   style?: any;
+  history: MyHistory;
 }
 
 interface State {
@@ -30,6 +32,19 @@ class SelectedFilters extends React.Component<Props, State> {
   state = {
     uncheckedFilterId: undefined
   };
+
+  handleClick = (filter: IFilter) => {
+    const { categoryId, history } = this.props;
+    const GET = queryString.parse(history.location.search);
+    GET.filters = filter.resetUrl;
+    history.replace(
+      `${compile(PATH_NAMES.category)({
+        id: categoryId
+      })}?${queryString.stringify(GET)}`
+    );
+    this.setState({ uncheckedFilterId: filter.id });
+  };
+
   render() {
     console.log("SelectedFilters.render");
     const { filters, categoryId, style } = this.props;
@@ -43,14 +58,11 @@ class SelectedFilters extends React.Component<Props, State> {
       <Flex style={style} className={styles.SelectedFilters} wrap="wrap">
         {checkedFilters.map((filter, i) =>
           <MyTouchFeedback key={i}>
-            <Link
-              key={i}
+            <div
               className={styles.item}
-              to={{
-                pathname: compile(PATH_NAMES.category)({ id: categoryId }),
-                search: `query=${filter.resetUrl}`
+              onClick={() => {
+                this.handleClick(filter);
               }}
-              onClick={() => this.setState({ uncheckedFilterId: filter.id })}
             >
               <MyIcon
                 className={styles.closeIcon}
@@ -59,7 +71,7 @@ class SelectedFilters extends React.Component<Props, State> {
               <span className={styles.label}>
                 {filter.name}
               </span>
-            </Link>
+            </div>
           </MyTouchFeedback>
         )}
       </Flex>

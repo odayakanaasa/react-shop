@@ -9,11 +9,11 @@ import { ICategory, IProduct } from "@src/modules/product/model";
 import { IRootReducer } from "@src/rootReducer";
 import { PATH_NAMES } from "@src/routes/index";
 import { IPage } from "@src/routes/interfaces";
-import { getMapFromSearch } from "@src/utils";
 import gql from "graphql-tag";
 import update from "immutability-helper";
 import { throttle } from "lodash";
 import { compile } from "path-to-regexp";
+import * as queryString from "query-string";
 import * as React from "react";
 import { graphql, OperationOption, QueryProps } from "react-apollo";
 import { connect } from "react-redux";
@@ -78,11 +78,8 @@ class CategoryPage extends React.Component<Props, State> {
   // state = { title: "", filterEnabled: false };
   state = {
     title: "",
-    // loading: false,
-    // openFilters: false,
     openFilters: false,
-    haveMoreProducts: true,
-    scrolledProducts: undefined
+    haveMoreProducts: true
   };
 
   ref;
@@ -305,7 +302,6 @@ class CategoryPage extends React.Component<Props, State> {
       dataAllProducts
     } = this.props;
 
-    const scrolledProducts = this.state.scrolledProducts;
     if (!(dataCategory.loading || dataAllProducts.loading)) {
       console.log("CategoryPage.render");
     }
@@ -353,6 +349,7 @@ class CategoryPage extends React.Component<Props, State> {
                   ref={element => (this.ref = element)}
                 >
                   <SelectedFilters
+                    history={history}
                     categoryId={id}
                     filters={dataAllProducts.allProducts.filters}
                     style={{
@@ -420,12 +417,12 @@ export const ALL_PRODUCTS_QUERY = gql(require("./allProducts.gql"));
 export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
   options: ownProps => {
     // fetchPolicy: "network-only",
-    const searchMap = getMapFromSearch(ownProps.location.search);
+    const GET = queryString.parse(ownProps.location.search);
     return {
       variables: {
         categoryId: ownProps.match.params.id,
-        filterStr: searchMap.get("query") || "",
-        sorting: searchMap.get("sorting") || "",
+        filters: GET.filters,
+        sorting: GET.sorting,
         first: LIMIT,
         offset: 0
       }
@@ -471,7 +468,7 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
 //     fetchPolicy: "cache-first",
 //     variables: {
 //       categoryId: parseInt(props.match.params.id, 0),
-//       filterStr: "61=7962;brand=cat"
+//       filters: "61=7962;brand=cat"
 //     }
 //   }),
 //   name: "dataFilteredProducts"

@@ -1,13 +1,13 @@
 query allProducts(
   $categoryId: Int
-  $filterStr: String
+  $filters: String
   $sorting: String
   $offset: Int
   $first: Int
 ) {
   allProducts(
     categoryId: $categoryId
-    filterStr: $filterStr
+    filters: $filters
     sorting: $sorting
     offset: $offset
     first: $first

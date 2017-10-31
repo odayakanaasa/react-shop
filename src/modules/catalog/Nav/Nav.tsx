@@ -2,9 +2,9 @@ import { ICatalogReducer } from "@src/modules/catalog/reducer";
 import { MyIcon } from "@src/modules/common";
 import { MyTouchFeedback } from "@src/modules/common/utils";
 import { IRootReducer } from "@src/rootReducer";
-import { getMapFromSearch } from "@src/utils";
 import { Flex, Popover, Progress } from "antd-mobile";
 import { compile } from "path-to-regexp";
+import * as queryString from "query-string";
 import * as React from "react";
 import { connect } from "react-redux";
 
@@ -58,18 +58,21 @@ class Nav extends React.Component<Props, State> {
       catalog: { scrolledProducts }
     } = this.props;
     const { found } = dataAllProducts.allProducts;
-    const searchMap = getMapFromSearch(history.location.search);
+    const GET = queryString.parse(history.location.search);
     const sortingProps: any = {
       placement: "bottomLeft",
       visible: this.state.sortingEnabled,
       onVisibleChange: this.toggleSorting,
       mask: true,
       onSelect: (node, index) => {
-        history.replace(
-          `${compile(PATH_NAMES.category)({
-            id: categoryId
-          })}?query=${searchMap.get("query") || ""}&sorting=${node.props.value}`
-        );
+        if (GET.sorting !== node.props.value) {
+          GET.sorting = node.props.value;
+          history.replace(
+            `${compile(PATH_NAMES.category)({
+              id: categoryId
+            })}?${queryString.stringify(GET)}`
+          );
+        }
         this.toggleSorting();
       }
     };
@@ -97,12 +100,10 @@ class Nav extends React.Component<Props, State> {
               )}
             >
               <Flex className={styles.navSorting}>
-                <div>
-                  <MyIcon
-                    className={styles.sortIcon}
-                    type={ICONS_MAP[selectedSort.icon]}
-                  />
-                </div>
+                <MyIcon
+                  className={styles.sortIcon}
+                  type={ICONS_MAP[selectedSort.icon]}
+                />
                 <Flex direction="column">
                   <div className={styles.navName}>Сортировка</div>
                   <div className={styles.navValue}>
@@ -114,23 +115,21 @@ class Nav extends React.Component<Props, State> {
           </MyTouchFeedback>
           <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
             <Flex
-              style={{ width: "50%", height: "100%" }}
               onClick={this.props.toggleFilters}
               className={styles.navFilter}
             >
-              <div>
-                <MyIcon
-                  className={styles.filterIcon}
-                  type={require("!svg-sprite-loader!./filter.svg")}
-                />
-              </div>
-              <Flex direction="column">
+              <MyIcon
+                className={styles.filterIcon}
+                type={require("!svg-sprite-loader!./filter.svg")}
+              />
+              <Flex direction="column" align="start">
                 <div className={styles.navName}>Фильтр</div>
                 <div
                   // className={styles.ProductsCounter}
                   className={styles.navValue}
                 >
-                  найдено <span style={{ color: "orange" }}>{found}</span> товара
+                  найдено <span style={{ color: "orange" }}>{found}</span>{" "}
+                  товара
                 </div>
               </Flex>
             </Flex>

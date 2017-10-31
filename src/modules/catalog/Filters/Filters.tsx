@@ -3,6 +3,7 @@ import { MyTouchFeedback } from "@src/modules/common/utils";
 import { IDataAllProduct } from "@src/routes/CategoryPage/CategoryPage";
 import { Accordion, Flex, List, Progress, Switch } from "antd-mobile";
 import { compile } from "path-to-regexp";
+import * as queryString from "query-string";
 import * as React from "react";
 import { QueryProps } from "react-apollo";
 
@@ -50,44 +51,6 @@ interface State {
 interface Props extends OwnProps, GraphQLProps {}
 
 class Filters extends React.Component<Props, State> {
-  // render() {
-  //   const { filters, amount } = this.props;
-  //   return (
-  //     <div>
-  //       <div className={styles.amount}>
-  //         Товаров: {amount.current} / {amount.total}
-  //       </div>
-  //       <List className={styles.Filters}>
-  //         {filters.map(filter =>
-  //           <List.Item
-  //             key={filter.id}
-  //             extra={filter.type === "B" ? <Switch checked={true} /> : null}
-  //             header={
-
-  //                 ? <div />
-  //                 : <MyTouchFeedback>
-  //                     <Flex>
-  //                       <div>
-  //                         {filter.name}
-  //                       </div>
-  //                     </Flex>
-  //                   </MyTouchFeedback>
-  //             }
-  //             className={styles.header}
-  //           >
-  //             <List className={styles.content}>
-  //               {filter.values!.map((value, i) =>
-  //                 <List.Item key={i} className={styles.value}>
-  //                   {value.name}
-  //                 </List.Item>
-  //               )}
-  //             </List>
-  //           </List.Item>
-  //         )}
-  //       </List>
-  //     </div>
-  //   );
-  // }
 
   state = {
     loading: false,
@@ -103,6 +66,7 @@ class Filters extends React.Component<Props, State> {
       history
     } = this.props;
     window.scrollTo(0, 0);
+    const GET = queryString.parse(history.location.search);
     let checkedValueIds = this.state.checkedValueIds;
     let url = "";
     if (value) {
@@ -119,15 +83,18 @@ class Filters extends React.Component<Props, State> {
       this.setState({ loading: true, checkedValueIds }, () =>
         refetch({
           categoryId,
-          filterStr: value ? value.url : "",
+          filters: value ? value.url : "",
           offset: 0
         }).then(res => {
           this.setState({ loading: false });
         })
       );
     }
+    GET.filters = url;
     history.replace(
-      `${compile(PATH_NAMES.category)({ id: categoryId })}?query=${url}`
+      `${compile(PATH_NAMES.category)({
+        id: categoryId
+      })}?${queryString.stringify(GET)}`
     );
   };
 
@@ -157,7 +124,7 @@ class Filters extends React.Component<Props, State> {
               }}
             >
               {filter.values!
-                .filter(color => color.count !== found)
+                .filter(color => color.isChecked || color.count !== found)
                 .map((value, i) =>
                   <div
                     key={i}
@@ -290,9 +257,9 @@ class Filters extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    if (!this.props.open) {
-      return false;
-    }
+    // if (!this.props.open) {
+    //   return false;
+    // }
     return true;
   }
 
@@ -380,7 +347,7 @@ class Filters extends React.Component<Props, State> {
 //     // fetchPolicy: "cache-first",
 //     variables: {
 //       categoryId: props.categoryId,
-//       filterStr: ""
+//       filters: ""
 //     }
 //   }),
 //   name: "dataFilteredProducts"
