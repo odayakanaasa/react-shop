@@ -49,9 +49,6 @@ class Products extends React.Component<Props, State> {
       viewedProductIds,
       style
     } = this.props;
-    const filteredProducts = showOnlyViewed
-      ? products.filter(p => viewedProductIds.indexOf(parseInt(p.id, 0)) !== -1)
-      : products;
 
     const gutter = 3;
     console.log("Products.render");
@@ -59,12 +56,11 @@ class Products extends React.Component<Props, State> {
     return (
       <div className={styles.Products} style={style}>
         <MasonryInfiniteScroller
-          pack={true}
-          // pack={false}
+          pack={false}
           sizes={[{ columns: 2, gutter }]}
           loadMore={() => ""}
         >
-          {filteredProducts.map((product, i) => {
+          {products.map((product, i) => {
             return <Product key={i} {...product} />;
           })}
         </MasonryInfiniteScroller>
