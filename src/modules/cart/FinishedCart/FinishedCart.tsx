@@ -26,11 +26,11 @@ class FinishedCart extends React.Component<OwnProps, State> {
   };
 
   componentDidMount() {
-    window.addEventListener("scroll", this.handleScroll, true);
+    window.addEventListener("scroll", this.handleScroll, false);
   }
 
   componentWillUnmount() {
-    window.removeEventListener("scroll", this.handleScroll, true);
+    window.removeEventListener("scroll", this.handleScroll, false);
   }
 
   render() {

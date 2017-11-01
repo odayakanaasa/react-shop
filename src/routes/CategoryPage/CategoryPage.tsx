@@ -22,10 +22,12 @@ import { compose } from "redux";
 
 const styles = require("./styles.css");
 
-export const LIMIT = 15;
+export const LIMIT = 20;
+// export const LIMIT = 50;
 
 // miliseconds bettwen scroll event
 const SCROLL_THROTTLE = 250;
+// const SCROLL_THROTTLE = 500;
 
 // px from bottom to start fetch more products
 // const FETCH_MORE_THRESHOLD = window.innerHeight * 2;
@@ -61,7 +63,6 @@ interface DispatchProps {
 export interface GraphQLProps {
   dataCategory: IDataCategory;
   dataAllProducts: IDataAllProduct;
-  // dataFilteredProducts: IDataFilteredProducts;
 }
 
 interface OwnProps extends IPage {}
@@ -122,7 +123,7 @@ class CategoryPage extends React.Component<Props, State> {
       SCROLL_THROTTLE
     );
     console.log("addEvent");
-    window.addEventListener("scroll", this.handleScrollThrottle, true);
+    window.addEventListener("scroll", this.handleScrollThrottle, false);
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -141,7 +142,6 @@ class CategoryPage extends React.Component<Props, State> {
 
     // if (!dataAllProducts.loading && this.state.loading) {
     if (!dataAllProducts.loading) {
-      // window.addEventListener("scroll", this.handleScrollThrottle, true);
 
       // state.loading = false;
       console.log("loading=false");
@@ -166,7 +166,6 @@ class CategoryPage extends React.Component<Props, State> {
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     const {
       dataCategory,
-      // dataFilteredProducts,
       history,
       match: { params: { id } },
       location
@@ -201,7 +200,8 @@ class CategoryPage extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (!hasMore(this.props.dataAllProducts)) {
       console.log("removeEventListener");
-      window.removeEventListener("scroll", this.handleScrollThrottle, true);
+      // window.removeEventListener("scroll", this.handleScrollThrottle, true);
+      window.removeEventListener("scroll", this.handleScrollThrottle, false);
     }
 
     const { loading, allProducts } = this.props.dataAllProducts;
@@ -216,7 +216,8 @@ class CategoryPage extends React.Component<Props, State> {
 
   componentWillUnmount() {
     console.log("removeEventListener");
-    window.removeEventListener("scroll", this.handleScrollThrottle, true);
+    // window.removeEventListener("scroll", this.handleScrollThrottle, true);
+    window.removeEventListener("scroll", this.handleScrollThrottle, false);
   }
 
   getLayoutOptions = () => {
@@ -232,8 +233,8 @@ class CategoryPage extends React.Component<Props, State> {
     document.body.style.overflow = this.state.openFilters ? "scroll" : "hidden";
     this.setState({ openFilters: !this.state.openFilters }, () => {
       this.state.openFilters
-        ? window.removeEventListener("scroll", this.handleScrollThrottle, true)
-        : window.addEventListener("scroll", this.handleScrollThrottle, true);
+        ? window.removeEventListener("scroll", this.handleScrollThrottle, false)
+        : window.addEventListener("scroll", this.handleScrollThrottle, false);
     });
   };
 
@@ -252,9 +253,6 @@ class CategoryPage extends React.Component<Props, State> {
       dataAllProducts: { allProducts, loading, fetchMore }
     } = this.props;
     console.log("window.pageYOffset", window.pageYOffset);
-    // if (loading) {
-    //   return;
-    // }
 
     if (location.pathname.search("category") !== -1) {
       const { products, found } = allProducts;
@@ -264,16 +262,16 @@ class CategoryPage extends React.Component<Props, State> {
 
       const scrolledProducts = this.getScrolledProducts(scrollTop);
 
-      this.props.dispatch({
-        type: ACTION_SET_SCROLLED_PRODUCTS,
-        value: scrolledProducts
-      });
+      // this.props.dispatch({
+      //   type: ACTION_SET_SCROLLED_PRODUCTS,
+      //   value: scrolledProducts
+      // });
 
       if (scrollTop > this.bottomHeight) {
         console.log("removeEventListener");
-        window.removeEventListener("scroll", this.handleScrollThrottle, true);
+        window.removeEventListener("scroll", this.handleScrollThrottle, false);
         fetchMore({} as any).then(res => {
-          window.addEventListener("scroll", this.handleScrollThrottle, true);
+          window.addEventListener("scroll", this.handleScrollThrottle, false);
           console.log("addEvent");
         });
       }

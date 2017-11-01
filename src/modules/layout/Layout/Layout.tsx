@@ -41,7 +41,7 @@ class Layout extends React.Component<Props, State> {
       event => this.setOnTop(event),
       SCROLL_THROTTLE
     );
-    window.addEventListener("scroll", this.setOnTopWithThrottle, true);
+    window.addEventListener("scroll", this.setOnTopWithThrottle, false);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,7 +49,7 @@ class Layout extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    window.removeEventListener("scroll", this.setOnTopWithThrottle, true);
+    window.removeEventListener("scroll", this.setOnTopWithThrottle, false);
   }
 
   render() {
