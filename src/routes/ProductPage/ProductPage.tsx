@@ -93,6 +93,12 @@ class Product extends React.Component<Props, {}> {
     this.props.unselectAll();
   }
 
+  // componentDidUpdate(prevProps, prevState) {
+  //   if (this.props.location.state && this.props.location.state.modal) {
+  //     document.getElementById("mainRoute")!.style.display = "none";
+  //   }
+  // }
+
   componentWillReceiveProps(nextProps: Props) {
     const { location, dataProduct } = nextProps;
     const { loading, product } = dataProduct;
@@ -179,7 +185,7 @@ class Product extends React.Component<Props, {}> {
   render() {
     const { location, history, dataProduct, dataCart } = this.props;
     if (dataProduct.loading || !this.props.product.subProductId) {
-      return <div style={{opacity: 0}}/>
+      return <div style={{ opacity: 0 }} />;
       // return (
       //   <Layout {...this.getLayoutOptions()}>
       //     <Loading />

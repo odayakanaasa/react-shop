@@ -102,7 +102,7 @@ class Nav extends React.Component<Props, State> {
                   className={styles.sortIcon}
                   type={ICONS_MAP[selectedSort.icon]}
                 />
-                <Flex direction="column">
+                <Flex direction="column" align="start">
                   <div className={styles.navName}>Сортировка</div>
                   <div className={styles.navValue}>
                     {selectedSort.name}

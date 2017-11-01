@@ -8,6 +8,7 @@ import * as React from "react";
 import { QueryProps } from "react-apollo";
 
 import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
+import LoadingMask from "../../layout/LoadingMask/LoadingMask";
 import { IAllProduct, IFilter, IFilterValue } from "../model";
 
 const styles = require("./styles.css");
@@ -269,11 +270,7 @@ class Filters extends React.Component<Props, State> {
         style={{ height: "100%", widht: "100%", overflowY: "hidden" }}
       >
         {this.state.loading &&
-          <div className={styles.darkMask}>
-            <div className={styles.loading}>
-              <MyIcon type="loading" size="lg" />
-            </div>}
-          </div>}
+          <LoadingMask />}
 
         <Flex className={styles.title}>
           <MyTouchFeedback style={{ background: "#19599e" }}>

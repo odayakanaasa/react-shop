@@ -20,7 +20,6 @@ def update():
         local('git push')
         run('git reset --hard')
         run('git pull -f')
-        run('git reset --hard')
         run('git checkout master')
         run('yarn')
         run('yarn run publish')
@@ -29,8 +28,8 @@ def test_update():
     with cd(REMOTE_PROJECT_DIR_TEST):
         # local('git push --set-upstream origin test')
         local('git push')
-        run('git pull -f')
         run('git reset --hard')
+        run('git pull -f')
         run('git checkout filters')
         run('yarn')
         run('yarn run publish')
