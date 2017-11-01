@@ -73,6 +73,14 @@ interface State {
   openFilters: boolean;
 }
 
+const hasMore = (dataAllProducts?: IDataAllProduct) => {
+  if (!dataAllProducts) {
+    return false;
+  }
+  const { allProducts: { products } } = dataAllProducts;
+  return products.length % LIMIT === 0;
+};
+
 class CategoryPage extends React.Component<Props, State> {
   // state = { title: "", filterEnabled: false };
   state = {
@@ -113,8 +121,8 @@ class CategoryPage extends React.Component<Props, State> {
       event => this.handleScroll(event),
       SCROLL_THROTTLE
     );
-    window.addEventListener("scroll", this.handleScrollThrottle, true);
     console.log("addEvent");
+    window.addEventListener("scroll", this.handleScrollThrottle, true);
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -190,7 +198,12 @@ class CategoryPage extends React.Component<Props, State> {
     return true;
   }
 
-  componentDidUpdate(prevProps: Props, prezvState: State) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (!hasMore(this.props.dataAllProducts)) {
+      console.log("removeEventListener");
+      window.removeEventListener("scroll", this.handleScrollThrottle, true);
+    }
+
     const { loading, allProducts } = this.props.dataAllProducts;
     if (!loading) {
       this.bottomHeight =
@@ -256,12 +269,9 @@ class CategoryPage extends React.Component<Props, State> {
         value: scrolledProducts
       });
 
-      if (
-        scrollTop > this.bottomHeight ||
-        allProducts.products.length === allProducts.found
-      ) {
-        window.removeEventListener("scroll", this.handleScrollThrottle, true);
+      if (scrollTop > this.bottomHeight) {
         console.log("removeEventListener");
+        window.removeEventListener("scroll", this.handleScrollThrottle, true);
         fetchMore({} as any).then(res => {
           window.addEventListener("scroll", this.handleScrollThrottle, true);
           console.log("addEvent");
@@ -346,8 +356,7 @@ class CategoryPage extends React.Component<Props, State> {
                     }}
                     openFilters={this.state.openFilters}
                   />
-                  {dataAllProducts.allProducts.products.length <
-                    dataAllProducts.allProducts.found &&
+                  {hasMore(dataAllProducts) &&
                     <div className={styles.loading}>
                       <MyIcon type="loading" size="lg" />
                     </div>}
@@ -412,7 +421,6 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
             },
             variables: {
               offset: allProducts.products.length,
-              first: 20,
               total: allProducts.total
             }
           });
