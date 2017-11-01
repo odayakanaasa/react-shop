@@ -53,6 +53,13 @@ class Products extends React.Component<Props, State> {
     const gutter = 3;
     console.log("Products.render");
 
+    // return (
+    //   <div className={styles.Products} style={style}>
+    //     {products.map((product, i) => {
+    //       return <Product key={i} {...product} />;
+    //     })}
+    //   </div>
+    // );
     return (
       <div className={styles.Products} style={style}>
         <MasonryInfiniteScroller
