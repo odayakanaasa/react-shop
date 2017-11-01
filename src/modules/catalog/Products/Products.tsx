@@ -40,6 +40,7 @@ class Products extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prezvState: State) {
     const { products } = this.props.allProducts;
+    console.log("Products.componentDidUpdate");
   }
 
   render() {
@@ -63,8 +64,9 @@ class Products extends React.Component<Props, State> {
     return (
       <div className={styles.Products} style={style}>
         <MasonryInfiniteScroller
-          pack={false}
-          sizes={[{ columns: 2, gutter }]}
+          style={{ marginLeft: "0.2rem" }}
+          pack={true}
+            sizes={[{ columns: 2, gutter }]}
           loadMore={() => ""}
         >
           {products.map((product, i) => {

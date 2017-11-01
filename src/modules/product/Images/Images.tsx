@@ -1,11 +1,12 @@
 import { MyIcon } from "@src/modules/common";
 import { Div } from "@src/modules/common/utils";
-import { Carousel, Flex } from "antd-mobile";
+import { Flex } from "antd-mobile";
 import { defaultProps } from "antd-mobile/lib/search-bar/PropsType";
 import * as React from "react";
 import { Link } from "react-router-dom";
+import ReactCarousel from "rmc-nuka-carousel";
 
-import { Aux, MyTouchFeedback } from "../../common/utils";
+import { Aux } from "../../common/utils";
 import { IImages } from "../model";
 
 const styles = require("./styles.css");
@@ -51,6 +52,7 @@ class Images extends React.Component<OwnProps, State> {
   };
 
   componentWillReceiveProps(nextProps: OwnProps) {
+    console.log("Images.componentWillReceiveProps");
     const selectedImageIndex =
       nextProps.selectedImageIndex || DEFAULT_SELECTED_IMAGE_INDEX;
     this.setState({ selectedImageIndex });
@@ -70,53 +72,85 @@ class Images extends React.Component<OwnProps, State> {
   };
 
   render() {
-    const { images, linkProps, dotHeight } = this.props;
+    const { images, linkProps, dotHeight, containerHeight } = this.props;
     const objectFitSize = this.props.objectFitSize || DEFAULT_OBJEFT_FIT_SIZE;
     const Component = linkProps ? Link : Div;
     if (images.length > 1) {
+      const selectedImage = images[this.state.selectedImageIndex]
       return (
         <Aux>
           <Component className={styles.Images} {...linkProps}>
-            <Carousel
-              autoplay={false}
-              className={styles.Carousel}
-              selectedIndex={this.state.selectedImageIndex}
-              dots={false}
-              infinite={false}
-              afterChange={index => {
-                const { selectedImageIndex, maxLoadedImageIndex } = this.state;
-                if (index !== selectedImageIndex) {
-                  this.setState({
-                    selectedImageIndex: index,
-                    maxLoadedImageIndex:
-                      index + 1 > maxLoadedImageIndex
-                        ? index + 1
-                        : maxLoadedImageIndex
-                  });
-                }
-              }}
-              style={{ height: this.getHeight(images[0]) }}
-            >
-              {this.props.images.map((image, index) =>
-                <Flex
-                  key={index}
+            {linkProps
+              ? <Flex
                   justify="center"
                   align="center"
                   style={{
-                    height: this.getHeight(images[0])
+                    height: this.getHeight(selectedImage)
                   }}
                 >
-                  {index <= this.state.maxLoadedImageIndex ||
-                  index === this.state.selectedImageIndex
-                    ? <img
-                        style={objectFitSize}
-                        className={styles.image}
-                        src={image.src}
+                  {false
+                    ? <MyIcon
+                        className={styles.noImage}
+                        type={require("!svg-sprite-loader!./no-image.svg")}
                       />
-                    : <MyIcon type="loading" size="lg" />}
+                    : <img
+                        className={styles.image}
+                        style={objectFitSize}
+                        src={selectedImage.src}
+                      />}
                 </Flex>
-              )}
-            </Carousel>
+              : <ReactCarousel
+                  // autoplay={false}
+                  // className={styles.Carousel}
+                  // selectedIndex={this.state.selectedImageIndex}
+                  // dots={false}
+                  // infinite={false}
+                  // speed={1}
+                  decorators={[]}
+                  dragging={false}
+                  swiping={true}
+                  autoplay={false}
+                  className={styles.Carousel}
+                  slideIndex={this.state.selectedImageIndex}
+                  dots={false}
+                  infinite={false}
+                  afterSlide={index => {
+                    const {
+                      selectedImageIndex,
+                      maxLoadedImageIndex
+                    } = this.state;
+                    if (index !== selectedImageIndex) {
+                      this.setState({
+                        selectedImageIndex: index,
+                        maxLoadedImageIndex:
+                          index + 1 > maxLoadedImageIndex
+                            ? index + 1
+                            : maxLoadedImageIndex
+                      });
+                    }
+                  }}
+                  style={{ height: this.getHeight(images[0]) }}
+                >
+                  {this.props.images.map((image, index) =>
+                    <Flex
+                      key={index}
+                      justify="center"
+                      align="center"
+                      style={{
+                        height: this.getHeight(images[0])
+                      }}
+                    >
+                      {index <= this.state.maxLoadedImageIndex ||
+                      index === this.state.selectedImageIndex
+                        ? <img
+                            style={objectFitSize}
+                            className={styles.image}
+                            src={image.src}
+                          />
+                        : <MyIcon type="loading" size="lg" />}
+                    </Flex>
+                  )}
+                </ReactCarousel>}
           </Component>
 
           {/* Carousel dots per image */}

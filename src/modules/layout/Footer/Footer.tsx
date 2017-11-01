@@ -23,12 +23,16 @@ class Footer extends React.Component<OwnProps & StateProps, {}> {
     return location!.pathname.indexOf("flatpage") !== -1;
   };
 
-  renderSection = (title, icon, pathname) => {
+  renderSection = (title, icon, pathname, modal) => {
     const { router: { location }, history } = this.props;
     const isCurrent = location!.pathname === pathname;
     const content = (
       <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-        <Flex justify="center" direction="column" style={{ height: "100%", padding: "0 1rem" }}>
+        <Flex
+          justify="center"
+          direction="column"
+          style={{ height: "100%", padding: "0 1rem" }}
+        >
           <MyIcon
             className={styles.icon}
             type={icon}
@@ -56,7 +60,7 @@ class Footer extends React.Component<OwnProps & StateProps, {}> {
           to={{
             pathname,
             state: {
-              modal: true,
+              modal,
               animated: true
             }
           }}
@@ -75,12 +79,14 @@ class Footer extends React.Component<OwnProps & StateProps, {}> {
           {this.renderSection(
             "Каталог",
             require("!svg-sprite-loader!./catalog.svg"),
-            PATH_NAMES.catalog
+            PATH_NAMES.catalog,
+            false
           )}
           {this.renderSection(
             "Инфо",
             require("!svg-sprite-loader!./info.svg"),
-            PATH_NAMES.flatpages
+            PATH_NAMES.flatpages,
+            true
           )}
         </Flex>
       );

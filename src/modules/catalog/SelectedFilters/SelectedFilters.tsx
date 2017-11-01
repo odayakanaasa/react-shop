@@ -38,7 +38,7 @@ class SelectedFilters extends React.Component<Props, State> {
     const { categoryId, history } = this.props;
     const GET = queryString.parse(history.location.search);
     GET.filters = filter.resetUrl;
-    history.replace(
+    history.push(
       `${compile(PATH_NAMES.category)({
         id: categoryId
       })}?${queryString.stringify(GET)}`
@@ -47,7 +47,7 @@ class SelectedFilters extends React.Component<Props, State> {
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    if (this.props.openFilters !== nextProps.openFilters) {
+    if (this.props.openFilters === nextProps.openFilters) {
       // Prevent rerender whan sidebar is toggled
       return false;
     }
@@ -56,7 +56,7 @@ class SelectedFilters extends React.Component<Props, State> {
 
   render() {
     console.log("SelectedFilters.render");
-    const { filters, categoryId, style } = this.props;
+    const { filters, categoryId, style, openFilters } = this.props;
     const checkedFilters = getSelectedFilters(filters).filter(
       filter => filter.id !== this.state.uncheckedFilterId
     );
@@ -64,7 +64,7 @@ class SelectedFilters extends React.Component<Props, State> {
       return null;
     }
     return (
-      <Flex style={style} className={styles.SelectedFilters} wrap="wrap">
+      <Flex style={style} className={styles.SelectedFilters} direction={openFilters ? "row" : "column"} wrap="wrap">
         {checkedFilters.map((filter, i) =>
           <MyTouchFeedback key={i}>
             <div

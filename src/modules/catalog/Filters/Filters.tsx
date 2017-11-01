@@ -86,7 +86,7 @@ class Filters extends React.Component<Props, State> {
       );
     }
     GET.filters = url;
-    history.replace(
+    history.push(
       `${compile(PATH_NAMES.category)({
         id: categoryId
       })}?${queryString.stringify(GET)}`

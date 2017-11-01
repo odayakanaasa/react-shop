@@ -30,7 +30,7 @@ interface OwnProps {
 }
 
 interface StateProps {
-  catalog: ICatalogReducer;
+  scrolledProducts: number;
 }
 
 interface Props extends OwnProps, StateProps {}
@@ -53,7 +53,7 @@ class Nav extends React.Component<Props, State> {
       history,
       dataAllProducts,
       categoryId,
-      catalog: { scrolledProducts }
+      scrolledProducts
     } = this.props;
     const { found, total } = dataAllProducts.allProducts;
     const GET = queryString.parse(history.location.search);
@@ -65,7 +65,7 @@ class Nav extends React.Component<Props, State> {
       onSelect: (node, index) => {
         if (GET.sorting !== node.props.value) {
           GET.sorting = node.props.value;
-          history.replace(
+          history.push(
             `${compile(PATH_NAMES.category)({
               id: categoryId
             })}?${queryString.stringify(GET)}`
@@ -87,6 +87,7 @@ class Nav extends React.Component<Props, State> {
               overlay={dataAllProducts.allProducts.sorting.map(sort =>
                 <Popover.Item
                   onVisibleChange={this.toggleSorting}
+                  className={styles.sortingItem}
                   style={{
                     color: sort.isSelected ? "orange" : "black"
                   }}
@@ -146,7 +147,7 @@ class Nav extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: IRootReducer): StateProps => ({
-  catalog: state.catalog
+  scrolledProducts: state.catalog.scrolledProducts!
 });
 
 export default connect<StateProps, {}, OwnProps>(mapStateToProps)(Nav);

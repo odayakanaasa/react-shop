@@ -20,10 +20,12 @@ import { connect } from "react-redux";
 import Sidebar from "react-sidebar";
 import { compose } from "redux";
 
+import { Aux } from "../../modules/common/utils";
+import LoadingMask from "../../modules/layout/LoadingMask/LoadingMask";
+
 const styles = require("./styles.css");
 
 export const LIMIT = 20;
-// export const LIMIT = 50;
 
 // miliseconds bettwen scroll event
 const SCROLL_THROTTLE = 250;
@@ -122,8 +124,7 @@ class CategoryPage extends React.Component<Props, State> {
       event => this.handleScroll(event),
       SCROLL_THROTTLE
     );
-    console.log("addEvent");
-    window.addEventListener("scroll", this.handleScrollThrottle, false);
+    this.addScrollListener();
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -142,18 +143,12 @@ class CategoryPage extends React.Component<Props, State> {
 
     // if (!dataAllProducts.loading && this.state.loading) {
     if (!dataAllProducts.loading) {
-
-      // state.loading = false;
       console.log("loading=false");
-      // this.setState({
-      //   scrolledProducts: dataAllProducts.allProducts.products.length
+      // this.props.dispatch({
+      //   type: ACTION_SET_SCROLLED_PRODUCTS,
+      //   value: dataAllProducts.allProducts.products.length
       // });
-      this.props.dispatch({
-        type: ACTION_SET_SCROLLED_PRODUCTS,
-        value: dataAllProducts.allProducts.products.length
-      });
       const { products, found } = dataAllProducts.allProducts!;
-      // const haveMoreProducts = products.length >= LIMIT;
     }
     if (
       !dataCategory.loading &&
@@ -172,11 +167,14 @@ class CategoryPage extends React.Component<Props, State> {
     } = nextProps;
 
     const pathname = compile(PATH_NAMES.category)({ id });
-    if (history.location.pathname === location.pathname) {
-      setTimeout(() => {
-        window.dispatchEvent(new Event("resize"));
-      }, 0);
-    }
+
+    // Fix nuka-carousel resize bag
+    // https://github.com/FormidableLabs/nuka-carousel/issues/103
+    // if (history.location.pathname === location.pathname) {
+    //   setTimeout(() => {
+    //     window.dispatchEvent(new Event("resize"));
+    //   }, 0);
+    // }
 
     if (nextProps.dataAllProducts.loading || nextProps.dataCategory.loading) {
       return false;
@@ -199,9 +197,7 @@ class CategoryPage extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (!hasMore(this.props.dataAllProducts)) {
-      console.log("removeEventListener");
-      // window.removeEventListener("scroll", this.handleScrollThrottle, true);
-      window.removeEventListener("scroll", this.handleScrollThrottle, false);
+      this.removeScrollListener();
     }
 
     const { loading, allProducts } = this.props.dataAllProducts;
@@ -215,9 +211,7 @@ class CategoryPage extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    console.log("removeEventListener");
-    // window.removeEventListener("scroll", this.handleScrollThrottle, true);
-    window.removeEventListener("scroll", this.handleScrollThrottle, false);
+    this.removeScrollListener();
   }
 
   getLayoutOptions = () => {
@@ -229,12 +223,20 @@ class CategoryPage extends React.Component<Props, State> {
     };
   };
 
+  addScrollListener = () => {
+    window.addEventListener("scroll", this.handleScrollThrottle, true);
+  };
+
+  removeScrollListener = () => {
+    window.removeEventListener("scroll", this.handleScrollThrottle, true);
+  };
+
   toggleFilters = () => {
     document.body.style.overflow = this.state.openFilters ? "scroll" : "hidden";
     this.setState({ openFilters: !this.state.openFilters }, () => {
       this.state.openFilters
-        ? window.removeEventListener("scroll", this.handleScrollThrottle, false)
-        : window.addEventListener("scroll", this.handleScrollThrottle, false);
+        ? this.removeScrollListener()
+        : this.addScrollListener();
     });
   };
 
@@ -262,17 +264,15 @@ class CategoryPage extends React.Component<Props, State> {
 
       const scrolledProducts = this.getScrolledProducts(scrollTop);
 
-      // this.props.dispatch({
-      //   type: ACTION_SET_SCROLLED_PRODUCTS,
-      //   value: scrolledProducts
-      // });
+      this.props.dispatch({
+        type: ACTION_SET_SCROLLED_PRODUCTS,
+        value: scrolledProducts
+      });
 
       if (scrollTop > this.bottomHeight) {
-        console.log("removeEventListener");
-        window.removeEventListener("scroll", this.handleScrollThrottle, false);
+        this.removeScrollListener();
         fetchMore({} as any).then(res => {
-          window.addEventListener("scroll", this.handleScrollThrottle, false);
-          console.log("addEvent");
+          this.addScrollListener();
         });
       }
     }

@@ -79,5 +79,8 @@
 }
 
 .sorting {
+}
+
+.sortingItem {
   z-index: 10000000;
 }

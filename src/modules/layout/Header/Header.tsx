@@ -42,7 +42,7 @@ class Header extends React.Component<Props, {}> {
         }}
       >
         {left === undefined
-          ? <MyTouchFeedback style={{ background: "#19599e" }}>
+          ? <MyTouchFeedback style={{ background: this.isTransporant() ? "lightgray" : "#19599e" }}>
               <MyIcon
                 className={styles.left}
                 style={{ fill: this.isTransporant() ? "black" : "white" }}
