@@ -48,6 +48,7 @@ export interface IDataAllProduct extends QueryProps {
     sorting: [ISort];
     products: IProduct[];
     found: number;
+    total: number;
   };
 }
 
@@ -70,16 +71,13 @@ interface Props extends OwnProps, StateProps, DispatchProps, GraphQLProps {}
 interface State {
   title: string;
   openFilters: boolean;
-  haveMoreProducts?: boolean;
-  // loading: boolean;
 }
 
 class CategoryPage extends React.Component<Props, State> {
   // state = { title: "", filterEnabled: false };
   state = {
     title: "",
-    openFilters: false,
-    haveMoreProducts: true
+    openFilters: false
   };
 
   ref;
@@ -91,7 +89,7 @@ class CategoryPage extends React.Component<Props, State> {
   refineScrolledProducts = scrolledProducts => {
     const { dataAllProducts } = this.props;
     const { fetchMore, allProducts } = dataAllProducts;
-    const { products, found } = allProducts!;
+    const { products, found, total } = allProducts!;
 
     if (scrolledProducts < LIMIT) {
       scrolledProducts = LIMIT > found ? found : LIMIT;
@@ -147,10 +145,7 @@ class CategoryPage extends React.Component<Props, State> {
         value: dataAllProducts.allProducts.products.length
       });
       const { products, found } = dataAllProducts.allProducts!;
-      const haveMoreProducts = products.length >= LIMIT;
-      if (haveMoreProducts !== this.state.haveMoreProducts) {
-        this.setState({ haveMoreProducts });
-      }
+      // const haveMoreProducts = products.length >= LIMIT;
     }
     if (
       !dataCategory.loading &&
@@ -158,10 +153,6 @@ class CategoryPage extends React.Component<Props, State> {
     ) {
       this.setState({ title: dataCategory.category!.name });
     }
-
-    // if (this.state.loading) {
-    //   window.removeEventListener("scroll", this.handleScrollThrottle, true);
-    // }
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
@@ -256,11 +247,8 @@ class CategoryPage extends React.Component<Props, State> {
       const { products, found } = allProducts;
 
       // Calculate scrolled products
-      // const scrollTop = event.srcElement.scrollTop;
       const scrollTop = window.pageYOffset;
 
-      // const scrollTop = document.body.scrollTop;
-      const { haveMoreProducts } = this.state;
       const scrolledProducts = this.getScrolledProducts(scrollTop);
 
       this.props.dispatch({
@@ -268,14 +256,10 @@ class CategoryPage extends React.Component<Props, State> {
         value: scrolledProducts
       });
 
-      // this.setState({ scrolledProducts: scrolled });
-
       if (
-        scrollTop > this.bottomHeight &&
-        haveMoreProducts === true
-        // !this.state.loading
+        scrollTop > this.bottomHeight ||
+        allProducts.products.length === allProducts.found
       ) {
-        // this.setState({ loading: true }, () => fetchMore({} as any));
         window.removeEventListener("scroll", this.handleScrollThrottle, true);
         console.log("removeEventListener");
         fetchMore({} as any).then(res => {
@@ -358,11 +342,12 @@ class CategoryPage extends React.Component<Props, State> {
                         getSelectedFilters(dataAllProducts.allProducts.filters)
                           .length > 0
                           ? "2.4rem"
-                          : 0
+                          : "0.2rem"
                     }}
                     openFilters={this.state.openFilters}
                   />
-                  {this.state.haveMoreProducts &&
+                  {dataAllProducts.allProducts.products.length <
+                    dataAllProducts.allProducts.found &&
                     <div className={styles.loading}>
                       <MyIcon type="loading" size="lg" />
                     </div>}
@@ -403,12 +388,13 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
   },
   props: (ownProps: any) => {
     const { data } = ownProps;
-    const { allProducts, loading, fetchMore, refetch } = data;
+    const { allProducts, loading, fetchMore, refetch, variables } = data;
     return {
       dataAllProducts: {
         allProducts,
         loading,
         refetch,
+        variables,
         fetchMore() {
           console.log("fetchMore");
           return fetchMore({
@@ -426,7 +412,8 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
             },
             variables: {
               offset: allProducts.products.length,
-              first: 20
+              first: 20,
+              total: allProducts.total
             }
           });
         }

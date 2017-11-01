@@ -22,8 +22,6 @@ const ICONS_MAP = {
 
 const getSelected = (fitlers: IFilter[]) => {};
 
-interface IAmount {}
-
 interface OwnProps {
   categoryId: number;
   toggleFilters: () => void;
@@ -57,7 +55,7 @@ class Nav extends React.Component<Props, State> {
       categoryId,
       catalog: { scrolledProducts }
     } = this.props;
-    const { found } = dataAllProducts.allProducts;
+    const { found, total } = dataAllProducts.allProducts;
     const GET = queryString.parse(history.location.search);
     const sortingProps: any = {
       placement: "bottomLeft",
@@ -128,8 +126,8 @@ class Nav extends React.Component<Props, State> {
                   // className={styles.ProductsCounter}
                   className={styles.navValue}
                 >
-                  найдено <span style={{ color: "orange" }}>{found}</span>{" "}
-                  товара
+                  найдено <span style={{ color: "orange" }}>{found}</span>
+                  {found !== total && ` из ${total}`} товара
                 </div>
               </Flex>
             </Flex>

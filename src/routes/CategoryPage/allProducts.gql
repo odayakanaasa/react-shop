@@ -4,6 +4,7 @@ query allProducts(
   $sorting: String
   $offset: Int
   $first: Int
+  $total: Int
 ) {
   allProducts(
     categoryId: $categoryId
@@ -11,6 +12,7 @@ query allProducts(
     sorting: $sorting
     offset: $offset
     first: $first
+    total: $total
   ) {
     filters {
       id
@@ -69,5 +71,6 @@ query allProducts(
       }
     }
     found
+    total
   }
 }

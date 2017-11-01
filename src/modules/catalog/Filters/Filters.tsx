@@ -14,11 +14,6 @@ const styles = require("./styles.css");
 
 const getSelected = (fitlers: IFilter[]) => {};
 
-interface IAmount {
-  found: number;
-  total?: number;
-}
-
 interface IDataFilteredProducts extends QueryProps {
   // filteredProducts: {
   //   filters: [IFilter];
