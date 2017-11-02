@@ -2,6 +2,7 @@ import { CartTrigger } from "@src/modules/cart";
 import { MyIcon } from "@src/modules/common";
 import { MyTouchFeedback } from "@src/modules/common/utils";
 import { IPage } from "@src/routes/interfaces";
+import { PATH_NAMES } from "@src/routes/RouteSwitch/RouteSwitch";
 import { Flex } from "antd-mobile";
 import * as React from "react";
 
@@ -12,6 +13,7 @@ interface OwnProps extends IPage {
   title?: JSX.Element | string;
   right?: JSX.Element;
   onTop: boolean;
+  style?: any;
 }
 
 interface StateProps {}
@@ -31,18 +33,23 @@ class Header extends React.Component<Props, {}> {
   };
 
   render() {
-    const { location, left, title, right, onTop } = this.props;
-    return (
+    const { location, left, title, right, onTop, style } = this.props;
+    return(
       <Flex
         className={styles.Header}
         justify="between"
         align="center"
         style={{
+          ...style,
           background: this.isTransporant() ? "none" : "#2474cc"
         }}
       >
         {left === undefined
-          ? <MyTouchFeedback style={{ background: this.isTransporant() ? "lightgray" : "#19599e" }}>
+          ? <MyTouchFeedback
+              style={{
+                background: this.isTransporant() ? "lightgray" : "#19599e"
+              }}
+            >
               <MyIcon
                 className={styles.left}
                 style={{ fill: this.isTransporant() ? "black" : "white" }}
@@ -67,7 +74,10 @@ class Header extends React.Component<Props, {}> {
           style={{
             color: this.isTransporant() ? "black" : "white",
             opacity:
-              location.pathname.indexOf("product") !== -1 && this.isTransporant() ? 0 : 1
+              location.pathname.indexOf("product") !== -1 &&
+              this.isTransporant()
+                ? 0
+                : 1
           }}
           className={styles.title}
         >

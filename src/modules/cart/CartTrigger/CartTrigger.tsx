@@ -39,7 +39,11 @@ class CartTrigger extends React.Component<Props, {}> {
     const { loading, cart } = data;
     const amount = getCartAmount(cart);
     return (
-      <MyTouchFeedback style={{ background: "#19599e" }}>
+      <MyTouchFeedback
+        style={{
+          background: isTransporant ? "lightgray" : "#19599e"
+        }}
+      >
         <Link
           className={styles.CartTrigger}
           style={{ visibility: this.isCartPage() ? "hidden" : "visible" }}

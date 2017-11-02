@@ -1,3 +1,4 @@
+import { Loading } from "@src/modules/common";
 import { SubCatalog } from "@src/modules/layout";
 import { ICategory } from "@src/modules/product/model";
 import gql from "graphql-tag";
@@ -18,7 +19,7 @@ class Catalog extends React.Component<GraphQLProps, {}> {
   render() {
     const { data } = this.props;
     if (data.loading) {
-      return <div />;
+      return <Loading />;
     }
     const { loading, categories } = data;
     const startCats: ICategory[] = [];

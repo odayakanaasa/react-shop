@@ -12,6 +12,7 @@ interface OwnProps extends IPage {
   header?: {
     left?: JSX.Element;
     title?: JSX.Element | string;
+    style?: any;
   };
   footer?: JSX.Element | null;
 }
@@ -30,7 +31,7 @@ class Layout extends React.Component<Props, State> {
   setOnTopWithThrottle: (event) => void;
 
   setOnTop = event => {
-    const onTop = window.pageYOffset < 100;
+    const onTop = window.pageYOffset < 10;
     if (onTop !== this.state.onTop) {
       this.setState({ onTop });
     }
