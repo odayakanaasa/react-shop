@@ -76,7 +76,7 @@ class Images extends React.Component<OwnProps, State> {
     const objectFitSize = this.props.objectFitSize || DEFAULT_OBJEFT_FIT_SIZE;
     const Component = linkProps ? Link : Div;
     if (images.length > 1) {
-      const selectedImage = images[this.state.selectedImageIndex]
+      const selectedImage = images[this.state.selectedImageIndex];
       return (
         <Aux>
           <Component className={styles.Images} {...linkProps}>
@@ -85,7 +85,8 @@ class Images extends React.Component<OwnProps, State> {
                   justify="center"
                   align="center"
                   style={{
-                    height: this.getHeight(selectedImage)
+                    // height: this.getHeight(selectedImage)
+                    height: this.getHeight(images[0])
                   }}
                 >
                   {false
@@ -97,6 +98,13 @@ class Images extends React.Component<OwnProps, State> {
                         className={styles.image}
                         style={objectFitSize}
                         src={selectedImage.src}
+                        onLoad={() => {
+                          // fire window resize event to change height
+                          window.dispatchEvent(new Event("resize"));
+                          // this.setState({
+                          //   initialHeight: null
+                          // });
+                        }}
                       />}
                 </Flex>
               : <ReactCarousel

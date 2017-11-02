@@ -256,7 +256,7 @@ class CategoryPage extends React.Component<Props, State> {
     } = this.props;
     console.log("window.pageYOffset", window.pageYOffset);
 
-    if (location.pathname.search("category") !== -1) {
+    if (!loading && location.pathname.search("category") !== -1) {
       const { products, found } = allProducts;
 
       // Calculate scrolled products
