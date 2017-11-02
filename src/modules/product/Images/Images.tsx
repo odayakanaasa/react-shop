@@ -99,11 +99,7 @@ class Images extends React.Component<OwnProps, State> {
                         style={objectFitSize}
                         src={selectedImage.src}
                         onLoad={() => {
-                          // fire window resize event to change height
                           window.dispatchEvent(new Event("resize"));
-                          // this.setState({
-                          //   initialHeight: null
-                          // });
                         }}
                       />}
                 </Flex>
