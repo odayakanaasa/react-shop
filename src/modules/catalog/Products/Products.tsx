@@ -44,6 +44,7 @@ class Products extends React.Component<Props, State> {
   }
 
   render() {
+    console.log("Products.render");
     const {
       allProducts: { products, total },
       showOnlyViewed,
@@ -52,7 +53,6 @@ class Products extends React.Component<Props, State> {
     } = this.props;
 
     const gutter = 3;
-    console.log("Products.render");
 
     // return (
     //   <div className={styles.Products} style={style}>

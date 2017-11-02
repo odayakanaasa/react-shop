@@ -33,7 +33,7 @@ const SCROLL_THROTTLE = 250;
 
 // px from bottom to start fetch more products
 // const FETCH_MORE_THRESHOLD = window.innerHeight * 2;
-const FETCH_MORE_THRESHOLD = window.innerHeight * 1.5;
+const FETCH_MORE_THRESHOLD = window.innerHeight * 3;
 
 interface IDataCategory extends QueryProps {
   category?: ICategory;

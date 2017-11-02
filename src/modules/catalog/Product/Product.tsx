@@ -19,7 +19,7 @@ const getMinOfArray = numArray => {
 };
 
 interface StateProps {
-  catalog: ICatalogReducer;
+  viewedProductIds: any;
 }
 
 interface OwnProps extends IProduct {}
@@ -37,8 +37,8 @@ class Product extends React.Component<StateProps & OwnProps, State> {
   }
 
   isViewed() {
-    const { catalog, id } = this.props;
-    return catalog.viewedProductIds.indexOf(parseInt(id, 0)) !== -1;
+    const { viewedProductIds, id } = this.props;
+    return viewedProductIds.indexOf(parseInt(id, 0)) !== -1;
   }
 
   changeTitleImage = (e, image) => {
@@ -60,7 +60,7 @@ class Product extends React.Component<StateProps & OwnProps, State> {
   };
 
   render() {
-    const { id, name, subProducts, brand, images, catalog } = this.props;
+    const { id, name, subProducts, brand, images } = this.props;
     const titleImage = this.state.titleImage;
     const subProduct = subProducts[0];
     const prices = subProducts.map(el => el.price);
@@ -68,7 +68,7 @@ class Product extends React.Component<StateProps & OwnProps, State> {
     const minPrice = getMinOfArray(prices);
 
     const width = Math.round(window.innerWidth / 2) - 5;
-
+    console.log("Product.render");
     return (
       <MyTouchFeedback>
         <div className={styles.Product} style={{ width }}>
@@ -98,7 +98,7 @@ class Product extends React.Component<StateProps & OwnProps, State> {
                       height: subProduct.oldPrice ? "3.5rem" : "3rem",
                       justifyContent: subProduct.oldPrice ? "center" : "left",
                       display: "flex",
-                      alignItems: subProduct.oldPrice ? "left" : "center",
+                      alignItems: subProduct.oldPrice ? "left" : "center"
                     }}
                     price={subProduct.price}
                     oldPrice={subProduct.oldPrice}
@@ -114,7 +114,7 @@ class Product extends React.Component<StateProps & OwnProps, State> {
 }
 
 const mapStateToProps = (state: IRootReducer): StateProps => ({
-  catalog: state.catalog
+  viewedProductIds: state.catalog.viewedProductIds
 });
 
 export default connect<StateProps, {}, OwnProps>(mapStateToProps)(Product);

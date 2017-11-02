@@ -72,6 +72,7 @@ class Images extends React.Component<OwnProps, State> {
   };
 
   render() {
+    console.log("Images.render");
     const { images, linkProps, dotHeight, containerHeight } = this.props;
     const objectFitSize = this.props.objectFitSize || DEFAULT_OBJEFT_FIT_SIZE;
     const Component = linkProps ? Link : Div;
