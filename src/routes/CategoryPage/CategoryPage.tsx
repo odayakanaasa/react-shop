@@ -251,7 +251,8 @@ class CategoryPage extends React.Component<Props, State> {
       const { products, found } = allProducts;
 
       // Calculate scrolled products
-      const scrollTop = window.pageYOffset;
+      // const scrollTop = window.pageYOffset;
+      const scrollTop = event.srcElement.scrollTop;
 
       const scrolledProducts = this.getScrolledProducts(scrollTop);
 
@@ -300,11 +301,11 @@ class CategoryPage extends React.Component<Props, State> {
                 toggleFilters={this.toggleFilters}
               />
               <Sidebar
-                rootClassName={`${styles.root} ${this.state.openFilters &&
-                  styles.rootOpened}`}
+                // rootClassName={`${styles.root} ${this.state.openFilters &&
+                //   styles.rootOpened}`}
                 sidebarClassName={styles.sidebar}
-                overlayClassName={styles.overlay}
-                contentClassName={styles.content}
+                // overlayClassName={styles.overlay}
+                // contentClassName={styles.content}
                 pullRight={true}
                 touch={false}
                 shadow={true}
