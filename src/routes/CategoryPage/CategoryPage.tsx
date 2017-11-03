@@ -262,10 +262,10 @@ class CategoryPage extends React.Component<Props, State> {
       });
 
       if (scrollTop > this.bottomHeight) {
-        // this.removeScrollListener();
-        // fetchMore({} as any).then(res => {
-        //   this.addScrollListener();
-        // });
+        this.removeScrollListener();
+        fetchMore({} as any).then(res => {
+          this.addScrollListener();
+        });
       }
     }
   };

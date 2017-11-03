@@ -66,7 +66,8 @@ class Products extends React.Component<Props, State> {
         <MasonryInfiniteScroller
           style={{ marginLeft: "0.2rem" }}
           pack={true}
-            sizes={[{ columns: 2, gutter }]}
+          packed="data-packed"
+          sizes={[{ columns: 2, gutter }]}
           loadMore={() => ""}
         >
           {products.map((product, i) => {
