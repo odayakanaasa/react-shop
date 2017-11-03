@@ -30,20 +30,6 @@
   /* padding-left: 3rem; */
 }
 
-.filterIcon {
-  padding: 0 5px;
-  height: 16px;
-  width: 16px;
-  fill: black;
-}
-
-.sortIcon {
-  padding: 0 5px;
-  height: 1.2rem;
-  width: 1.2rem;
-  fill: black;
-}
-
 .navName {
 }
 
@@ -51,6 +37,13 @@
   margin-top: 0.1rem;
   font-size: 0.7rem;
   color: gray;
+}
+
+.filterIcon {
+  padding: 0 5px;
+  height: 16px;
+  width: 16px;
+  fill: black;
 }
 
 .ProductsCounter {
@@ -76,11 +69,4 @@
 
 .finished * {
   border-color: green !important;
-}
-
-.sorting {
-}
-
-.sortingItem {
-  z-index: 10000000;
 }

@@ -1,24 +1,16 @@
-import { ICatalogReducer } from "@src/modules/catalog/reducer";
+import { Sorting } from "@src/modules/catalog";
 import { MyIcon } from "@src/modules/common";
 import { MyTouchFeedback } from "@src/modules/common/utils";
 import { IRootReducer } from "@src/rootReducer";
-import { Flex, Popover, Progress } from "antd-mobile";
-import { compile } from "path-to-regexp";
-import * as queryString from "query-string";
+import { Flex, Progress } from "antd-mobile";
 import * as React from "react";
 import { connect } from "react-redux";
 
 import { IDataAllProduct } from "../../../routes/CategoryPage/CategoryPage";
 import { MyHistory } from "../../../routes/interfaces";
-import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
 import { IFilter } from "../model";
 
 const styles = require("./styles.css");
-
-const ICONS_MAP = {
-  "sort-asc": require("!svg-sprite-loader!./sort-asc.svg"),
-  "sort-desc": require("!svg-sprite-loader!./sort-desc.svg")
-};
 
 const getSelected = (fitlers: IFilter[]) => {};
 
@@ -35,19 +27,9 @@ interface StateProps {
 
 interface Props extends OwnProps, StateProps {}
 
-interface State {
-  sortingEnabled: boolean;
-}
+interface State {}
 
 class Nav extends React.Component<Props, State> {
-  state = {
-    sortingEnabled: false
-  };
-
-  toggleSorting = () => {
-    this.setState({ sortingEnabled: !this.state.sortingEnabled });
-  };
-
   render() {
     const {
       history,
@@ -55,63 +37,11 @@ class Nav extends React.Component<Props, State> {
       categoryId,
       scrolledProducts
     } = this.props;
-    const { found, total } = dataAllProducts.allProducts;
-    const GET = queryString.parse(history.location.search);
-    const sortingProps: any = {
-      placement: "bottomLeft",
-      visible: this.state.sortingEnabled,
-      onVisibleChange: this.toggleSorting,
-      mask: true,
-      onSelect: (node, index) => {
-        if (GET.sorting !== node.props.value) {
-          GET.sorting = node.props.value;
-          history.push(
-            `${compile(PATH_NAMES.category)({
-              id: categoryId
-            })}?${queryString.stringify(GET)}`
-          );
-        }
-        this.toggleSorting();
-      }
-    };
-    const selectedSort = dataAllProducts.allProducts.sorting.filter(
-      sort => sort.isSelected
-    )[0];
+    const { found, total, sorting } = dataAllProducts.allProducts;
     return (
       <Flex className={styles.Nav} direction="column">
         <Flex className={styles.nav} justify="between" align="center">
-          <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-            <Popover
-              classNme={styles.sorting}
-              {...sortingProps}
-              overlay={dataAllProducts.allProducts.sorting.map(sort =>
-                <Popover.Item
-                  onVisibleChange={this.toggleSorting}
-                  className={styles.sortingItem}
-                  style={{
-                    color: sort.isSelected ? "orange" : "black"
-                  }}
-                  value={sort.value}
-                  icon={<MyIcon type={ICONS_MAP[sort.icon]} size="md" />}
-                >
-                  {sort.name}
-                </Popover.Item>
-              )}
-            >
-              <Flex className={styles.navSorting}>
-                <MyIcon
-                  className={styles.sortIcon}
-                  type={ICONS_MAP[selectedSort.icon]}
-                />
-                <Flex direction="column" align="start">
-                  <div className={styles.navName}>Сортировка</div>
-                  <div className={styles.navValue}>
-                    {selectedSort.name}
-                  </div>
-                </Flex>
-              </Flex>
-            </Popover>
-          </MyTouchFeedback>
+          <Sorting items={sorting} history={history} categoryId={categoryId} />
           <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
             <Flex
               onClick={this.props.toggleFilters}

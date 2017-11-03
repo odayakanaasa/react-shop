@@ -4,6 +4,7 @@ import { Flex } from "antd-mobile";
 import { compile } from "path-to-regexp";
 import * as queryString from "query-string";
 import * as React from "react";
+import { Link } from "react-router-dom";
 
 import { MyHistory } from "../../../routes/interfaces";
 import { MyTouchFeedback } from "../../common/utils";
@@ -23,56 +24,59 @@ interface OwnProps {
   openFilters: boolean;
 }
 
-interface State {
-  uncheckedFilterId?: number;
-}
+interface State {}
 
 interface Props extends OwnProps {}
 
 class SelectedFilters extends React.Component<Props, State> {
-  state = {
-    uncheckedFilterId: undefined
-  };
+  // handleClick = (filter: IFilter) => {
+  //   const { categoryId, history } = this.props;
+  //   const GET = queryString.parse(history.location.search);
+  //   GET.filters = filter.resetUrl;
+  //   history.push(
+  //     `${compile(PATH_NAMES.category)({
+  //       id: categoryId
+  //     })}?${queryString.stringify(GET)}`
+  //   );
+  //   this.setState({ uncheckedFilterId: filter.id });
+  // };
 
-  handleClick = (filter: IFilter) => {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    // if (this.props.openFilters === nextProps.openFilters) {
+    //   // Prevent rerender whan sidebar is toggled
+    //   return false;
+    // }
+    return true;
+  }
+
+  getUrl = (filter: IFilter) => {
     const { categoryId, history } = this.props;
     const GET = queryString.parse(history.location.search);
     GET.filters = filter.resetUrl;
-    history.push(
-      `${compile(PATH_NAMES.category)({
-        id: categoryId
-      })}?${queryString.stringify(GET)}`
-    );
-    this.setState({ uncheckedFilterId: filter.id });
+    return `${compile(PATH_NAMES.category)({
+      id: categoryId
+    })}?${queryString.stringify(GET)}`;
   };
-
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
-    if (this.props.openFilters === nextProps.openFilters) {
-      // Prevent rerender whan sidebar is toggled
-      return false;
-    }
-    return true;
-  }
 
   render() {
     console.log("SelectedFilters.render");
     const { filters, categoryId, style, openFilters } = this.props;
     const checkedFilters = getSelectedFilters(filters).filter(
-      filter => filter.id !== this.state.uncheckedFilterId
+      filter => filter.hasChecked
     );
     if (checkedFilters.length === 0) {
       return null;
     }
     return (
-      <Flex style={style} className={styles.SelectedFilters} direction={openFilters ? "row" : "column"} wrap="wrap">
+      <Flex
+        style={style}
+        className={styles.SelectedFilters}
+        direction={openFilters ? "row" : "column"}
+        wrap="wrap"
+      >
         {checkedFilters.map((filter, i) =>
           <MyTouchFeedback key={i}>
-            <div
-              className={styles.item}
-              onClick={() => {
-                this.handleClick(filter);
-              }}
-            >
+            <Link to={this.getUrl(filter)} className={styles.item}>
               <MyIcon
                 className={styles.closeIcon}
                 type={require("!svg-sprite-loader!./circle-close.svg")}
@@ -80,7 +84,7 @@ class SelectedFilters extends React.Component<Props, State> {
               <span className={styles.label}>
                 {filter.name}
               </span>
-            </div>
+            </Link>
           </MyTouchFeedback>
         )}
       </Flex>

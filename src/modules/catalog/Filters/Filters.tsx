@@ -53,6 +53,116 @@ class Filters extends React.Component<Props, State> {
     checkedValueIds: [] as number[]
   };
 
+  componentWillReceiveProps(nextProps) {
+    const { dataAllProducts: { loading, allProducts } } = nextProps;
+    const checkedValueIds = this.getCheckedValueIds();
+    if (checkedValueIds !== this.state.checkedValueIds) {
+      this.setState({ checkedValueIds });
+    }
+    if (this.state.loading) {
+      this.setState({ loading: false });
+    }
+    if (!loading && !this.state.total) {
+      const total = allProducts.found;
+      this.setState({ total });
+    }
+  }
+
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    // if (nextProps.open !== this.props.open) {
+    //   return false;
+    // }
+    return true;
+  }
+
+  render() {
+    const { onSetOpen, dataAllProducts: { allProducts } } = this.props;
+    const { filters, found } = allProducts;
+    const total = this.state.total;
+    console.log("Filters.render()");
+    return (
+      <Flex
+        className={styles.Filters}
+        direction="column"
+        style={{ height: "100%", widht: "100%", overflowY: "hidden" }}
+      >
+        {this.state.loading && <LoadingMask />}
+
+        <Flex className={styles.title}>
+          <MyTouchFeedback style={{ background: "#19599e" }}>
+            <MyIcon
+              className={styles.closeIcon}
+              type={require("!svg-sprite-loader!./close.svg")}
+              onClick={onSetOpen}
+            />
+          </MyTouchFeedback>
+          <div>
+            Найдено {found}
+            {!total || found === total ? "" : ` из ${total}`}
+          </div>
+        </Flex>
+        <Progress
+          className={`${styles.progress} ${found === total && styles.finished}`}
+          percent={Math.round(found / total! * 100)}
+          position="normal"
+          // unfilled={false}
+          unfilled={true}
+        />
+        <Accordion
+          activeKey={filters.map(filter => String(filter.id))}
+          className={styles.accordion}
+        >
+          {filters.map(filter => this.getFilter(filter, found))}
+        </Accordion>
+
+        <Flex className={styles.buttons} align="center">
+          <div
+            onClick={() => {
+              console.log("close");
+              onSetOpen();
+            }}
+            className={styles.button}
+          >
+            <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+              <div>ЗАКРЫТЬ</div>
+            </MyTouchFeedback>
+          </div>
+
+          {filters.filter(filter => filter.hasChecked).length > 0 &&
+            <div
+              style={{
+                display: found === total ? "none" : "block",
+                color: "red"
+                // opacity: found === total ? 0.5 : 1
+              }}
+              className={styles.button}
+              onClick={() => this.handleClick()}
+            >
+              <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+                <div>СБРОСИТЬ</div>
+              </MyTouchFeedback>
+            </div>}
+        </Flex>
+      </Flex>
+    );
+  }
+
+  getCheckedValueIds = () => {
+    const ids: number[] = [];
+    const { dataAllProducts } = this.props;
+    if (dataAllProducts) {
+      const { allProducts: { filters } } = dataAllProducts;
+      filters.forEach(filter => {
+        filter!.values.forEach(value => {
+          if (value.isChecked) {
+            ids.push(value.id);
+          }
+        });
+      });
+    }
+    return ids;
+  };
+
   handleClick = (value?: IFilterValue) => {
     const {
       categoryId,
@@ -239,124 +349,6 @@ class Filters extends React.Component<Props, State> {
       );
     }
   };
-
-  componentWillReceiveProps(nextProps) {
-    const { dataAllProducts: { loading, allProducts } } = nextProps;
-    if (this.state.loading) {
-      this.setState({ loading: false });
-    }
-    if (!loading && !this.state.total) {
-      const total = allProducts.found;
-      this.setState({ total });
-    }
-  }
-
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
-    if (nextProps.open !== this.props.open) {
-      return false;
-    }
-    return true;
-  }
-
-  render() {
-    const { onSetOpen, dataAllProducts: { allProducts } } = this.props;
-    const { filters, found } = allProducts;
-    const total = this.state.total;
-    console.log("Filters.render()");
-    return (
-      <Flex
-        className={styles.Filters}
-        direction="column"
-        style={{ height: "100%", widht: "100%", overflowY: "hidden" }}
-      >
-        {this.state.loading &&
-          <LoadingMask />}
-
-        <Flex className={styles.title}>
-          <MyTouchFeedback style={{ background: "#19599e" }}>
-            <MyIcon
-              className={styles.closeIcon}
-              type={require("!svg-sprite-loader!./close.svg")}
-              onClick={onSetOpen}
-            />
-          </MyTouchFeedback>
-          <div>
-            Найдено {found}
-            {!total || found === total ? "" : ` из ${total}`}
-          </div>
-        </Flex>
-        <Progress
-          className={`${styles.progress} ${found === total && styles.finished}`}
-          percent={Math.round(found / total! * 100)}
-          position="normal"
-          // unfilled={false}
-          unfilled={true}
-        />
-        <Accordion
-          activeKey={filters.map(filter => String(filter.id))}
-          className={styles.accordion}
-        >
-          {filters.map(filter => this.getFilter(filter, found))}
-        </Accordion>
-
-        <Flex className={styles.buttons} align="center">
-          <div
-            onClick={() => {
-              console.log("close");
-              onSetOpen();
-            }}
-            className={styles.button}
-          >
-            <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-              <div>ЗАКРЫТЬ</div>
-            </MyTouchFeedback>
-          </div>
-
-          {filters.filter(filter => filter.hasChecked).length > 0 &&
-            <div
-              style={{
-                display: found === total ? "none" : "block",
-                color: "red"
-                // opacity: found === total ? 0.5 : 1
-              }}
-              className={styles.button}
-              onClick={() => this.handleClick()}
-            >
-              <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-                <div>СБРОСИТЬ</div>
-              </MyTouchFeedback>
-            </div>}
-        </Flex>
-      </Flex>
-    );
-  }
 }
-
-// const FILTERED_PRODUCTS_QUERY = gql(require("./filteredProducts.gql"));
-// const filteredProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
-//   options: props => ({
-//     // fetchPolicy: "cache-first",
-//     variables: {
-//       categoryId: props.categoryId,
-//       filters: ""
-//     }
-//   }),
-//   name: "dataFilteredProducts"
-// };
-
-// <List className={styles.content}>
-// {filter.values!.map((value, i) =>
-//   <List.Item key={i} className={styles.value}>
-//     {value.name}
-//   </List.Item>
-// )}
-// </List>
-
-// export default compose(
-//   graphql<GraphQLProps, OwnProps>(
-//     FILTERED_PRODUCTS_QUERY,
-//     filteredProductsOptions
-//   )
-// )(Filters);
 
 export default Filters;

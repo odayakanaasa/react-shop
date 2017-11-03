@@ -68,7 +68,7 @@ class Product extends React.Component<StateProps & OwnProps, State> {
     const minPrice = getMinOfArray(prices);
 
     const width = Math.round(window.innerWidth / 2) - 5;
-    console.log("Product.render");
+    // console.log("Product.render");
     return (
       <MyTouchFeedback>
         <div className={styles.Product} style={{ width }}>
