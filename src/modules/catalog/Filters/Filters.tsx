@@ -60,7 +60,7 @@ class Filters extends React.Component<Props, State> {
       dataAllProducts: { refetch },
       history
     } = this.props;
-    window.scrollTo(0, 0);
+    document.getElementById("js-content")!.scrollIntoView();
     const GET = queryString.parse(history.location.search);
     let checkedValueIds = this.state.checkedValueIds;
     let url = "";

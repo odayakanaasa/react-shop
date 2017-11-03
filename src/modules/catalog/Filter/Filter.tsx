@@ -216,7 +216,7 @@ class Filter extends React.Component<Props, State> {
 
   handleClick = (value: IFilterValue) => {
     const { setLoading, categoryId, refetch, history } = this.props;
-    window.scrollTo(0, 0);
+    document.getElementById("js-content")!.scrollIntoView();
     const GET = queryString.parse(history.location.search);
 
     let checkedValueIds = [...this.state.checkedValueIds];

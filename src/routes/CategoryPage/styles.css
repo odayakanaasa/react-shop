@@ -27,14 +27,14 @@
 }
 
 .sidebarContent {
-  margin-top: 6.05rem;
-  margin-bottom: 3rem;
+  padding-top: 6.05rem;
+  padding-bottom: 3rem;
   width: 100%;
   position: relative !important;
-  top: 0;
+  /* top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 0; */
   overflow-y: hidden;
   transition: left 0.3s ease-out, right 0.3s ease-out;
 }
@@ -43,8 +43,8 @@
 }
 
 .root {
-  overflow: scroll !important;
-  position: relative !important;
+  /* overflow: scroll !important;
+  position: relative !important; */
 }
 
 .rootOpened {
@@ -52,5 +52,5 @@
 }
 
 .content {
-  position: relative !important;
+  /* position: relative !important; */
 }

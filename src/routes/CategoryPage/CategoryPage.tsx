@@ -134,7 +134,7 @@ class CategoryPage extends React.Component<Props, State> {
       this.props.match.params.id !== nextProps.match.params.id ||
       this.props.location.search !== nextProps.location.search
     ) {
-      window.scrollTo(0, 0);
+      document.getElementById("js-content")!.scrollIntoView();
     }
 
     // if (this.state.loading) {
@@ -301,11 +301,11 @@ class CategoryPage extends React.Component<Props, State> {
                 toggleFilters={this.toggleFilters}
               />
               <Sidebar
-                // rootClassName={`${styles.root} ${this.state.openFilters &&
-                //   styles.rootOpened}`}
+                rootClassName={`${styles.root} ${this.state.openFilters &&
+                  styles.rootOpened}`}
                 sidebarClassName={styles.sidebar}
-                // overlayClassName={styles.overlay}
-                // contentClassName={styles.content}
+                overlayClassName={styles.overlay}
+                contentClassName={styles.content}
                 pullRight={true}
                 touch={false}
                 shadow={true}
@@ -322,6 +322,7 @@ class CategoryPage extends React.Component<Props, State> {
                 onSetOpen={this.toggleFilters}
               >
                 <div
+                  id="js-content"
                   className={styles.sidebarContent}
                   ref={element => (this.ref = element)}
                 >
