@@ -3,5 +3,6 @@ query flatpages {
     id
     name
     content
+    html
   }
 }

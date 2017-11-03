@@ -6,4 +6,5 @@ export interface IFlatpage {
   id: string;
   name: string;
   content: string;
+  html: string;
 }

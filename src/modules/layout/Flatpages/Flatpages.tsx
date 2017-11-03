@@ -8,6 +8,7 @@ import * as React from "react";
 import { graphql, QueryProps } from "react-apollo";
 import { withRouter } from "react-router";
 import { compose } from "redux";
+const renderHTML = require("react-render-html");
 
 import { IFlatpage } from "../model";
 
@@ -88,7 +89,7 @@ class Flatpages extends React.Component<Props, {}> {
       <div>
         {pathname !== PATH_NAMES.flatpages &&
           <div className={styles.title}>Инфо</div>}
-        <Accordion accordion={true} className={styles.Flatpages}>
+        <Accordion accordion={true} className={styles.Flatpages} defaultActiveKey={flatpages![0].id}>
           {flatpages!.map(page =>
             <Accordion.Panel
               key={page.id}
@@ -108,7 +109,7 @@ class Flatpages extends React.Component<Props, {}> {
               className={styles.header}
             >
               <div className={styles.content}>
-                {page.content}
+                {renderHTML(page.html)}
               </div>
             </Accordion.Panel>
           )}

@@ -141,15 +141,6 @@ class CategoryPage extends React.Component<Props, State> {
     //   return false;
     // }
 
-    // if (!dataAllProducts.loading && this.state.loading) {
-    if (!dataAllProducts.loading) {
-      console.log("loading=false");
-      // this.props.dispatch({
-      //   type: ACTION_SET_SCROLLED_PRODUCTS,
-      //   value: dataAllProducts.allProducts.products.length
-      // });
-      const { products, found } = dataAllProducts.allProducts!;
-    }
     if (
       !dataCategory.loading &&
       dataCategory.category!.name !== this.state.title
