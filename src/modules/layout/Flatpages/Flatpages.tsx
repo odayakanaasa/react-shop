@@ -89,7 +89,11 @@ class Flatpages extends React.Component<Props, {}> {
       <div>
         {pathname !== PATH_NAMES.flatpages &&
           <div className={styles.title}>Инфо</div>}
-        <Accordion accordion={true} className={styles.Flatpages} defaultActiveKey={flatpages![0].id}>
+        <Accordion
+          accordion={true}
+          className={styles.Flatpages}
+          // defaultActiveKey={flatpages![0].id}
+        >
           {flatpages!.map(page =>
             <Accordion.Panel
               key={page.id}
