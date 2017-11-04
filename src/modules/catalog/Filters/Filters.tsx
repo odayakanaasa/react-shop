@@ -59,8 +59,8 @@ class Filters extends React.Component<Props, State> {
     const checkedValueIds = this.getCheckedValueIds(allProducts.filters);
     if (
       checkedValueIds !== this.state.checkedValueIds &&
-      allProducts !== this.props.dataAllProducts.allProducts &&
-      nextProps.open !== this.props.open
+      allProducts !== this.props.dataAllProducts.allProducts
+      // && nextProps.open !== this.props.open
     ) {
       this.setState({ checkedValueIds });
     }

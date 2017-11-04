@@ -160,6 +160,10 @@ class CategoryPage extends React.Component<Props, State> {
       location
     } = nextProps;
 
+    // if (nextProps.dataAllProducts && nextProps.dataAllProducts !== this.props.dataAllProducts) {
+    //   return true;
+    // }
+
     if (
       dataCategory.loading ||
       dataAllProducts.loading ||
@@ -380,7 +384,7 @@ class CategoryPage extends React.Component<Props, State> {
 const CATEGORY_QUERY = gql(require("./category.gql"));
 const categoryOptions: OperationOption<OwnProps, GraphQLProps> = {
   options: props => ({
-    fetchPolicy: "cache-first",
+    // fetchPolicy: "cache-first",
     variables: {
       id: parseInt(props.match.params.id, 0)
     }
@@ -392,9 +396,9 @@ export const ALL_PRODUCTS_QUERY = gql(require("./allProducts.gql"));
 
 export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
   options: ownProps => {
-    // fetchPolicy: "network-only",
     const GET = queryString.parse(ownProps.location.search);
     return {
+      fetchPolicy: "network-only",  // it's important!
       variables: {
         categoryId: ownProps.match.params.id,
         filters: GET.filters,
