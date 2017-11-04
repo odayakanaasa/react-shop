@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 
 import { LIMIT } from "../../../routes/CategoryPage/CategoryPage";
 import { Product } from "../index";
-import { IAllProduct } from "../model";
+import { IAllProducts } from "../model";
 import { ICatalogReducer } from "../reducer";
 
 const styles = require("./styles.css");
@@ -20,7 +20,7 @@ interface StateProps {
 interface OwnProps {
   categoryId: string;
   location: MyLocation;
-  allProducts: IAllProduct;
+  allProducts: IAllProducts;
   style: any;
   openFilters: boolean;
 }

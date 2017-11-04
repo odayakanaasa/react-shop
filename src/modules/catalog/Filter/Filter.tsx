@@ -6,7 +6,7 @@ import * as React from "react";
 import { QueryProps } from "react-apollo";
 
 import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
-import { IAllProduct, IFilter, IFilterValue } from "../model";
+import { IAllProducts, IFilter, IFilterValue } from "../model";
 
 const styles = require("./styles.css");
 
@@ -18,7 +18,7 @@ interface IDataFilteredProducts extends QueryProps {
   //   total: number;
   //   // products?: IProduct[];
   // };
-  allProducts: IAllProduct;
+  allProducts: IAllProducts;
 }
 
 interface OwnProps {

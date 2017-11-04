@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 
 import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
 import LoadingMask from "../../layout/LoadingMask/LoadingMask";
-import { IAllProduct, IFilter, IFilterValue } from "../model";
+import { IAllProducts, IFilter, IFilterValue } from "../model";
 
 const styles = require("./styles.css");
 
@@ -22,7 +22,7 @@ interface IDataFilteredProducts extends QueryProps {
   //   total: number;
   //   // products?: IProduct[];
   // };
-  allProducts: IAllProduct;
+  allProducts: IAllProducts;
 }
 
 interface OwnProps {
@@ -40,7 +40,7 @@ export interface GraphQLProps {
 }
 
 interface State {
-  loading: boolean;
+  // loading: boolean;
   total?: number;
   checkedValueIds: number[];
 }
@@ -49,7 +49,7 @@ interface Props extends OwnProps, GraphQLProps {}
 
 class Filters extends React.Component<Props, State> {
   state = {
-    loading: false,
+    // loading: false,
     total: undefined,
     checkedValueIds: [] as number[]
   };
@@ -64,9 +64,9 @@ class Filters extends React.Component<Props, State> {
     ) {
       this.setState({ checkedValueIds });
     }
-    if (this.state.loading) {
-      this.setState({ loading: false });
-    }
+    // if (this.state.loading) {
+    //   this.setState({ loading: false });
+    // }
     if (!loading && !this.state.total) {
       const total = allProducts.found;
       this.setState({ total });
@@ -98,7 +98,7 @@ class Filters extends React.Component<Props, State> {
         direction="column"
         style={{ height: "100%", widht: "100%", overflowY: "hidden" }}
       >
-        {this.state.loading && <LoadingMask />}
+        {/* {this.state.loading && <LoadingMask />} */}
 
         <Flex className={styles.title}>
           <MyTouchFeedback style={{ background: "#19599e" }}>
@@ -184,17 +184,26 @@ class Filters extends React.Component<Props, State> {
     } else {
       checkedValueIds = [];
     }
-    if (!this.state.loading) {
-      this.setState({ loading: true, checkedValueIds }, () =>
-        refetch({
-          categoryId,
-          filters: value ? value.url : "",
-          offset: 0
-        }).then(res => {
-          this.setState({ loading: false });
-        })
-      );
-    }
+    // if (!this.state.loading) {
+    // this.setState(
+    //   {
+    //     // loading: true,
+    //     checkedValueIds
+    //   },
+    //   () =>
+    //     refetch({
+    //       categoryId,
+    //       filters: value ? value.url : "",
+    //       offset: 0
+    //     }).then(res => {
+    //       this.setState(
+    //         {
+    //           // loading: false
+    //         }
+    //       );
+    //     })
+    // );
+    // }
     GET.filters = url;
     history.push(
       `${compile(PATH_NAMES.category)({

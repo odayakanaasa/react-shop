@@ -20,13 +20,15 @@ import { connect } from "react-redux";
 import Sidebar from "react-sidebar";
 import { compose } from "redux";
 
+import { IAllProducts } from "../../modules/catalog/model";
+
 const styles = require("./styles.css");
 
 export const LIMIT = 20;
 
 // miliseconds bettwen scroll event
-const SCROLL_THROTTLE = 250;
-// const SCROLL_THROTTLE = 500;
+// const SCROLL_THROTTLE = 250;
+const SCROLL_THROTTLE = 500;
 
 // px from bottom to start fetch more products
 // const FETCH_MORE_THRESHOLD = window.innerHeight * 2;
@@ -73,12 +75,11 @@ interface State {
   openFilters: boolean;
 }
 
-const hasMore = (dataAllProducts?: IDataAllProduct) => {
-  if (!dataAllProducts) {
+const hasMore = (allProducts?: IAllProducts): boolean => {
+  if (!allProducts) {
     return false;
   }
-  const { allProducts: { products } } = dataAllProducts;
-  return products.length % LIMIT === 0;
+  return allProducts!.products.length % LIMIT === 0;
 };
 
 class CategoryPage extends React.Component<Props, State> {
@@ -109,11 +110,33 @@ class CategoryPage extends React.Component<Props, State> {
   componentWillReceiveProps(nextProps: Props) {
     const { dataCategory, dataAllProducts } = nextProps;
 
+    if (nextProps.location !== this.props.location) {
+      console.log(nextProps.location);
+    }
+
     if (
       this.props.match.params.id !== nextProps.match.params.id ||
       this.props.location.search !== nextProps.location.search
     ) {
       document.getElementById("js-content")!.scrollIntoView();
+    }
+
+    if (
+      nextProps.dataAllProducts.allProducts &&
+      this.props.dataAllProducts.allProducts
+    ) {
+      const loadedProducts = this.refineScrolledProducts(
+        nextProps.dataAllProducts.allProducts.products.length
+      );
+      if (
+        loadedProducts !==
+        this.props.dataAllProducts.allProducts.products.length
+      ) {
+        this.props.dispatch({
+          type: ACTION_SET_SCROLLED_PRODUCTS,
+          value: loadedProducts
+        });
+      }
     }
 
     // if (this.state.loading) {
@@ -131,10 +154,19 @@ class CategoryPage extends React.Component<Props, State> {
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     const {
       dataCategory,
+      dataAllProducts,
       history,
       match: { params: { id } },
       location
     } = nextProps;
+
+    if (
+      dataCategory.loading ||
+      dataAllProducts.loading ||
+      !dataAllProducts.allProducts
+    ) {
+      return false;
+    }
 
     const pathname = compile(PATH_NAMES.category)({ id });
 
@@ -146,27 +178,20 @@ class CategoryPage extends React.Component<Props, State> {
     //   }, 0);
     // }
 
-    if (nextProps.dataAllProducts.loading || nextProps.dataCategory.loading) {
-      return false;
-    }
+    // if (nextProps.dataAllProducts.loading || nextProps.dataCategory.loading) {
+    //   return false;
+    // }
 
-    if (history.location.pathname !== location.pathname) {
-      // Prevent rerender cause two active routes (main and modal in RouteSwitch)
-      return false;
-    }
-
-    if (
-      JSON.stringify(this.props) === JSON.stringify(nextProps) &&
-      JSON.stringify(this.state) === JSON.stringify(nextState)
-    ) {
-      return false;
-    }
+    // if (history.location.pathname !== location.pathname) {
+    //   // Prevent rerender cause two active routes (main and modal in RouteSwitch)
+    //   return false;
+    // }
 
     return true;
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    if (!hasMore(this.props.dataAllProducts)) {
+    if (!hasMore(this.props.dataAllProducts.allProducts as any)) {
       this.removeScrollListener();
     }
 
@@ -192,10 +217,7 @@ class CategoryPage extends React.Component<Props, State> {
       dataCategory,
       dataAllProducts
     } = this.props;
-
-    if (!(dataCategory.loading || dataAllProducts.loading)) {
-      console.log("CategoryPage.render");
-    }
+    console.log("CategoryPage.render");
 
     return (
       <Layout
@@ -208,12 +230,6 @@ class CategoryPage extends React.Component<Props, State> {
         !dataAllProducts.allProducts
           ? <Loading />
           : <div className={styles.CategoryPage}>
-              <Nav
-                history={history}
-                dataAllProducts={dataAllProducts}
-                categoryId={id}
-                toggleFilters={this.toggleFilters}
-              />
               <Sidebar
                 rootClassName={`${styles.root} ${this.state.openFilters &&
                   styles.rootOpened}`}
@@ -240,6 +256,12 @@ class CategoryPage extends React.Component<Props, State> {
                   className={styles.sidebarContent}
                   ref={element => (this.ref = element)}
                 >
+                  <Nav
+                    history={history}
+                    dataAllProducts={dataAllProducts}
+                    categoryId={id}
+                    toggleFilters={this.toggleFilters}
+                  />
                   <SelectedFilters
                     openFilters={this.state.openFilters}
                     history={history}
@@ -261,7 +283,7 @@ class CategoryPage extends React.Component<Props, State> {
                     }}
                     openFilters={this.state.openFilters}
                   />
-                  {hasMore(dataAllProducts) &&
+                  {hasMore(dataAllProducts.allProducts as any) &&
                     <div className={styles.loading}>
                       <MyIcon type="loading" size="lg" />
                     </div>}
@@ -330,7 +352,7 @@ class CategoryPage extends React.Component<Props, State> {
       location,
       dataAllProducts: { allProducts, loading, fetchMore }
     } = this.props;
-    console.log("window.pageYOffset", window.pageYOffset);
+    console.log("window.pageYOffset", event.srcElement.scrollTop);
 
     if (!loading && location.pathname.search("category") !== -1) {
       const { products, found } = allProducts;
@@ -339,12 +361,11 @@ class CategoryPage extends React.Component<Props, State> {
       // const scrollTop = window.pageYOffset;
       const scrollTop = event.srcElement.scrollTop;
 
-      const scrolledProducts = this.getScrolledProducts(scrollTop);
-
-      this.props.dispatch({
-        type: ACTION_SET_SCROLLED_PRODUCTS,
-        value: scrolledProducts
-      });
+      // const scrolledProducts = this.getScrolledProducts(scrollTop);
+      // this.props.dispatch({
+      //   type: ACTION_SET_SCROLLED_PRODUCTS,
+      //   value: scrolledProducts
+      // });
 
       if (scrollTop > this.bottomHeight) {
         this.removeScrollListener();
@@ -417,18 +438,6 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
     };
   }
 };
-
-// const FILTERED_PRODUCTS_QUERY = gql(require("./filteredProducts.gql"));
-// const filteredProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
-//   options: props => ({
-//     fetchPolicy: "cache-first",
-//     variables: {
-//       categoryId: parseInt(props.match.params.id, 0),
-//       filters: "61=7962;brand=cat"
-//     }
-//   }),
-//   name: "dataFilteredProducts"
-// };
 
 const mapStateToProps = (state: IRootReducer): StateProps => ({});
 

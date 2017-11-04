@@ -64,9 +64,6 @@ class SelectedFilters extends React.Component<Props, State> {
     const checkedFilters = getSelectedFilters(filters).filter(
       filter => filter.hasChecked
     );
-    if (checkedFilters.length === 0) {
-      return null;
-    }
     return (
       <Flex
         style={style}

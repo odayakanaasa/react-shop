@@ -30,6 +30,11 @@ interface Props extends OwnProps, StateProps {}
 interface State {}
 
 class Nav extends React.Component<Props, State> {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    console.log("Nav.shouldComponentUpdate");
+    return true;
+  }
+
   render() {
     const {
       history,
@@ -37,6 +42,7 @@ class Nav extends React.Component<Props, State> {
       categoryId,
       scrolledProducts
     } = this.props;
+    console.log("Nav.render");
     const { found, total, sorting } = dataAllProducts.allProducts;
     return (
       <Flex className={styles.Nav} direction="column">
@@ -57,7 +63,14 @@ class Nav extends React.Component<Props, State> {
                   // className={styles.ProductsCounter}
                   className={styles.navValue}
                 >
-                  найдено <span style={{ color: "orange" }}>{found}</span>
+                  найдено{" "}
+                  <span
+                    style={{
+                      // color: "orange"
+                    }}
+                  >
+                    {found}
+                  </span>
                   {found !== total && ` из ${total}`} товара
                 </div>
               </Flex>
@@ -65,7 +78,7 @@ class Nav extends React.Component<Props, State> {
           </MyTouchFeedback>
         </Flex>
         <Progress
-          className={`${styles.progress} ${scrolledProducts === found &&
+          className={`${styles.progress} ${scrolledProducts >= found &&
             styles.finished}`}
           percent={Math.round(scrolledProducts! / found * 100)}
           position="normal"

@@ -77,7 +77,7 @@ class CheckoutForm extends React.Component<Props, State> {
 
   handleFocus = () => {
     console.log("handleFocus");
-    window.scrollTo(0, 1000000);
+    // window.scrollTo(0, 1000000);
   };
 
   handleBlur = (name, value) => {

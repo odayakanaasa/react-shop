@@ -84,7 +84,7 @@
 }
 
 .finished * {
-  border-color: #17c13c !important;
+  border-color: forestgreen !important;
 }
 
 .accordion {

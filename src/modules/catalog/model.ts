@@ -1,6 +1,6 @@
 import { IProduct } from "../product/model";
 
-export interface IAllProduct {
+export interface IAllProducts {
   total: number;
   products: [IProduct];
   filters: [IFilter];
