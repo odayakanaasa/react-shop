@@ -53,9 +53,9 @@ class Filters extends React.Component<Props, State> {
     checkedValueIds: [] as number[]
   };
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     const { dataAllProducts: { loading, allProducts } } = nextProps;
-    const checkedValueIds = this.getCheckedValueIds();
+    const checkedValueIds = this.getCheckedValueIds(allProducts.filters);
     if (checkedValueIds !== this.state.checkedValueIds) {
       this.setState({ checkedValueIds });
     }
@@ -112,7 +112,7 @@ class Filters extends React.Component<Props, State> {
           activeKey={filters.map(filter => String(filter.id))}
           className={styles.accordion}
         >
-          {filters.map(filter => this.getFilter(filter, found))}
+          {filters.map(filter => this.renderFilter(filter, found))}
         </Accordion>
 
         <Flex className={styles.buttons} align="center">
@@ -147,19 +147,15 @@ class Filters extends React.Component<Props, State> {
     );
   }
 
-  getCheckedValueIds = () => {
+  getCheckedValueIds = (filters: IFilter[]) => {
     const ids: number[] = [];
-    const { dataAllProducts } = this.props;
-    if (dataAllProducts) {
-      const { allProducts: { filters } } = dataAllProducts;
-      filters.forEach(filter => {
-        filter!.values.forEach(value => {
-          if (value.isChecked) {
-            ids.push(value.id);
-          }
-        });
+    filters.forEach(filter => {
+      filter!.values.forEach(value => {
+        if (value.isChecked) {
+          ids.push(value.id);
+        }
       });
-    }
+    });
     return ids;
   };
 
@@ -203,7 +199,7 @@ class Filters extends React.Component<Props, State> {
     );
   };
 
-  getFilter = (filter: IFilter, found) => {
+  renderFilter = (filter: IFilter, found) => {
     const { categoryId } = this.props;
     const { dataAllProducts } = this.props;
     const { refetch } = dataAllProducts;

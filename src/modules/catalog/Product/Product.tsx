@@ -22,7 +22,9 @@ interface StateProps {
   viewedProductIds: any;
 }
 
-interface OwnProps extends IProduct {}
+interface OwnProps extends IProduct {
+  colorValues: string[];
+}
 
 interface State {
   titleImage: IImages;
@@ -30,9 +32,22 @@ interface State {
 
 class Product extends React.Component<StateProps & OwnProps, State> {
   componentWillMount() {
-    const { images } = this.props;
+    const { images, colorValues } = this.props;
+    let titleImage;
+    if (colorValues.length > 0) {
+      const titleImages = images.filter(
+        img => colorValues.indexOf(img.colorValue) !== -1
+      );
+      if (titleImages.length > 0) {
+        titleImage = titleImages[0];
+      }
+    } else {
+      titleImage = images.filter(img => img.isTitle)[0];
+    }
+    titleImage = titleImage || images[0];
+
     this.setState({
-      titleImage: images.filter(img => img.isTitle)[0] || images[0]
+      titleImage
     });
   }
 
@@ -69,6 +84,8 @@ class Product extends React.Component<StateProps & OwnProps, State> {
 
     const width = Math.round(window.innerWidth / 2) - 5;
     // console.log("Product.render");
+    const selectedImageIndex =
+      images.indexOf(titleImage) === -1 ? 0 : images.indexOf(titleImage);
     return (
       <MyTouchFeedback>
         <div className={styles.Product} style={{ width }}>
@@ -80,6 +97,7 @@ class Product extends React.Component<StateProps & OwnProps, State> {
                 className={styles.isViewed}
               />}
             <Images
+              selectedImageIndex={selectedImageIndex}
               images={images}
               objectFitSize={{ width: "90%", height: "90%" }}
               dotHeight={10}

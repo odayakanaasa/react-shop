@@ -36,20 +36,26 @@ interface OwnProps {
   linkProps?: {};
 }
 
+interface Props extends OwnProps {}
+
 interface State {
   selectedImageIndex: number;
   maxLoadedImageIndex: number;
 }
 
-class Images extends React.Component<OwnProps, State> {
+class Images extends React.Component<Props, State> {
   static defaultProps = {
     selectedImageIndex: DEFAULT_SELECTED_IMAGE_INDEX
   };
 
-  state = {
-    selectedImageIndex: DEFAULT_SELECTED_IMAGE_INDEX,
-    maxLoadedImageIndex: DEFAULT_SELECTED_IMAGE_INDEX
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      selectedImageIndex:
+        props.selectedImageIndex || DEFAULT_SELECTED_IMAGE_INDEX,
+      maxLoadedImageIndex: DEFAULT_SELECTED_IMAGE_INDEX
+    };
+  }
 
   componentWillReceiveProps(nextProps: OwnProps) {
     // console.log("Images.componentWillReceiveProps");

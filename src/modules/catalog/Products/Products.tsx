@@ -46,7 +46,7 @@ class Products extends React.Component<Props, State> {
   render() {
     console.log("Products.render");
     const {
-      allProducts: { products, total },
+      allProducts: { products, filters, total },
       showOnlyViewed,
       viewedProductIds,
       style
@@ -54,13 +54,15 @@ class Products extends React.Component<Props, State> {
 
     const gutter = 3;
 
-    // return (
-    //   <div className={styles.Products} style={style}>
-    //     {products.map((product, i) => {
-    //       return <Product key={i} {...product} />;
-    //     })}
-    //   </div>
-    // );
+    let colorValues: string[] = [];
+    filters.forEach(filter => {
+      if (filter.isColor) {
+        colorValues = filter.values
+          .filter(value => value.isChecked)
+          .map(value => value.value);
+      }
+    });
+
     return (
       <div className={styles.Products} style={style}>
         <MasonryInfiniteScroller
@@ -71,7 +73,7 @@ class Products extends React.Component<Props, State> {
           loadMore={() => ""}
         >
           {products.map((product, i) => {
-            return <Product key={i} {...product} />;
+            return <Product colorValues={colorValues} key={i} {...product} />;
           })}
         </MasonryInfiniteScroller>
         {/*<ShowOnlyViewed/>*/}
