@@ -29,7 +29,7 @@ interface OwnProps {
   categoryId: number;
   history: any;
   open: boolean;
-  onSetOpen: () => void;
+  toggleFilters: () => void;
   // filters: [IFilter];
   // amount: IAmount;
 }
@@ -57,7 +57,11 @@ class Filters extends React.Component<Props, State> {
   componentWillReceiveProps(nextProps: Props) {
     const { dataAllProducts: { loading, allProducts } } = nextProps;
     const checkedValueIds = this.getCheckedValueIds(allProducts.filters);
-    if (checkedValueIds !== this.state.checkedValueIds) {
+    if (
+      checkedValueIds !== this.state.checkedValueIds &&
+      allProducts !== this.props.dataAllProducts.allProducts &&
+      nextProps.open !== this.props.open
+    ) {
       this.setState({ checkedValueIds });
     }
     if (this.state.loading) {
@@ -70,8 +74,10 @@ class Filters extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    if (!nextProps.dataAllProducts.allProducts) {
-      // if (nextProps.open !== this.props.open) {
+    if (
+      !nextProps.dataAllProducts.allProducts ||
+      nextProps.open !== this.props.open
+    ) {
       return false;
     }
     return true;
@@ -80,7 +86,7 @@ class Filters extends React.Component<Props, State> {
   render() {
     const {
       categoryId,
-      onSetOpen,
+      toggleFilters,
       dataAllProducts: { allProducts }
     } = this.props;
     const { filters, found } = allProducts;
@@ -99,7 +105,7 @@ class Filters extends React.Component<Props, State> {
             <MyIcon
               className={styles.closeIcon}
               type={require("!svg-sprite-loader!./close.svg")}
-              onClick={onSetOpen}
+              onClick={toggleFilters}
             />
           </MyTouchFeedback>
           <div>
@@ -121,10 +127,10 @@ class Filters extends React.Component<Props, State> {
           {filters.map(filter => this.renderFilter(filter, found))}
         </Accordion>
 
-        <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-          <Link to={`${compile(PATH_NAMES.category)({ id: categoryId })}`}>
+        {this.state.checkedValueIds.length > 0 &&
+          <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
             <Flex
-              // onClick={this.handleClick}
+              onClick={this.handleReset}
               justify="center"
               align="center"
               className={styles.clearButton}
@@ -140,8 +146,7 @@ class Filters extends React.Component<Props, State> {
                 type={require("svg-sprite-loader!./clear.svg")}
               />
             </Flex>
-          </Link>
-        </MyTouchFeedback>
+          </MyTouchFeedback>}
       </Flex>
     );
   }
@@ -195,6 +200,32 @@ class Filters extends React.Component<Props, State> {
       `${compile(PATH_NAMES.category)({
         id: categoryId
       })}?${queryString.stringify(GET)}`
+    );
+  };
+
+  handleReset = () => {
+    const {
+      categoryId,
+      // dataFilteredProducts: { refetch, loading },
+      dataAllProducts: { refetch },
+      history,
+      toggleFilters
+    } = this.props;
+    // document.getElementById("js-content")!.scrollIntoView();
+    this.setState(
+      {
+        checkedValueIds: []
+      },
+      () => {
+        const GET = queryString.parse(history.location.search);
+        GET.filters = "";
+        history.push(
+          `${compile(PATH_NAMES.category)({
+            id: categoryId
+          })}?${queryString.stringify(GET)}`
+        );
+        setTimeout(toggleFilters, 500);
+      }
     );
   };
 
@@ -284,7 +315,6 @@ class Filters extends React.Component<Props, State> {
               </div>
               <Switch
                 color="orange"
-                // checked={filter.values[0].isChecked}
                 checked={checkedValueIds.indexOf(filter.values[0].id) !== -1}
                 onChange={() => {
                   this.handleClick(filter.values[0]);

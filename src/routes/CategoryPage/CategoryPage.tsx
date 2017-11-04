@@ -20,9 +20,6 @@ import { connect } from "react-redux";
 import Sidebar from "react-sidebar";
 import { compose } from "redux";
 
-import { Aux } from "../../modules/common/utils";
-import LoadingMask from "../../modules/layout/LoadingMask/LoadingMask";
-
 const styles = require("./styles.css");
 
 export const LIMIT = 20;
@@ -96,24 +93,6 @@ class CategoryPage extends React.Component<Props, State> {
   bottomHeight: number;
 
   handleScrollThrottle: (event) => void;
-
-  refineScrolledProducts = scrolledProducts => {
-    const { dataAllProducts } = this.props;
-    const { fetchMore, allProducts } = dataAllProducts;
-    const { products, found, total } = allProducts!;
-
-    if (scrolledProducts < LIMIT) {
-      scrolledProducts = LIMIT > found ? found : LIMIT;
-    } else if (scrolledProducts > found) {
-      scrolledProducts = found;
-    }
-    return scrolledProducts;
-  };
-
-  isLoading = () => {
-    const { dataCategory, dataAllProducts } = this.props;
-    return dataCategory.loading || dataAllProducts.loading;
-  };
 
   componentDidMount() {
     // tslint:disable-next-line:max-line-length
@@ -205,6 +184,112 @@ class CategoryPage extends React.Component<Props, State> {
     this.removeScrollListener();
   }
 
+  render() {
+    const {
+      match: { params: { id } },
+      location,
+      history,
+      dataCategory,
+      dataAllProducts
+    } = this.props;
+
+    if (!(dataCategory.loading || dataAllProducts.loading)) {
+      console.log("CategoryPage.render");
+    }
+
+    return (
+      <Layout
+        location={location}
+        history={history}
+        {...this.getLayoutOptions()}
+      >
+        {dataCategory.loading ||
+        dataAllProducts.loading ||
+        !dataAllProducts.allProducts
+          ? <Loading />
+          : <div className={styles.CategoryPage}>
+              <Nav
+                history={history}
+                dataAllProducts={dataAllProducts}
+                categoryId={id}
+                toggleFilters={this.toggleFilters}
+              />
+              <Sidebar
+                rootClassName={`${styles.root} ${this.state.openFilters &&
+                  styles.rootOpened}`}
+                sidebarClassName={styles.sidebar}
+                overlayClassName={styles.overlay}
+                contentClassName={styles.content}
+                pullRight={true}
+                touch={false}
+                shadow={true}
+                sidebar={
+                  <Filters
+                    dataAllProducts={dataAllProducts}
+                    categoryId={id}
+                    open={this.state.openFilters}
+                    toggleFilters={this.toggleFilters}
+                    history={history}
+                  />
+                }
+                open={this.state.openFilters}
+                onSetOpen={this.toggleFilters}
+              >
+                <div
+                  id="js-content"
+                  className={styles.sidebarContent}
+                  ref={element => (this.ref = element)}
+                >
+                  <SelectedFilters
+                    openFilters={this.state.openFilters}
+                    history={history}
+                    categoryId={id}
+                    filters={dataAllProducts.allProducts.filters}
+                    style={{
+                      flexDirection: this.state.openFilters ? "column" : "row"
+                    }}
+                  />
+                  <Products
+                    allProducts={dataAllProducts.allProducts}
+                    location={location}
+                    style={{
+                      marginTop:
+                        getSelectedFilters(dataAllProducts.allProducts.filters)
+                          .length > 0
+                          ? "2.4rem"
+                          : "0.2rem"
+                    }}
+                    openFilters={this.state.openFilters}
+                  />
+                  {hasMore(dataAllProducts) &&
+                    <div className={styles.loading}>
+                      <MyIcon type="loading" size="lg" />
+                    </div>}
+                </div>
+              </Sidebar>
+            </div>}
+      </Layout>
+    );
+  }
+
+  refineScrolledProducts = scrolledProducts => {
+    const { dataAllProducts } = this.props;
+    const { fetchMore, allProducts } = dataAllProducts;
+    const { products, found, total } = allProducts!;
+
+    if (scrolledProducts < LIMIT) {
+      scrolledProducts = LIMIT > found ? found : LIMIT;
+    } else if (scrolledProducts > found) {
+      scrolledProducts = found;
+    }
+    return scrolledProducts;
+  };
+
+  isLoading = () => {
+    const { dataCategory, dataAllProducts } = this.props;
+    return dataCategory.loading || dataAllProducts.loading;
+  };
+
   getLayoutOptions = () => {
     const { location, dataCategory: { category } } = this.props;
     return {
@@ -269,94 +354,6 @@ class CategoryPage extends React.Component<Props, State> {
       }
     }
   };
-
-  render() {
-    const {
-      match: { params: { id } },
-      location,
-      history,
-      dataCategory,
-      dataAllProducts
-    } = this.props;
-
-    if (!(dataCategory.loading || dataAllProducts.loading)) {
-      console.log("CategoryPage.render");
-    }
-
-    return (
-      <Layout
-        location={location}
-        history={history}
-        {...this.getLayoutOptions()}
-      >
-        {dataCategory.loading ||
-        dataAllProducts.loading ||
-        !dataAllProducts.allProducts
-          ? <Loading />
-          : <div className={styles.CategoryPage}>
-              <Nav
-                history={history}
-                dataAllProducts={dataAllProducts}
-                categoryId={id}
-                toggleFilters={this.toggleFilters}
-              />
-              <Sidebar
-                rootClassName={`${styles.root} ${this.state.openFilters &&
-                  styles.rootOpened}`}
-                sidebarClassName={styles.sidebar}
-                overlayClassName={styles.overlay}
-                contentClassName={styles.content}
-                pullRight={true}
-                touch={false}
-                shadow={true}
-                sidebar={
-                  <Filters
-                    dataAllProducts={dataAllProducts}
-                    categoryId={id}
-                    open={this.state.openFilters}
-                    onSetOpen={this.toggleFilters}
-                    history={history}
-                  />
-                }
-                open={this.state.openFilters}
-                onSetOpen={this.toggleFilters}
-              >
-                <div
-                  id="js-content"
-                  className={styles.sidebarContent}
-                  ref={element => (this.ref = element)}
-                >
-                  <SelectedFilters
-                    openFilters={this.state.openFilters}
-                    history={history}
-                    categoryId={id}
-                    filters={dataAllProducts.allProducts.filters}
-                    style={{
-                      flexDirection: this.state.openFilters ? "column" : "row"
-                    }}
-                  />
-                  <Products
-                    allProducts={dataAllProducts.allProducts}
-                    location={location}
-                    style={{
-                      marginTop:
-                        getSelectedFilters(dataAllProducts.allProducts.filters)
-                          .length > 0
-                          ? "2.4rem"
-                          : "0.2rem"
-                    }}
-                    openFilters={this.state.openFilters}
-                  />
-                  {hasMore(dataAllProducts) &&
-                    <div className={styles.loading}>
-                      <MyIcon type="loading" size="lg" />
-                    </div>}
-                </div>
-              </Sidebar>
-            </div>}
-      </Layout>
-    );
-  }
 }
 
 const CATEGORY_QUERY = gql(require("./category.gql"));
