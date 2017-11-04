@@ -6,6 +6,7 @@ import { compile } from "path-to-regexp";
 import * as queryString from "query-string";
 import * as React from "react";
 import { QueryProps } from "react-apollo";
+import { Link } from "react-router-dom";
 
 import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
 import LoadingMask from "../../layout/LoadingMask/LoadingMask";
@@ -69,14 +70,19 @@ class Filters extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    // if (nextProps.open !== this.props.open) {
-    //   return false;
-    // }
+    if (!nextProps.dataAllProducts.allProducts) {
+      // if (nextProps.open !== this.props.open) {
+      return false;
+    }
     return true;
   }
 
   render() {
-    const { onSetOpen, dataAllProducts: { allProducts } } = this.props;
+    const {
+      categoryId,
+      onSetOpen,
+      dataAllProducts: { allProducts }
+    } = this.props;
     const { filters, found } = allProducts;
     const total = this.state.total;
     console.log("Filters.render()");
@@ -115,34 +121,27 @@ class Filters extends React.Component<Props, State> {
           {filters.map(filter => this.renderFilter(filter, found))}
         </Accordion>
 
-        <Flex className={styles.buttons} align="center">
-          <div
-            onClick={() => {
-              console.log("close");
-              onSetOpen();
-            }}
-            className={styles.button}
-          >
-            <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-              <div>ЗАКРЫТЬ</div>
-            </MyTouchFeedback>
-          </div>
-
-          {filters.filter(filter => filter.hasChecked).length > 0 &&
-            <div
+        <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
+          <Link to={`${compile(PATH_NAMES.category)({ id: categoryId })}`}>
+            <Flex
+              // onClick={this.handleClick}
+              justify="center"
+              align="center"
+              className={styles.clearButton}
               style={{
-                display: found === total ? "none" : "block",
-                color: "red"
-                // opacity: found === total ? 0.5 : 1
+                background:
+                  filters.filter(filter => filter.hasChecked).length > 0
+                    ? "orange"
+                    : "lightgray"
               }}
-              className={styles.button}
-              onClick={() => this.handleClick()}
             >
-              <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
-                <div>СБРОСИТЬ</div>
-              </MyTouchFeedback>
-            </div>}
-        </Flex>
+              <MyIcon
+                className={styles.clearIcon}
+                type={require("svg-sprite-loader!./clear.svg")}
+              />
+            </Flex>
+          </Link>
+        </MyTouchFeedback>
       </Flex>
     );
   }
@@ -249,7 +248,7 @@ class Filters extends React.Component<Props, State> {
                         className={styles.color}
                         type={require("svg-sprite-loader!./checked-circle.svg")}
                         style={{
-                          fill: "green",
+                          fill: "orange",
                           width: "1.1rem",
                           height: "1.1rem",
                           position: "absolute",
@@ -284,6 +283,7 @@ class Filters extends React.Component<Props, State> {
                 </div>
               </div>
               <Switch
+                color="orange"
                 // checked={filter.values[0].isChecked}
                 checked={checkedValueIds.indexOf(filter.values[0].id) !== -1}
                 onChange={() => {
@@ -320,7 +320,7 @@ class Filters extends React.Component<Props, State> {
                           className={styles.checkIcon}
                           type={require("svg-sprite-loader!./checked-circle.svg")}
                           style={{
-                            fill: "green"
+                            fill: "orange"
                           }}
                         />
                       : <MyIcon
