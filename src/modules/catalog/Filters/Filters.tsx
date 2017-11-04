@@ -170,7 +170,6 @@ class Filters extends React.Component<Props, State> {
       dataAllProducts: { refetch },
       history
     } = this.props;
-    document.getElementById("js-content")!.scrollIntoView();
     const GET = queryString.parse(history.location.search);
     let checkedValueIds = this.state.checkedValueIds;
     let url = "";
@@ -220,7 +219,6 @@ class Filters extends React.Component<Props, State> {
       history,
       toggleFilters
     } = this.props;
-    // document.getElementById("js-content")!.scrollIntoView();
     this.setState(
       {
         checkedValueIds: []
