@@ -30,49 +30,16 @@ interface State {
   titleImage: IImages;
 }
 
-class Product extends React.Component<StateProps & OwnProps, State> {
+interface Props extends OwnProps, StateProps {}
+
+class Product extends React.Component<Props, State> {
   componentWillMount() {
-    const { images, colorValues } = this.props;
-    let titleImage;
-    if (colorValues.length > 0) {
-      const titleImages = images.filter(
-        img => colorValues.indexOf(img.colorValue) !== -1
-      );
-      if (titleImages.length > 0) {
-        titleImage = titleImages[0];
-      }
-    } else {
-      titleImage = images.filter(img => img.isTitle)[0];
-    }
-    titleImage = titleImage || images[0];
-
-    this.setState({
-      titleImage
-    });
+    this.setTitleImage(this.props);
   }
 
-  isViewed() {
-    const { viewedProductIds, id } = this.props;
-    return viewedProductIds.indexOf(parseInt(id, 0)) !== -1;
+  componentWillReceiveProps(nextProps: Props) {
+    this.setTitleImage(nextProps);
   }
-
-  changeTitleImage = (e, image) => {
-    this.setState({ titleImage: image });
-  };
-
-  getLinkProps = () => {
-    const { id, subProducts, brand } = this.props;
-    const subProduct = subProducts[0];
-    return {
-      to: {
-        pathname: compile(`/product/:id/`)({ id }),
-        state: {
-          modal: true,
-          title: `${brand.name} ${subProduct.article}`
-        }
-      }
-    };
-  };
 
   render() {
     const { id, name, subProducts, brand, images } = this.props;
@@ -129,6 +96,49 @@ class Product extends React.Component<StateProps & OwnProps, State> {
       </MyTouchFeedback>
     );
   }
+
+  setTitleImage = (props: Props) => {
+    const { images, colorValues } = props;
+    let titleImage;
+    if (colorValues.length > 0) {
+      const titleImages = images.filter(
+        img => colorValues.indexOf(img.colorValue) !== -1
+      );
+      if (titleImages.length > 0) {
+        titleImage = titleImages[0];
+      }
+    } else {
+      titleImage = images.filter(img => img.isTitle)[0];
+    }
+    titleImage = titleImage || images[0];
+
+    this.setState({
+      titleImage
+    });
+  };
+
+  isViewed() {
+    const { viewedProductIds, id } = this.props;
+    return viewedProductIds.indexOf(parseInt(id, 0)) !== -1;
+  }
+
+  changeTitleImage = (e, image) => {
+    this.setState({ titleImage: image });
+  };
+
+  getLinkProps = () => {
+    const { id, subProducts, brand } = this.props;
+    const subProduct = subProducts[0];
+    return {
+      to: {
+        pathname: compile(`/product/:id/`)({ id }),
+        state: {
+          modal: true,
+          title: `${brand.name} ${subProduct.article}`
+        }
+      }
+    };
+  };
 }
 
 const mapStateToProps = (state: IRootReducer): StateProps => ({
