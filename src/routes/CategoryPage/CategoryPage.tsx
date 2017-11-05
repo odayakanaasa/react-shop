@@ -38,13 +38,6 @@ interface IDataCategory extends QueryProps {
   category?: ICategory;
 }
 
-interface IDataFilteredProducts extends QueryProps {
-  filteredProducts: {
-    filters: [IFilter];
-    total: number;
-    // products?: IProduct[];
-  };
-}
 export interface IDataAllProduct extends QueryProps {
   allProducts: {
     filters: [IFilter];
@@ -55,7 +48,8 @@ export interface IDataAllProduct extends QueryProps {
   };
 }
 
-interface StateProps {}
+interface StateProps {
+}
 
 interface DispatchProps {
   dispatch: Dispatch;
@@ -132,6 +126,7 @@ class CategoryPage extends React.Component<Props, State> {
         loadedProducts !==
         this.props.dataAllProducts.allProducts.products.length
       ) {
+        const { allProducts } = this.props.dataAllProducts;
         this.props.dispatch({
           type: ACTION_SET_SCROLLED_PRODUCTS,
           value: loadedProducts
@@ -398,7 +393,7 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
   options: ownProps => {
     const GET = queryString.parse(ownProps.location.search);
     return {
-      fetchPolicy: "network-only",  // it's important!
+      fetchPolicy: "network-only", // it's important!
       variables: {
         categoryId: ownProps.match.params.id,
         filters: GET.filters,
@@ -443,7 +438,8 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
   }
 };
 
-const mapStateToProps = (state: IRootReducer): StateProps => ({});
+const mapStateToProps = (state: IRootReducer): StateProps => ({
+});
 
 export default compose(
   connect<StateProps, DispatchProps, OwnProps>(mapStateToProps),

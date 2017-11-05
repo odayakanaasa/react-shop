@@ -43,7 +43,8 @@ class Nav extends React.Component<Props, State> {
       scrolledProducts
     } = this.props;
     console.log("Nav.render");
-    const { found, total, sorting } = dataAllProducts.allProducts;
+    const { found, sorting } = dataAllProducts.allProducts;
+    const total = dataAllProducts.allProducts.total
     return (
       <Flex className={styles.Nav} direction="column">
         <Flex className={styles.nav} justify="between" align="center">

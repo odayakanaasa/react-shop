@@ -1,15 +1,17 @@
+import { Dispatch } from "@src/interfaces";
 import { MyIcon } from "@src/modules/common";
 import { MyTouchFeedback } from "@src/modules/common/utils";
+import { IRootReducer } from "@src/rootReducer";
 import { IDataAllProduct } from "@src/routes/CategoryPage/CategoryPage";
 import { Accordion, Flex, List, Progress, Switch } from "antd-mobile";
 import { compile } from "path-to-regexp";
 import * as queryString from "query-string";
 import * as React from "react";
 import { QueryProps } from "react-apollo";
-import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { compose } from "redux";
 
 import { PATH_NAMES } from "../../../routes/RouteSwitch/RouteSwitch";
-import LoadingMask from "../../layout/LoadingMask/LoadingMask";
 import { IAllProducts, IFilter, IFilterValue } from "../model";
 
 const styles = require("./styles.css");
@@ -17,11 +19,6 @@ const styles = require("./styles.css");
 const getSelected = (fitlers: IFilter[]) => {};
 
 interface IDataFilteredProducts extends QueryProps {
-  // filteredProducts: {
-  //   filters: [IFilter];
-  //   total: number;
-  //   // products?: IProduct[];
-  // };
   allProducts: IAllProducts;
 }
 
@@ -30,26 +27,30 @@ interface OwnProps {
   history: any;
   open: boolean;
   toggleFilters: () => void;
-  // filters: [IFilter];
-  // amount: IAmount;
+}
+
+interface StateProps {
+}
+
+interface DispatchProps {
+  dispatch: Dispatch;
 }
 
 export interface GraphQLProps {
-  // dataFilteredProducts: IDataFilteredProducts;
   dataAllProducts: IDataAllProduct;
 }
 
 interface State {
-  // loading: boolean;
+  loading: boolean;
   total?: number;
   checkedValueIds: number[];
 }
 
-interface Props extends OwnProps, GraphQLProps {}
+interface Props extends OwnProps, StateProps, DispatchProps, GraphQLProps {}
 
 class Filters extends React.Component<Props, State> {
   state = {
-    // loading: false,
+    loading: false,
     total: undefined,
     checkedValueIds: [] as number[]
   };
@@ -62,15 +63,14 @@ class Filters extends React.Component<Props, State> {
       allProducts !== this.props.dataAllProducts.allProducts
       // && nextProps.open !== this.props.open
     ) {
-      this.setState({ checkedValueIds });
+      this.setState({
+        checkedValueIds,
+        loading: !this.state.loading
+      });
     }
     // if (this.state.loading) {
     //   this.setState({ loading: false });
     // }
-    if (!loading && !this.state.total) {
-      const total = allProducts.found;
-      this.setState({ total });
-    }
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
@@ -89,8 +89,7 @@ class Filters extends React.Component<Props, State> {
       toggleFilters,
       dataAllProducts: { allProducts }
     } = this.props;
-    const { filters, found } = allProducts;
-    const total = this.state.total;
+    const { filters, found, total } = allProducts;
     console.log("Filters.render()");
     return (
       <Flex
@@ -110,11 +109,14 @@ class Filters extends React.Component<Props, State> {
           </MyTouchFeedback>
           <div>
             Найдено {found}
-            {!total || found === total ? "" : ` из ${total}`}
+            {!total || found === total
+              ? ""
+              : ` из ${total}`}
           </div>
         </Flex>
         <Progress
-          className={`${styles.progress} ${found === total && styles.finished}`}
+          className={`${styles.progress} ${found === total &&
+            styles.finished}`}
           percent={Math.round(found / total! * 100)}
           position="normal"
           // unfilled={false}
@@ -219,19 +221,27 @@ class Filters extends React.Component<Props, State> {
       history,
       toggleFilters
     } = this.props;
+
+    const GET = queryString.parse(history.location.search);
+    GET.filters = "";
+    // history.push(
+    //   `${compile(PATH_NAMES.category)({
+    //     id: categoryId
+    //   })}?${queryString.stringify(GET)}`
+    // );
+    // setTimeout(toggleFilters, 500);
     this.setState(
       {
-        checkedValueIds: []
+        checkedValueIds: [],
+        loading: true
       },
       () => {
-        const GET = queryString.parse(history.location.search);
-        GET.filters = "";
         history.push(
           `${compile(PATH_NAMES.category)({
             id: categoryId
           })}?${queryString.stringify(GET)}`
         );
-        setTimeout(toggleFilters, 500);
+        // setTimeout(toggleFilters, 500);
       }
     );
   };
@@ -384,4 +394,9 @@ class Filters extends React.Component<Props, State> {
   };
 }
 
-export default Filters;
+const mapStateToProps = (state: IRootReducer): StateProps => ({
+});
+
+export default compose(
+  connect<StateProps, DispatchProps, OwnProps>(mapStateToProps)
+)(Filters);

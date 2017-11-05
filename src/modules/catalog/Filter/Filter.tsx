@@ -13,11 +13,6 @@ const styles = require("./styles.css");
 const getSelected = (fitlers: IFilter[]) => {};
 
 interface IDataFilteredProducts extends QueryProps {
-  // filteredProducts: {
-  //   filters: [IFilter];
-  //   total: number;
-  //   // products?: IProduct[];
-  // };
   allProducts: IAllProducts;
 }
 
