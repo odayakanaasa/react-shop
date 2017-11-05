@@ -8,7 +8,11 @@ class LoadingMask extends React.Component<any, {}> {
     return (
       <div className={styles.LoadingMask} style={this.props.style}>
         <div className={styles.loading}>
-          <MyIcon type="loading" size="lg" />
+          <MyIcon
+            type="loading"
+            size="lg"
+            className={styles.icon}
+          />
         </div>
       </div>
     );

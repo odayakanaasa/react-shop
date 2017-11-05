@@ -1,6 +1,7 @@
 import { Dispatch } from "@src/interfaces";
 import { MyIcon } from "@src/modules/common";
 import { MyTouchFeedback } from "@src/modules/common/utils";
+import { LoadingMask } from "@src/modules/layout";
 import { IRootReducer } from "@src/rootReducer";
 import { IDataAllProduct } from "@src/routes/CategoryPage/CategoryPage";
 import { Accordion, Flex, List, Progress, Switch } from "antd-mobile";
@@ -29,8 +30,7 @@ interface OwnProps {
   toggleFilters: () => void;
 }
 
-interface StateProps {
-}
+interface StateProps {}
 
 interface DispatchProps {
   dispatch: Dispatch;
@@ -42,7 +42,6 @@ export interface GraphQLProps {
 
 interface State {
   loading: boolean;
-  total?: number;
   checkedValueIds: number[];
 }
 
@@ -51,7 +50,6 @@ interface Props extends OwnProps, StateProps, DispatchProps, GraphQLProps {}
 class Filters extends React.Component<Props, State> {
   state = {
     loading: false,
-    total: undefined,
     checkedValueIds: [] as number[]
   };
 
@@ -65,7 +63,7 @@ class Filters extends React.Component<Props, State> {
     ) {
       this.setState({
         checkedValueIds,
-        loading: !this.state.loading
+        loading: false
       });
     }
     // if (this.state.loading) {
@@ -97,7 +95,7 @@ class Filters extends React.Component<Props, State> {
         direction="column"
         style={{ height: "100%", widht: "100%", overflowY: "hidden" }}
       >
-        {/* {this.state.loading && <LoadingMask />} */}
+        {this.state.loading && <LoadingMask />}
 
         <Flex className={styles.title}>
           <MyTouchFeedback style={{ background: "#19599e" }}>
@@ -109,14 +107,11 @@ class Filters extends React.Component<Props, State> {
           </MyTouchFeedback>
           <div>
             Найдено {found}
-            {!total || found === total
-              ? ""
-              : ` из ${total}`}
+            {!total || found === total ? "" : ` из ${total}`}
           </div>
         </Flex>
         <Progress
-          className={`${styles.progress} ${found === total &&
-            styles.finished}`}
+          className={`${styles.progress} ${found === total && styles.finished}`}
           percent={Math.round(found / total! * 100)}
           position="normal"
           // unfilled={false}
@@ -132,7 +127,7 @@ class Filters extends React.Component<Props, State> {
         {this.state.checkedValueIds.length > 0 &&
           <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
             <Flex
-              onClick={this.handleReset}
+              onClick={() => this.handleClick(undefined)}
               justify="center"
               align="center"
               className={styles.clearButton}
@@ -166,84 +161,38 @@ class Filters extends React.Component<Props, State> {
   };
 
   handleClick = (value?: IFilterValue) => {
-    const {
-      categoryId,
-      // dataFilteredProducts: { refetch, loading },
-      dataAllProducts: { refetch },
-      history
-    } = this.props;
-    const GET = queryString.parse(history.location.search);
-    let checkedValueIds = this.state.checkedValueIds;
-    let url = "";
+    const { categoryId, dataAllProducts: { refetch }, history } = this.props;
+    let checkedValueIds;
+    let url;
     if (value) {
       url = value.url;
+      checkedValueIds = this.state.checkedValueIds;
       if (checkedValueIds.indexOf(value.id) === -1) {
         checkedValueIds.push(value.id);
       } else {
         checkedValueIds = checkedValueIds.filter(id => id !== value.id);
       }
     } else {
+      url = "";
       checkedValueIds = [];
     }
-    // if (!this.state.loading) {
-    // this.setState(
-    //   {
-    //     // loading: true,
-    //     checkedValueIds
-    //   },
-    //   () =>
-    //     refetch({
-    //       categoryId,
-    //       filters: value ? value.url : "",
-    //       offset: 0
-    //     }).then(res => {
-    //       this.setState(
-    //         {
-    //           // loading: false
-    //         }
-    //       );
-    //     })
-    // );
-    // }
-    GET.filters = url;
-    history.push(
-      `${compile(PATH_NAMES.category)({
-        id: categoryId
-      })}?${queryString.stringify(GET)}`
-    );
-  };
-
-  handleReset = () => {
-    const {
-      categoryId,
-      // dataFilteredProducts: { refetch, loading },
-      dataAllProducts: { refetch },
-      history,
-      toggleFilters
-    } = this.props;
-
-    const GET = queryString.parse(history.location.search);
-    GET.filters = "";
-    // history.push(
-    //   `${compile(PATH_NAMES.category)({
-    //     id: categoryId
-    //   })}?${queryString.stringify(GET)}`
-    // );
-    // setTimeout(toggleFilters, 500);
-    this.setState(
-      {
-        checkedValueIds: [],
-        loading: true
-      },
-      () => {
-        history.push(
-          `${compile(PATH_NAMES.category)({
-            id: categoryId
-          })}?${queryString.stringify(GET)}`
-        );
-        // setTimeout(toggleFilters, 500);
-      }
-    );
+    if (!this.state.loading) {
+      this.setState(
+        {
+          loading: true,
+          checkedValueIds
+        },
+        () => {
+          const GET = queryString.parse(history.location.search);
+          GET.filters = url;
+          history.push(
+            `${compile(PATH_NAMES.category)({
+              id: categoryId
+            })}?${queryString.stringify(GET)}`
+          );
+        }
+      );
+    }
   };
 
   renderFilter = (filter: IFilter, found) => {
@@ -394,8 +343,7 @@ class Filters extends React.Component<Props, State> {
   };
 }
 
-const mapStateToProps = (state: IRootReducer): StateProps => ({
-});
+const mapStateToProps = (state: IRootReducer): StateProps => ({});
 
 export default compose(
   connect<StateProps, DispatchProps, OwnProps>(mapStateToProps)
