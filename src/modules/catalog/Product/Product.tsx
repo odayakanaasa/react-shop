@@ -50,7 +50,6 @@ class Product extends React.Component<Props, State> {
     const minPrice = getMinOfArray(prices);
 
     const width = Math.round(window.innerWidth / 2) - 5;
-    console.log("Product.render");
     const selectedImageIndex =
       images.indexOf(titleImage) === -1 ? 0 : images.indexOf(titleImage);
     return (

@@ -31,7 +31,6 @@ interface State {}
 
 class Nav extends React.Component<Props, State> {
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    console.log("Nav.shouldComponentUpdate");
     return true;
   }
 
@@ -42,7 +41,6 @@ class Nav extends React.Component<Props, State> {
       categoryId,
       scrolledProducts
     } = this.props;
-    console.log("Nav.render");
     const { found, sorting } = dataAllProducts.allProducts;
     const total = dataAllProducts.allProducts.total;
     return (

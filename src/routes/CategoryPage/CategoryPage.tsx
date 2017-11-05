@@ -103,10 +103,6 @@ class CategoryPage extends React.Component<Props, State> {
   componentWillReceiveProps(nextProps: Props) {
     const { dataCategory, dataAllProducts } = nextProps;
 
-    if (nextProps.location !== this.props.location) {
-      console.log(nextProps.location);
-    }
-
     if (
       this.props.match.params.id !== nextProps.match.params.id ||
       this.props.location.search !== nextProps.location.search
@@ -211,7 +207,6 @@ class CategoryPage extends React.Component<Props, State> {
       dataCategory,
       dataAllProducts
     } = this.props;
-    console.log("CategoryPage.render");
 
     return (
       <Layout
@@ -349,7 +344,6 @@ class CategoryPage extends React.Component<Props, State> {
       location,
       dataAllProducts: { allProducts, loading, fetchMore }
     } = this.props;
-    console.log("window.pageYOffset", event.srcElement.scrollTop);
 
     if (!loading && location.pathname.search("category") !== -1) {
       const { products, found } = allProducts;
@@ -411,7 +405,6 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
         refetch,
         variables,
         fetchMore() {
-          console.log("fetchMore");
           return fetchMore({
             updateQuery: (prev, { fetchMoreResult }) => {
               if (!fetchMoreResult.allProducts) {

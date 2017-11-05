@@ -44,7 +44,6 @@ class SelectedFilters extends React.Component<Props, State> {
   };
 
   render() {
-//    console.log("SelectedFilters.render");
     const { filters, categoryId, style, openFilters } = this.props;
     const checkedFilters = getSelectedFilters(filters).filter(
       filter => filter.hasChecked

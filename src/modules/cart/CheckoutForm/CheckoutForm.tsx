@@ -67,16 +67,13 @@ class CheckoutForm extends React.Component<Props, State> {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("CheckoutForm.componentWillReceiveProps");
   }
 
   handleChange = (name, value) => {
-    console.log("CheckoutForm.handleChange");
     this.props.setFieldValue(name, value);
   };
 
   handleFocus = () => {
-    console.log("handleFocus");
     // window.scrollTo(0, 1000000);
   };
 

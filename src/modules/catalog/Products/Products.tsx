@@ -40,11 +40,9 @@ class Products extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prezvState: State) {
     const { products } = this.props.allProducts;
-//    console.log("Products.componentDidUpdate");
   }
 
   render() {
-//    console.log("Products.render");
     const {
       allProducts: { products, filters, total },
       showOnlyViewed,

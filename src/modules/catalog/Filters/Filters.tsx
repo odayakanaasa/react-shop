@@ -84,7 +84,6 @@ class Filters extends React.Component<Props, State> {
       dataAllProducts: { allProducts }
     } = this.props;
     const { filters, found, total } = allProducts;
-    console.log("Filters.render()");
     return (
       <Flex
         className={styles.Filters}

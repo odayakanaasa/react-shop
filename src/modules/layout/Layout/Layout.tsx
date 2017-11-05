@@ -45,10 +45,6 @@ class Layout extends React.Component<Props, State> {
     window.addEventListener("scroll", this.setOnTopWithThrottle, false);
   }
 
-  componentWillReceiveProps(nextProps) {
-    console.log("Layout.componentWillReceiveProps");
-  }
-
   componentWillUnmount() {
     window.removeEventListener("scroll", this.setOnTopWithThrottle, false);
   }
