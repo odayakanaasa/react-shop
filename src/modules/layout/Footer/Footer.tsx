@@ -26,6 +26,7 @@ class Footer extends React.Component<OwnProps & StateProps, {}> {
   renderSection = (title, icon, pathname, modal) => {
     const { router: { location }, history } = this.props;
     const isCurrent = location!.pathname === pathname;
+    const fill = isCurrent ? (title === "Скидки" ? "red" : "orange") : "black";
     const content = (
       <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
         <Flex
@@ -37,7 +38,7 @@ class Footer extends React.Component<OwnProps & StateProps, {}> {
             className={styles.icon}
             type={icon}
             style={{
-              fill: isCurrent ? "orange" : "black"
+              fill
             }}
           />
           <div className={styles.label}>
@@ -80,6 +81,12 @@ class Footer extends React.Component<OwnProps & StateProps, {}> {
             "Каталог",
             require("!svg-sprite-loader!./catalog.svg"),
             PATH_NAMES.catalog,
+            false
+          )}
+          {this.renderSection(
+            "Скидки",
+            require("!svg-sprite-loader!./discount.svg"),
+            PATH_NAMES.sale,
             false
           )}
           {this.renderSection(

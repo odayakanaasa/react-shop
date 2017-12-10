@@ -47,6 +47,12 @@
   margin-top: 0.4rem;
 }
 
+.discount {
+  text-align: right;
+  color: #b94a48;
+  font-size: 1.5rem;
+}
+
 .isViewed {
   z-index: 1;
   position: absolute;
