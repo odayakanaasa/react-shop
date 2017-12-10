@@ -26,7 +26,7 @@ import { IAllProducts } from "../../modules/catalog/model";
 
 const styles = require("./styles.css");
 
-const SALE_TITLE = "Скидки"
+const SALE_TITLE = "Скидки";
 
 export const LIMIT = 20;
 
@@ -83,7 +83,6 @@ export const getPathName = (categoryId?) => {
 };
 
 class CategoryPage extends React.Component<Props, State> {
-
   ref;
 
   bottomHeight: number;
@@ -477,6 +476,7 @@ export const allProductsOptions: OperationOption<OwnProps, GraphQLProps> = {
       variables.withDiscountOnly = false;
     } else {
       variables.withDiscountOnly = true; // sale page
+      variables.categoryId = null;
     }
     return {
       fetchPolicy: "network-only", // it's important!
