@@ -17,16 +17,24 @@ interface StateProps {
   router: IRouterReducer;
 }
 
+type RenderSectionFunc = (
+  title: string,
+  icon: string,
+  pathname: string,
+  modal: boolean,
+  activeColor: string
+) => any;
+
 class Footer extends React.Component<OwnProps & StateProps, {}> {
   isFlatpage = () => {
     const { router: { location }, history } = this.props;
     return location!.pathname.indexOf("flatpage") !== -1;
   };
 
-  renderSection = (title, icon, pathname, modal) => {
+  renderSection: RenderSectionFunc = (title, icon, pathname, modal, activeColor) => {
     const { router: { location }, history } = this.props;
     const isCurrent = location!.pathname === pathname;
-    const fill = isCurrent ? (title === "Скидки" ? "red" : "orange") : "black";
+    const fill = isCurrent ? activeColor : "black";
     const content = (
       <MyTouchFeedback style={{ backgroundColor: "lightgray" }}>
         <Flex
@@ -81,19 +89,22 @@ class Footer extends React.Component<OwnProps & StateProps, {}> {
             "Каталог",
             require("!svg-sprite-loader!./catalog.svg"),
             PATH_NAMES.catalog,
-            false
+            false,
+            "orange"
           )}
           {this.renderSection(
             "Скидки",
             require("!svg-sprite-loader!./discount.svg"),
             PATH_NAMES.sale,
-            false
+            false,
+            "red"
           )}
           {this.renderSection(
             "Инфо",
             require("!svg-sprite-loader!./info.svg"),
             PATH_NAMES.flatpages,
-            true
+            true,
+            "rgb(36, 116, 204)"
           )}
         </Flex>
       );

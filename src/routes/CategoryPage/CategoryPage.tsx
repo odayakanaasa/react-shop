@@ -82,9 +82,6 @@ export const getPathName = (categoryId?) => {
     : PATH_NAMES.sale;
 };
 
-
-
-
 class CategoryPage extends React.Component<Props, State> {
 
   ref;
